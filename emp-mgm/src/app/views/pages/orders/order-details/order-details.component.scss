@@ -1,0 +1,34 @@
+tr.example-detail-row {
+  height: 0;
+}
+
+tr.example-row-row:not(.example-expanded-row):hover {
+  background: whitesmoke;
+}
+
+tr.example-row-row:not(.example-expanded-row):active {
+  background: #efefef;
+}
+
+.example-row-row td {
+  border-bottom-width: 0;
+}
+
+.example-row-detail {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 400px;
+  position: relative;
+}
+
+.example-row-description {
+  padding: 20px;
+}
+
+.example-row-description-attribution {
+  opacity: 0.5;
+}
+
+.no-clear.ng-select .ng-clear-wrapper {
+  display: none;
+}

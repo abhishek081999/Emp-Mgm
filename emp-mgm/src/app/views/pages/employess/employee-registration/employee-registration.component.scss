@@ -1,0 +1,26 @@
+.password-input-container {
+    position: relative;
+  
+    // label {
+    //   display: block;
+    //   margin-bottom: 5px;
+    // }
+  
+    // input {
+    //   padding-right: 30px;
+    // }
+  
+    .eye-icon {
+      position: absolute;
+      top: 69%;
+      right: 10px;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+    
+    @media screen and (max-width: 768px) {
+      .eye-icon {
+        right: 5px;
+      }
+    }
+  }

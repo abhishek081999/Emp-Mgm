@@ -1,0 +1,95 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Employees</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Designations</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Designations</h6>
+                <form #crate_designation="ngForm" (ngSubmit)="crate_designation.valid && submit()">
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="text" name="designation_name" placeholder="Designation Name"
+                                    #designation_name="ngModel" [(ngModel)]="designation.name" required
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="designation_name?.errors?.required && (crate_designation.submitted || designation_name.dirty || designation_name.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <ng-select [items]="departments" [searchable]="true" #department_id="ngModel"
+                                    [(ngModel)]="designation.department_id" name="department_id"
+                                    placeholder="Select Department" bindValue="_id" bindLabel="name">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="department_id?.errors?.required && (crate_designation.submitted || department_id.dirty || department_id.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" [disabled]="crate_designation.invalid"
+                                class="btn btn-primary btn-block">Save</button>
+                            <a type="submit" *ngIf="isEdit" class="btn btn-outline-danger btn-block"
+                                (click)="cancelEdit()">Cancel</a>
+                        </div>
+
+                    </div>
+                </form>
+                <div class="row mt-3" *ngIf="isDesignationAvailable">
+                    <div class="col-5 col-md-3">
+                        <ul ngbNav #verticalNav="ngbNav" class="nav-tabs nav-tabs-vertical">
+                            <li *ngFor="let element of designations; let i = index" [ngbNavItem]="i">
+                                <a ngbNavLink (click)="onDeptSelect(element)">{{element.dept_name}}</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="mb-2">{{element.dept_name}}</h6>
+                                    <div class="table-responsive">
+                                        <table cdkDropList (cdkDropListDropped)="drop($event)"
+                                            class="table table-hover table-bordered" cellspacing="0" mat-table
+                                            [dataSource]="dataSource" matSort>
+
+                                            <ng-container matColumnDef="name" sticky>
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>Designation
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row?.name | titlecase}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="no_of_emp">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> No of Employee
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row?.no_of_emp}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="options">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                                                <td mat-cell *matCellDef="let row">
+                                                    <a placement="top" ngbTooltip="Edit" (click)="editDesignation(row)">
+                                                        <i class="feather icon-edit icon-xs mr-2"></i></a>
+                                                    <a (click)="deleteDesignation(row._id)" placement="top"
+                                                        ngbTooltip="Delete"> <i
+                                                            class="feather icon-trash-2 icon-xs mr-2"></i></a>
+                                                </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true;"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag></tr>
+
+                                        </table>
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-7 col-md-9">
+                        <div [ngbNavOutlet]="verticalNav" class="tab-content-vertical border p-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

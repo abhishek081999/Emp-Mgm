@@ -1,0 +1,157 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Call Backs</li>
+    </ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+			<div class="card-body">
+                <h6 class="card-title">Call Backs/ Follow ups</h6>
+				<div class="row mb-3">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+					No Call Backs/Follow Ups Found.
+				</ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+
+                        <ng-container matColumnDef="leadowner">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Owner </th>
+                            <td mat-cell *matCellDef="let row" > {{row.leadowner}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadownername">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Owner Name</th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadownername}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadsource">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Source </th>
+                            <td mat-cell *matCellDef="let row" > {{row.leadsource}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadassigndate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header><p>Assign Date / <br>Reassign Date</p></th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.leadassigndate | date: 'mediumDate'}}<br>{{row.leadassigndate | date: 'shortTime'}}</p> 
+                        </ng-container>
+
+                        <ng-container matColumnDef="leaddate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Lead Date </th>
+                            <td mat-cell *matCellDef="let row" >                                 
+                                <p>{{row.leaddate | date: 'mediumDate'}}<br>{{row.leaddate | date: 'shortTime'}}</p> 
+                            </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="callbackdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Callback/Followup Date </th>
+                            <td mat-cell *matCellDef="let row" > 
+                                <p>{{row.callbackdate | date: 'mediumDate'}}<br>{{row.callbackdate | date: 'shortTime'}}</p> 
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+                            <td mat-cell *matCellDef="let row" > {{row.name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="phone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                            <td mat-cell *matCellDef="let row" > {{row.phone}} </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="email">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                            <td mat-cell *matCellDef="let row" > {{row.email}} </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="whatsappnum">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Whatsapp Num. </th>
+                            <td mat-cell *matCellDef="let row" > {{row.whatsappnum}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="city">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> City </th>
+                            <td mat-cell *matCellDef="let row" > {{row.city}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="state">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> State </th>
+                            <td mat-cell *matCellDef="let row" > {{row.state}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="dob">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Dob </th>
+                            <td mat-cell *matCellDef="let row" > {{row.dob}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gender">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th>
+                            <td mat-cell *matCellDef="let row" > {{row.gender}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="occupation">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Occupation </th>
+                            <td mat-cell *matCellDef="let row" > {{row.occupation}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="experience">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> <p>Experience In<br>Stock Market</p>  </th>
+                            <td mat-cell *matCellDef="let row" > {{row.experience}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="leadstatus">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Status </th>
+                            <td mat-cell *matCellDef="let row" > {{row.leadstatus}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicetype">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Type </th>
+                            <td mat-cell *matCellDef="let row" > {{row.servicetype}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicecode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                            <td mat-cell *matCellDef="let row" > {{row.servicecode}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicename">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                            <td mat-cell *matCellDef="let row" > {{row.servicename}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="comment">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comment </th>
+                            <td mat-cell *matCellDef="let row" > {{row.comment}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="updatedate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Edited </th>
+                            <td mat-cell *matCellDef="let row"> 
+                                <p>{{row.updatedate | date: 'mediumDate'}}<br>{{row.updatedate | date: 'shortTime'}}</p> 
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer" (click)="leaddisplay(row)"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+			</div>
+		</div>
+	</div>
+</div>

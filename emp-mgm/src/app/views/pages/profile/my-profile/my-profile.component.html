@@ -1,0 +1,666 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Profile</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+    </ol>
+</nav>
+
+<form #updateForm="ngForm" (ngSubmit)="updateForm.valid && onUpdate()" class="forms-sample">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Basic Details</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="profiledropzone" appDnd (fileDropped)="onFileDropped($event)">
+                                        <input type="file" accept="image/*" #fileDropRef id="fileDropRef"
+                                            (change)="fileBrowseHandler($event)" />
+                                        <h3 *ngIf="!imgurl">Drag and Drop profile Image Here</h3>
+                                        <h3 *ngIf="!imgurl">or</h3>
+                                        <label *ngIf="!imgurl" for="fileDropRef">Browse</label>
+                                        <h3 class="prodeshov">Drag and Drop profile Image Here</h3>
+                                        <h3 class="prodeshov">or</h3>
+                                        <label class="prodeshov" for="fileDropRef">Browse</label>
+                                        <img [src]="imgurl" class="dropimage proimghov" *ngIf="imgurl">
+                                    </div>
+                                    <br>
+                                    <label class="browse" for="fileDropRef">Browse Image</label>
+                                    <br>
+                                    <p align="justify">Image size not more than 300kb.</p>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Full Name*</label>
+                                                <input type="text" #fullName="ngModel" [(ngModel)]="employee.fullName"
+                                                    name="fullName" placeholder="Your Full Name" required
+                                                    class="form-control">
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="fullName?.errors?.required && (updateForm.submitted || fullName.dirty || fullName.touched)">
+                                                    This field is required.</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Admin ID</label>
+                                                <!--full name-->
+                                                <input type="text" #invid="ngModel" [(ngModel)]="employee.invid"
+                                                    name="invid" placeholder="Your Instructor ID" disabled
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Mobile Number*</label>
+                                                <!--telephone-->
+                                                <input type="text" #telephone="ngModel" [(ngModel)]="employee.telephone"
+                                                    name="telephone" placeholder="Your telephone number" required
+                                                    minlength="10" maxlength="10" class="form-control">
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telephone?.errors?.required && (updateForm.submitted || telephone.dirty || telephone.touched)">
+                                                    This field is required.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telephone?.errors?.minlength && (updateForm.submitted || telephone.dirty || telephone.touched)">
+                                                    Min length mustbe 10.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telephone?.errors?.maxlength && (updateForm.submitted || telephone.dirty || telephone.touched)">
+                                                    Max length mustbe 10.</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Whatsapp Number*</label>
+                                                <!--telephone-->
+                                                <input type="text" #alternativenumber="ngModel"
+                                                    [(ngModel)]="employee.alternatenum" name="alternativenumber"
+                                                    placeholder="Your Whatsapp number" minlength="10" maxlength="10"
+                                                    class="form-control">
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="alternativenumber?.errors?.required && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                                                    This field is required.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="alternativenumber?.errors?.minlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                                                    Min length mustbe 10.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="alternativenumber?.errors?.maxlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                                                    Max length mustbe 10.</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Email*</label>
+                                                <!--email-->
+                                                <input type="text" disabled #email="ngModel"
+                                                    [(ngModel)]="employee.email" name="email" class="form-control"
+                                                    placeholder="Your Email" required [pattern]="emailRegex">
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="email?.errors?.required && (updateForm.submitted || email.dirty || email.touched)">
+                                                    This field is required.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="email?.errors?.pattern && (updateForm.submitted || email.dirty || email.touched)">
+                                                    Invalid email address.</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Telegram Number*</label>
+                                                <!--telephone-->
+                                                <input type="text" #telegram="ngModel" [(ngModel)]="employee.telegram"
+                                                    name="telegramnumber" placeholder="Your Telegram number"
+                                                    pattern="^[0-9]*$" minlength="10" maxlength="10" required
+                                                    class="form-control">
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telegram?.errors?.required && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                                    This field is required.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telegram?.errors?.minlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                                    Min length mustbe 10.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telegram?.errors?.maxlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                                    Max length mustbe 10.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="telegram?.errors?.pattern && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                                    Please Enter
+                                                    Correct 10 digit Mobile Number</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /row-->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Date of Birth*</label>
+                                        <input type="date" #dob="ngModel" [(ngModel)]="employee.dob" name="dob"
+                                            class="form-control" required>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="dob?.errors?.required && (updateForm.submitted || dob.dirty || dob.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <label>Address*</label>
+                                        <input type="text" #address="ngModel" [(ngModel)]="employee.address"
+                                            name="address" class="form-control" placeholder="Your Addesss" required>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="address?.errors?.required && (updateForm.submitted || address.dirty || address.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /row-->
+                            <div class="row">
+                                <!-- <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Country*</label>
+                                        <select class="form-control" #country="ngModel"
+                                            [(ngModel)]="selectedUser.country" name="country" required
+                                            (change)="onChange()">
+                                            <option value="India">India</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="country?.errors?.required && (updateForm.submitted || country.dirty || country.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div> -->
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Country*</label>
+                                        <ng-select [items]="countries" #country="ngModel"
+                                            [(ngModel)]="employee.countryCode" name="country"
+                                            placeholder="Select Country code" bindValue="code" [searchFn]="SearchFncode"
+                                            (change)="onChange()" required>
+                                            <ng-template ng-label-tmp let-item="item">
+                                                <span class="ng-value-label">{{item.name | uppercase}}
+                                                    ({{item.code}})</span>
+                                            </ng-template>
+
+                                            <ng-template ng-option-tmp let-item="item">
+                                                {{item.name | uppercase}} ({{item.code}})
+                                            </ng-template>
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="country?.errors?.required && (updateForm.submitted || country.dirty || country.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>State*</label>
+                                        <select class="form-control" #state="ngModel" [(ngModel)]="employee.state"
+                                            name="state" required>
+                                            <option *ngFor="let p of statename" [value]="p">{{p}}</option>
+                                        </select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="state?.errors?.required && (updateForm.submitted || state.dirty || state.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>City*</label>
+                                        <input type="text" #city="ngModel" [(ngModel)]="employee.city" name="city"
+                                            class="form-control" placeholder="Your City" required>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="city?.errors?.required && (updateForm.submitted || city.dirty || city.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Pincode*</label>
+                                        <input type="text" #pincode="ngModel" [(ngModel)]="employee.pincode"
+                                            name="pincode" class="form-control" placeholder="Your Pincode" required>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="pincode?.errors?.required && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-md-3" *ngIf="isother">
+                                    <div class="form-group">
+                                        <label>Other Country Name*</label>
+                                        <input type="text" #othercountry="ngModel" [(ngModel)]="othercountryname"
+                                            name="othercountry" class="form-control" placeholder="Your country"
+                                            [required]="isother">
+                                        <p class="text-danger mt-1"
+                                            *ngIf="othercountry?.errors?.required && (updateForm.submitted || othercountry.dirty || othercountry.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div> -->
+                                <div class="col-md-3" *ngIf="isother">
+                                    <div class="form-group">
+                                        <label>Other State Name*</label>
+                                        <input type="text" #otherstate="ngModel" [(ngModel)]="otherstatename"
+                                            name="otherstate" class="form-control" placeholder="Your State"
+                                            [required]="isother">
+                                        <p class="text-danger mt-1"
+                                            *ngIf="otherstate?.errors?.required && (updateForm.submitted || otherstate.dirty || otherstate.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /row-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Personal Details</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="passportPic">
+                                    Passport Image*</label>
+                                <input id="passportPic" class="form-control" type="file" name="passportPic"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'passport','Passport_image')">
+                                <a class="mt-2" *ngIf="this.employeeDetails.passport"
+                                    (click)="view_image(this.employeeDetails.passport)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View Passport</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="pancard">Pancard*</label>
+                                <input id="pancard" class="form-control" type="file" name="pancard"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'pancard','Pancard')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.pancard"
+                                    (click)="view_image(this.employeeDetails.pancard)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i>
+                                    View Pancard</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Adhaar">Adhaar Card*</label>
+                                <input id="Adhaar" class="form-control" type="file" name="Adhaar"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'adhaarcard','Adhaarcard')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.adhaarcard"
+                                    (click)="view_image(this.employeeDetails.adhaarcard)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View Aadhaar
+                                    Card</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="cancelcheque">Cancel Cheque*</label>
+                                <input id="cancelcheque" class="form-control" type="file" name="cancelcheque"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'cancelCheque','Cancel_cheque')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.cancelCheque"
+                                    (click)="view_image(this.employeeDetails.cancelCheque)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View Cancel
+                                    Cheque</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Madhyamik">Secondary Result*</label>
+                                <input id="Madhyamik" class="form-control" type="file" name="Madhyamik"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'secondary','Secondary')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.secondary"
+                                    (click)="view_image(this.employeeDetails.secondary)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View 10th
+                                    Result</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Hs">Higher Secondary Result*</label>
+                                <input id="Hs" class="form-control" type="file" name="Hs"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'higherSecondary','Higher_secondary')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.higherSecondary"
+                                    (click)="view_image(this.employeeDetails.higherSecondary)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View 12th
+                                    Result</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="graduation">Graduation Result*</label>
+                                <input id="graduation" class="form-control" type="file" name="graduation"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'graduation','Graduation')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.graduation"
+                                    (click)="view_image(this.employeeDetails.graduation)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View Graduation
+                                    Result</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="graduation">Higher Study</label>
+                                <input id="higer-study" class="form-control" type="file" name="higer-study"
+                                    accept="image/jpeg,image/png,image/jpg"
+                                    (change)="personalFileHandler($event,'higherStudy','Higher_study')">
+                                <a class="ml-3" *ngIf="this.employeeDetails.higherStudy"
+                                    (click)="view_image(this.employeeDetails.higherStudy)" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View Higher Study
+                                    Certificate</a>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="bloodGroup">Blood Group*</label>
+                                <!-- <input type="text" name="bloodGroup"> -->
+
+                                <ng-select [items]="bloodGroups" bindLabel="name" bindValue="value"
+                                    placeholder="Select blood group" name="bloodgroup"
+                                    [(ngModel)]="employeeDetails.bloodGroup" #bloodgroup="ngModel" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="bloodgroup?.errors?.required && (bloodgroup.dirty || bloodgroup.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="Marital">Marital Status*</label>
+                                <ng-select [items]="Marital" #marrital="ngModel"
+                                    [(ngModel)]="employeeDetails.maritalStatus" class="wd-md-340 border-0 rounded-sm"
+                                    name="Marital" placeholder="Select Marital Status" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="marrital?.errors?.required && (marrital.dirty || marrital.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-2">
+                            <h5 class="mb-3 mb-md-0" id="emergency">Emergency Contact
+                                Details*
+                            </h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="name">Emergency Contact Name*</label>
+                                <input type="text" name="Name" class="form-control" placeholder="Emergency Contact Name"
+                                    [(ngModel)]="employeeDetails.emergencyContact.name" #Name="ngModel" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="Name?.errors?.required && (Name.dirty || Name.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Relation">Relation*</label>
+                                <ng-select [items]="Relation" [(ngModel)]="employeeDetails.emergencyContact.relation"
+                                    class="wd-md-340 border-0 rounded-sm" name="relation" placeholder="Select Relation"
+                                    #relationsip="ngModel" required>
+
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="relationsip?.errors?.required && (relationsip.dirty || relationsip.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Phone">Phone No*</label>
+                                <input type="text" name="Phone" maxlength="10" minlength="10" class="form-control"
+                                    placeholder="Phone Number" [(ngModel)]="employeeDetails.emergencyContact.phone"
+                                    #Phone="ngModel" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="Phone?.errors?.required && (Phone.dirty || Phone.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="isInsAccCreated">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Below Details are required for Instructors</h6>
+                    <h6 class="card-title">Bio</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Bio*<a placement="top"
+                                        ngbTooltip="Please mention your Experience & Qualification in 300-500 Letters"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Please mention your Experience & Qualification in 300-500 Letters"
+                                    #bio="ngModel" [(ngModel)]="selectedUser.bio" name="bio" maxlength="500"
+                                    minlength="300" required></textarea>
+                                Letter Count: {{selectedUser?.bio?.length}}/500 <i
+                                    *ngIf="selectedUser?.bio?.length>=300" class="small-icon"
+                                    data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1"
+                                    *ngIf="bio?.errors?.required && (updateForm.submitted || bio.dirty || bio.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="bio?.errors?.minlength && (updateForm.submitted || bio.dirty || bio.touched)">
+                                    Min length mustbe 300.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="bio?.errors?.maxlength && (updateForm.submitted || bio.dirty || bio.touched)">
+                                    Max length mustbe 500.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Course Category* <a placement="top"
+                                        ngbTooltip="Multiple selection from our given Category"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <ng-select #specialization="ngModel" [(ngModel)]="selectedUser.specialization"
+                                    name="specialization" [multiple]=true required [items]="categories">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="specialization?.errors?.required && (updateForm.submitted || specialization.dirty || specialization.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Select your Training Language*<a placement="top"
+                                        ngbTooltip="You can select multiple languages"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <ng-select #language="ngModel" [(ngModel)]="selectedUser.language" name="language"
+                                    [multiple]=true required [items]="languages">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="language?.errors?.required && (updateForm.submitted || language.dirty || language.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>How do you like to provide your Training?*</label>
+                                <select class="form-control" #trainingtype="ngModel"
+                                    [(ngModel)]="selectedUser.trainingtype" name="trainingtype" required>
+                                    <option value="Recorded Class Only">Recorded Class Only</option>
+                                    <option value="Live Class Only">Live Class Only</option>
+                                    <option value="Both - Live + Recorded Class">Both - Live + Recorded Class</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="trainingtype?.errors?.required && (updateForm.submitted || trainingtype.dirty || trainingtype.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Please confirm, if you are okay with providing Recorded Demo Class?*</label>
+                                <select class="form-control" #democlass="ngModel" [(ngModel)]="selectedUser.democlass"
+                                    name="democlass" required>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="democlass?.errors?.required && (updateForm.submitted || democlass.dirty || democlass.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Active in Stock Market / Capital Market / Financial Market?*</label>
+                                <select class="form-control" #activeinmarket="ngModel"
+                                    [(ngModel)]="selectedUser.activeinmarket" name="activeinmarket" required>
+                                    <option value="0-3 Years">0-3 Years</option>
+                                    <option value="3-5 Years">3-5 Years</option>
+                                    <option value="5-10 Years">5-10 Years</option>
+                                    <option value="10-20 Years">10-20 Years</option>
+                                    <option value="Above 20 Years">Above 20 Years</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="activeinmarket?.errors?.required && (updateForm.submitted || activeinmarket.dirty || activeinmarket.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Years of Experience in Teaching on Your Subject?*</label>
+                                <select class="form-control" #experience="ngModel" [(ngModel)]="selectedUser.experience"
+                                    name="experience" required>
+                                    <option value="0-3 Years">0-3 Years</option>
+                                    <option value="3-5 Years">3-5 Years</option>
+                                    <option value="5-10 Years">5-10 Years</option>
+                                    <option value="10-15 Years">10-15 Years</option>
+                                    <option value="Above 15 Years">Above 15 Years</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="experience?.errors?.required && (updateForm.submitted || experience.dirty || experience.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="isInsAccCreated">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Social Profile</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Facebook</label>
+                                <input type="text" class="form-control" placeholder="Link" #facebook="ngModel"
+                                    [(ngModel)]="selectedUser.facebook" name="facebook">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Linkdin</label>
+                                <input type="text" class="form-control" placeholder="Link" #linkdin="ngModel"
+                                    [(ngModel)]="selectedUser.linkdin" name="linkdin">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Instagram</label>
+                                <input type="text" class="form-control" placeholder="Link" #instagram="ngModel"
+                                    [(ngModel)]="selectedUser.instagram" name="instagram">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Twitter</label>
+                                <input type="text" class="form-control" placeholder="Link" #twitter="ngModel"
+                                    [(ngModel)]="selectedUser.twitter" name="twitter">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ngb-alert [dismissible]="false" [type]="'danger'" *ngIf="updateForm.submitted && updateForm.invalid">
+        You Missed Some Fields
+    </ngb-alert>
+    <a class="btn btn-success mr-2" *ngIf="!isInsAccCreated" (click)="isInsAccCreated = true">Apply For Instructor</a>
+    <button type="submit" class="btn btn-primary mr-2">Save Profile</button>
+</form>
+
+<div class="row mt-3">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Change Password</h6>
+                <form #pwdForm="ngForm" (ngSubmit)="pwdForm.valid && pwdReset()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <!--email-->
+                                <input type="text" disabled #email="ngModel" [(ngModel)]="loggedUser.email" name="email"
+                                    class="form-control" placeholder="Your Email" [pattern]="emailRegex">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Old password</label>
+                                <input class="form-control" type="password" #oldpwd="ngModel" autocomplete="off"
+                                    [(ngModel)]="resetpwd.oldpwd" name="oldpwd" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="oldpwd?.errors?.required && (pwdForm.submitted || oldpwd.dirty || oldpwd.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>New password</label>
+                                <input class="form-control" type="password" #newpwd="ngModel"
+                                    [(ngModel)]="resetpwd.newpwd" name="newpwd" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="newpwd?.errors?.required && (pwdForm.submitted || newpwd.dirty || newpwd.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Confirm new password</label>
+                                <input class="form-control" type="password" #renewpwd="ngModel"
+                                    [(ngModel)]="resetpwd.renewpwd" name="renewpwd" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="renewpwd?.errors?.required && (pwdForm.submitted || renewpwd.dirty || renewpwd.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Reset Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

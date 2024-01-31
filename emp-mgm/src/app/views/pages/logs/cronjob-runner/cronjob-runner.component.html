@@ -1,0 +1,35 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Logs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Cron Job Runner</li>
+    </ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Cron Jobs</h6>
+                <input type="date" name="fromdate1" #fromdate1="ngModel" [(ngModel)]="fromDateFilter" class="form-control">
+                <br>
+                <button (click)="dailyLeadReportCron()" class="mb-3 btn btn-primary">Daily Lead Report Cron</button> <br>
+                <button (click)="dailyLeadTatReportCron()" class="mb-3 btn btn-primary">Daily Lead TAT Report Cron</button> <br>
+                <button (click)="dailyOnboardingTATCron()" class="mb-3 btn btn-primary">Daily Onboarding TAT Report Cron</button> <br>
+                <button (click)="dailyUpcomingPaymentsCron()" class="mb-3 btn btn-primary">Daily Upcoming Payments Cron</button> <br> 
+                <button (click)="dailyUpcomingProductExpiringCron()" class="mb-3 btn btn-primary">Daily Upcoming Product Expiring Cron</button> <br>
+                <button (click)="fortnightPaymentDues()" class="mb-3 btn btn-primary">Fortnight Payment Dues Cron</button> <br>
+                <button (click)="weeklyLeadTatReportCron()" class="mb-3 btn btn-primary">Weekly Lead Tat Report Cron</button> <br>
+                <button (click)="weeklyDataMismatchCron()" class="mb-3 btn btn-primary">Weekly Data Mismatch Cron</button><br>
+                <button (click)="BSEBhabCopySync()" class="mb-3 btn btn-primary">Bse Bhav Copy Sync</button><br>
+                <button (click)="NSEBhabCopySync()" class="mb-3 btn btn-primary">Nse Bhav Copy Sync</button><br>
+                <button (click)="NSEStockNameSync()" class="mb-3 btn btn-primary">Nse Stock Name Sync</button><br>
+
+                <input type="text" name="invid" #invid="ngModel" [(ngModel)]="batchdata.invid" placeholder="invid" class="form-control">
+                <input type="text" name="oldbatch" #oldbatch="ngModel" [(ngModel)]="batchdata.oldbatch" placeholder="oldbatch" class="form-control">
+                <input type="text" name="newbatch" #newbatch="ngModel" [(ngModel)]="batchdata.newbatch" placeholder="newbatch" class="form-control">
+                <button (click)="batchchange()" class="mb-3 btn btn-primary">Batch change</button><br>
+
+            </div>
+		</div>
+	</div>
+</div>

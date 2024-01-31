@@ -1,0 +1,473 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin/products/">Products</a></li>
+        <li class="breadcrumb-item"><a routerLink="/admin/products/portfolio-checkup">Portfolio Checkups</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Portfolio Checkups Details</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Portfolio Checkups Details</h6>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+
+                <p><b>Student:</b> {{portfolioCheckup?.student_name}} - {{portfolioCheckup?.student_invid}}</p>
+                <p><b>Mentor:</b> {{portfolioCheckup?.mentor_name}} - {{portfolioCheckup?.mentor_invid}}</p>
+                <p><b>Product:</b> {{portfolioCheckup?.product_name}} - {{portfolioCheckup?.product_code}}</p>
+                <p><b>Purchase Date:</b> {{portfolioCheckup?.purchase_date | date:'mediumDate'}} | <b>Expiry Date:</b>
+                    {{portfolioCheckup?.expiry_date | date:'mediumDate'}}</p>
+                <p><b>Portfolio Checkup Initiated:</b> {{portfolioCheckup?.createdAt | date:'mediumDate'}} | <b>Last
+                        Update:</b> {{portfolioCheckup?.updatedAt | date:'mediumDate'}} -
+                    {{portfolioCheckup?.updatedBy}}
+                </p>
+                <p><b>Risk Capacity:</b>{{portfolioCheckup?.risk_capacity}}</p>
+                <br>
+                <div class="row">
+                    <div class="col-md-12 mb-4 mt-1">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="green-block">
+                                    <p class="mb-2"><b>Invested Amount</b></p>
+                                    <span>{{totalAmount | currency:'INR'}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="green-block">
+                                    <p class="mb-2"><b>Current Value</b></p>
+                                    <span>{{currentTotalValue | currency:'INR'}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="green-block">
+                                    <p class="mb-2"><b>Total Returns</b></p>
+                                    <span [ngStyle]="{
+                                        'color':totalReturn<0?'red':'green'
+                                        }">{{ totalReturn | currency:'INR'}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="green-block">
+                                    <p class="mb-2"><b>Total Returns%</b></p>
+                                    <span [ngStyle]="{
+                                        'color':totalReturnPerc<0?'red':'green'
+                                        }">{{ totalReturnPerc }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <form #replyForm="ngForm" enctype="multipart/form-data" (ngSubmit)="replyForm.valid && submit()">
+                    <div class="table-responsive no-fix-height">
+                        <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                            [dataSource]="dataSource" multiTemplateDataRows matSort>
+
+                            <ng-container matColumnDef="sr_no">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Sr. No. </th>
+                                <td mat-cell *matCellDef="let row; let i = dataIndex"> {{i+1}}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="exchange">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Exchange </th>
+                                <td mat-cell *matCellDef="let row"> {{row?.exchange}}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="stock_name">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Stock Name </th>
+                                <td mat-cell *matCellDef="let row"> {{row?.stock_name}}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="holding_for">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Holding For </th>
+                                <td mat-cell *matCellDef="let row"> {{row?.holding_for}}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="holding_qty">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Holding Qty </th>
+                                <td mat-cell *matCellDef="let row"> {{row?.holding_qty}} </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="buying_price">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Buying Price(Avg) </th>
+                                <td mat-cell *matCellDef="let row"> {{row?.buying_price | currency:'INR'}} </td>
+                            </ng-container>
+
+
+                            <ng-container matColumnDef="percentage">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Stock Weigtage Percentage </th>
+                                <td mat-cell *matCellDef="let row">({{getper(row)}}%)</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="ltp">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> LTP <br> (Return %)</th>
+                                <td mat-cell *matCellDef="let row"> {{row?.ltp | currency:'INR' }}<br>
+                                    <span *ngIf="row.ltp" [ngStyle]="{
+                                        'color':getprice(row)<0?'red':'green'
+                                        }">({{getprice(row)}}%)</span>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="invested_amount">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Invested <br> (Current) </th>
+                                <td mat-cell *matCellDef="let row"> {{row?.invested_amount | currency:'INR'}} <br>
+                                    <span *ngIf="row.ltp && row.holding_qty" [ngStyle]="{
+                                        'color':getCurrentValue(row)<row?.invested_amount?'red':'green'
+                                        }">({{getCurrentValue(row) | currency:'INR'}})</span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="status">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Validation <br> Status </th>
+                                <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                    'color':row?.isValidated?'green':'red'
+                                    }"> {{row?.isValidated?'Validated':'Pending'}} <br>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="expand">
+                                <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+                                <td mat-cell *matCellDef="let rowele">
+                                    <a aria-label="expand row" class="btn btn-primary"
+                                        (click)="(expandedElement = expandedElement === rowele ? null : rowele); $event.stopPropagation()">
+                                        View Query
+                                    </a>
+                                </td>
+                            </ng-container>
+
+                            <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+                            <ng-container matColumnDef="expandedDetail">
+                                <td mat-cell *matCellDef="let p; let rowIndex = dataIndex" style="padding: 0px;"
+                                    [attr.colspan]="displayedColumns.length">
+                                    <div class="example-row-detail"
+                                        [@detailExpand]="p == expandedElement ? 'expanded' : 'collapsed'">
+                                        <div class="row example-row-description">
+                                            <div *ngIf="isedit" class="col-md-8">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="exchange">Exchange*</label>
+                                                            <select class="form-control" name="exchange{{rowIndex}}"
+                                                                id="exchange" #exchange="ngModel"
+                                                                [(ngModel)]="p.exchange" (change)="exchangeSelect(p)"
+                                                                required>
+                                                                <option value="">Select an option</option>
+                                                                <option value="NSE">NSE</option>
+                                                                <option value="BSE">BSE</option>
+                                                            </select>
+                                                            <p *ngIf="exchange?.errors?.required && (exchange.dirty || exchange.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                This field is required
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="p.exchange == 'NSE'" class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="stock" class="form-label">Stock
+                                                                Name*</label>
+                                                            <ng-select [items]="allNseStocks" [searchFn]="SearchFn"
+                                                                bindValue="name" bindLabel="name" [searchable]="true"
+                                                                [minTermLength]="3"
+                                                                typeToSearchText="Please enter 3 or more characters"
+                                                                id="stock" placeholder="Stock Name" required
+                                                                name="stock_name{{rowIndex}}" #stock_name="ngModel"
+                                                                dropdownPosition="bottom" (change)="stockSelect(p)"
+                                                                [(ngModel)]="p.stock_name">
+                                                                <!-- <ng-template ng-label-tmp let-item="item">
+                                                                    <span class="ng-value-label">{{item.exchange}} : {{item.exchange}}</span>
+                                                                </ng-template> -->
+                                                                <ng-template ng-option-tmp let-item="item">
+                                                                    {{item.exchange}} - {{item.name}}
+                                                                </ng-template>
+                                                            </ng-select>
+                                                            <p *ngIf="stock_name?.errors?.required && (stock_name.dirty || stock_name.touched || replyForm.submitted)"
+                                                                class="text-danger">Stock Name is required
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div *ngIf="p.exchange == 'BSE'" class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="stock" class="form-label">Stock
+                                                                Name*</label>
+                                                            <ng-select [items]="allBseStocks" [searchFn]="SearchFn"
+                                                                bindValue="name" bindLabel="name" [searchable]="true"
+                                                                [minTermLength]="3"
+                                                                typeToSearchText="Please enter 3 or more characters"
+                                                                id="stock" placeholder="Stock Name" required
+                                                                name="stock_name{{rowIndex}}" #stock_name="ngModel"
+                                                                dropdownPosition="bottom" (change)="stockSelect(p)"
+                                                                [(ngModel)]="p.stock_name">
+                                                                <!-- <ng-template ng-label-tmp let-item="item">
+                                                                    <span class="ng-value-label">{{item.exchange}} : {{item.exchange}}</span>
+                                                                </ng-template> -->
+                                                                <ng-template ng-option-tmp let-item="item">
+                                                                    {{item.exchange}} - {{item.name}}
+                                                                </ng-template>
+                                                            </ng-select>
+                                                            <p *ngIf="stock_name?.errors?.required && (stock_name.dirty || stock_name.touched || replyForm.submitted)"
+                                                                class="text-danger">Stock Name is required
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="hold">Holding For*</label>
+                                                            <select class="form-control" name="holdingFor{{rowIndex}}"
+                                                                id="hold" #hfor="ngModel" [(ngModel)]="p.holding_for"
+                                                                required>
+                                                                <option value="">Select an option</option>
+                                                                <option *ngFor="let h of hold" [value]="h">
+                                                                    {{h}}
+                                                                </option>
+                                                            </select>
+                                                            <p *ngIf="hfor?.errors?.required && (hfor.dirty || hfor.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                This field is required
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="Quantity">Holding Quantity*</label>
+                                                            <input type="text" (change)="calc(p)" pattern="^[0-9]*$"
+                                                                name="Quantity{{rowIndex}}" class="form-control"
+                                                                id="Quantity" placeholder="Holding Quantity"
+                                                                [(ngModel)]="p.holding_qty" #hq="ngModel" required>
+                                                            <p *ngIf="hq?.errors?.required && (hq.dirty || hq.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                This field is required.
+                                                            </p>
+                                                            <p *ngIf="hq?.errors?.pattern && (hq.dirty || hq.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                Only Numbers Allowed.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="Price">Buying Price(Avg)*</label>
+                                                            <input type="text" pattern="^[0-9]*$" (change)="calc(p)"
+                                                                name="priceAvg{{rowIndex}}" class="form-control"
+                                                                id="Price" placeholder="Buying Price(Avg)"
+                                                                [(ngModel)]="p.buying_price" #bp="ngModel" required>
+                                                            <p *ngIf="bp?.errors?.required && (bp.dirty || bp.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                This field is required.
+                                                            </p>
+                                                            <p *ngIf="bp?.errors?.pattern && (bp.dirty || bp.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                Only Numbers Allowed.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="ltp">LTP</label>
+                                                            <input type="text" pattern="^[0-9]*$" name="ltp{{rowIndex}}"
+                                                                class="form-control" id="ltp" [(ngModel)]="p.ltp"
+                                                                #ltp="ngModel" disabled>
+                                                            <span *ngIf="p.ltp" [ngStyle]="{
+                                                                    'color':getprice(p)<0?'red':'green'
+                                                                    }">{{getprice(p)}}%</span>
+                                                            <p *ngIf="ltp?.errors?.required && (ltp.dirty || ltp.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                This field is required.
+                                                            </p>
+                                                            <p *ngIf="ltp?.errors?.pattern && (ltp.dirty || ltp.touched || replyForm.submitted)"
+                                                                class="text-danger">
+                                                                Only Numbers Allowed.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="Invested">Invested Amount</label>
+                                                            <input type="text" name="Invested{{rowIndex}}"
+                                                                class="form-control" id="Invested"
+                                                                [(ngModel)]="p.invested_amount" #inv="ngModel" readonly>
+                                                            <span *ngIf="p.ltp && p.holding_qty" [ngStyle]="{
+                                        'color':getCurrentValue(p)<p?.invested_amount?'red':'green'
+                                        }">({{getCurrentValue(p)}})</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="isedit" class="col-md-4">
+                                                <label for="YourQuery">Your Query*</label>
+                                                <textarea name="YourQuery{{rowIndex}}" class="form-control"
+                                                    id="YourQuery" cols="30" rows="5" [(ngModel)]="p.query"
+                                                    #qu="ngModel" required></textarea>
+                                                <div *ngIf="qu?.errors?.required && (qu.dirty || qu.touched || replyForm.submitted) "
+                                                    class="text-danger">
+                                                    <p>This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="!isedit" class="col-md-12 mb-2">
+                                                <p><b>Query:</b></p><br>
+                                                <p>{{p.query}}</p>
+                                            </div>
+                                            <div class="col-md-12 mt-2">
+                                                <p><b>Fundamental Reply*:</b></p>
+                                                <br>
+                                                <textarea #fundamentalReply="ngModel" [(ngModel)]="p.fundamentalReply"
+                                                    name="fundamentalReply{{rowIndex}}" class="form-control" required
+                                                    rows="7"></textarea>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="fundamentalReply?.errors?.required && (replyForm.submitted || fundamentalReply.dirty || fundamentalReply.touched)">
+                                                    This field is required.</p>
+                                            </div>
+                                            <div class="col-md-12 mt-2">
+                                                <p><b>Technical Reply*:</b></p>
+                                                <br>
+                                                <textarea #technicalReply="ngModel" [(ngModel)]="p.technicalReply"
+                                                    name="technicalReply{{rowIndex}}" class="form-control" required
+                                                    rows="8"></textarea>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="technicalReply?.errors?.required && (replyForm.submitted || technicalReply.dirty || technicalReply.touched)">
+                                                    This field is required.</p>
+                                            </div>
+                                            <div class="col-md-12 mt-2">
+                                                <p><b>Overall Reply*:</b></p>
+                                                <br>
+                                                <textarea #reply="ngModel" [(ngModel)]="p.reply"
+                                                    name="reply{{rowIndex}}" class="form-control" required
+                                                    rows="9"></textarea>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="reply?.errors?.required && (replyForm.submitted || reply.dirty || reply.touched)">
+                                                    This field is required.</p>
+                                            </div>
+                                            <a *ngIf="!p?.isValidated" (click)="validated(p)"
+                                                class="btn btn-success mt-2">Validation Complete</a>
+                                            <a *ngIf="p?.isValidated" (click)="validated(p)"
+                                                class="btn btn-danger mt-2">Validation Pending</a>
+                                            <a *ngIf="!p?.IsStudentVisibility" (click)="visibleReplies(p)"
+                                                class="btn btn-secondary mt-2 ml-2">
+                                                Student Visiblilty Off
+                                            </a>
+                                            <a *ngIf="p?.IsStudentVisibility" (click)="visibleReplies(p)"
+                                                class="btn btn-success mt-2 ml-2">
+                                                Student Visiblilty On
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                                class=" cursor-pointer example-element-row"
+                                [class.example-expanded-row]="expandedElement === element"
+                                (click)="expandedElement = expandedElement === element ? null : element">
+                            </tr>
+                            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row">
+                            </tr>
+                        </table>
+                    </div>
+                    <a class="btn btn-primary mt-3 mb-3" *ngIf="isedit" (click)="addStock()">Add Stocks</a>
+                    <div class="row">
+                        <div class="col-md-9">
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary btn-block my-2" (click)="export()"
+                                    style="float: right;">Export Portfolio Stocks</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="my-3">Upload Documents</p>
+                    <div class="row" *ngFor="let reply of replyDocs; let i=index">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Type*</label>
+                                <select class="form-control" #type="ngModel" [(ngModel)]="reply.type" name="type{{i}}"
+                                    required>
+                                    <option value="" selected>Select Type</option>
+                                    <option value="Title">Title</option>
+                                    <option value="Document">Document</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="type?.errors?.required && (replyForm.submitted || type.dirty || type.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="type.valid">
+                            <label>Title*</label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" #title="ngModel" [(ngModel)]="reply.title"
+                                    name="title{{i}}" required placeholder="title*">
+                                <p class="text-danger mt-1"
+                                    *ngIf="title?.errors?.required && (replyForm.submitted || title.dirty || title.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="reply.type==='Document' && reply.title">
+                            <label>Document*</label>
+                            <div class="form-group">
+                                <input type="file" class="form-control" (change)="handelFileInput($event,reply)"
+                                    name="file{{i}}" placeholder="file">
+                            </div>
+                        </div>
+                        <div class="col-md-2 mt-2" *ngIf="reply.type==='Document' && reply.file && downloadable">
+                            <div class="form-group">
+                                <a (click)="downloaddoc(reply)" target="_blank">{{reply.file}}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group mt-4">
+                                <a (click)="removeReplyDocs(i)"><i class="small-icon" data-feather="minus-circle"
+                                        appFeatherIcon></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <a (click)="addReplyDocs()" class="btn btn-primary"><i class="small-icon" data-feather="plus-circle"
+                            appFeatherIcon></i>Add Document</a>
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'"
+                        *ngIf="(replyForm.submitted || replyForm.dirty || replyForm.touched) && replyForm.invalid">
+                        You Missed Some Fields
+                    </ngb-alert>
+                    <br>
+
+                    <div class="form-group mt-2">
+                        <label>Total Portfolio Note</label>
+                        <div class="">
+                            <textarea name="notes" class="form-control" id="" #notes="ngModel" cols="5" rows="5"
+                                [(ngModel)]="portfolioCheckup.notes"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group mt-2">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" name="isEditable" #isEditable="ngModel"
+                                    [(ngModel)]="portfolioCheckup.isEditable" class="form-check-input">
+                                <i class="input-frame"></i>
+                                Please Tick this box to Give Edit Permission to Student.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group mt-2">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" name="downloadToggle" #downloadToggle="ngModel"
+                                    [(ngModel)]="portfolioCheckup.IsDownloadEnable" class="form-check-input">
+                                <i class="input-frame"></i>
+                                Please Tick this box to Visible Portfolio Report Download button.
+                            </label>
+                        </div>
+                    </div>
+                    <br>
+                    <a *ngIf="!isedit" class="btn btn-primary mt-2 mr-3" (click)="editform()">Edit</a>
+                    <button class="btn btn-success mt-2">Submit</button>
+                    <a *ngIf="portfolioCheckup?.IsDownloadEnable" placement="top" ngbTooltip="Download Portfolio pdf"
+                        class="mx-2" (click)="getPdf(portfolioCheckup)"> Download Portfolio Report
+                        <i class="small-icon" data-feather="download" appFeatherIcon></i>
+                    </a>
+                    <p class="mb-2 mt-2" *ngIf="isupload">
+                        <ngb-progressbar type="primary" [value]="progressvalue" [showValue]="true"></ngb-progressbar>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

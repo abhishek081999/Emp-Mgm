@@ -1,0 +1,23 @@
+$breakpoint-tablet: 768px;
+@media (max-width: $breakpoint-tablet) {
+  .popubuttons{
+    width: auto;
+    margin: 5px;
+  }
+
+}
+
+.changecolour::selection{
+  background-color: blueviolet;
+}
+.attendance-item {
+  background-color: red;
+}
+
+.regularize-item {
+  background-color: green;
+}
+
+.leave-item {
+  background-color: blue;
+}

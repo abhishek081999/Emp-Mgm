@@ -1,0 +1,25 @@
+.coursedetails a{
+    &.Document:before {
+        font: normal normal normal 18px/1 feather;
+        content: "\e968";
+        margin-right: 10px
+    }
+
+    &.Quiz:before {
+        font: normal normal normal 18px/1 feather;
+        content: "\e97e";
+        margin-right: 10px
+    }
+
+    &.Video:before {
+        font: normal normal normal 18px/1 feather;
+        content: "\e9bb";
+        margin-right: 10px
+    }
+
+    .Webinar:before {
+        font: normal normal normal 18px/1 feather;
+        content: "\e9a2";
+        margin-right: 10px
+    }
+}

@@ -1,0 +1,111 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Sales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Pending Payment List</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Pending Payment List</h6>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="sales_rep">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.sales_rep}} <br> {{row.sales_rep_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="invid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Student ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.invid}} <br> {{row.fullName}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telephone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Contact </th>
+                            <td mat-cell *matCellDef="let row"> P: {{row.telephone}} <br> W: {{row.whatsapp}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="service_code" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.service_code}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="service_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.service_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="payment_mode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Mode </th>
+                            <td mat-cell *matCellDef="let row"> {{row.payment_mode}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="installment_amount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ins. Amount (Incl. GST) </th>
+                            <td mat-cell *matCellDef="let row"> {{row.installment_amount | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalinstallment_amount | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="installment_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ins. Date</th>
+                            <td mat-cell *matCellDef="let row"> {{row.installment_date | date:'mediumDate'}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="installment_number">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ins Number</th>
+                            <td mat-cell *matCellDef="let row"> {{row.installment_number}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="orderID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>orderID </th>
+                            <td mat-cell *matCellDef="let row" ngbTooltip="Click here to View Order"
+                                (click)="gotoorder(row)"> {{row.orderID }}
+                                <i class="small-icon" data-feather="external-link" appFeatherIcon></i>
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_amount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Booked Amount (Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_amount | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

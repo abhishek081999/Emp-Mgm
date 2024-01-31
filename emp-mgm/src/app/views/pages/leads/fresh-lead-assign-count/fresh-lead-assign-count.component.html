@@ -1,0 +1,114 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Fresh Lead Assing Count</li>
+    </ol>
+</nav>
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" #startDateAtten="ngModel" [(ngModel)]="startdate" name="startDateAtten"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" #endDateAtten="ngModel" [(ngModel)]="enddate" name="endDateAtten"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>
+                            Select Team*</label>
+                        <ng-select [items]="teamsDrop" [searchable]="true" bindValue="_id" bindLabel="name"
+                            #departmentAtten="ngModel" [(ngModel)]="team" class="wd-md-340 border-0 rounded-sm"
+                            name="departmentAtten" placeholder="Select Team">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label> Select Lead Owner*</label>
+                        <ng-select [items]="employeesDrop" [searchFn]="StaffSearchFn" [searchable]="true"
+                            #managerAtten="ngModel" [(ngModel)]="leadOwner" name="leadowner"
+                            placeholder="Filter by Lead Owner" bindValue="invid">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.fullName}} - {{item.invid}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary mt-30px btn-block " (click)="filter()">Search</button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary mt-30px btn-block " (click)="Export()">Export</button>
+                </div>
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="employee_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Owner
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.employee_name}}<br>{{row.leadOwner}}
+
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="fresh_lead_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Fresh Lead Count
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.fresh_lead_count}}
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalassigncount}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.date | date: 'mediumDate'}}</p>
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="team_lead_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead Name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.team_lead_name }}<br>{{row.team_lead_invid }}
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="team_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.team_name }}
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

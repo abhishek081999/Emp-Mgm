@@ -1,0 +1,96 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Communications</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Messages</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Messages</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <ng-select [items]="filterlist" bindLabel="code" bindValue="_id" name="orderby" #statusfilter="ngModel"
+                [(ngModel)]="pagefilter" placeholder="Search By Course/Product Code"
+                class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+            </ng-select>
+        </div>
+
+        <div class="input-group rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <ng-select [items]="allIns" bindValue="_id" name="orderby1" #statusfilter1="ngModel"
+                [(ngModel)]="pagefilter1" placeholder="Search By Trainer ID" class="wd-md-200 border-0 rounded-sm"
+                (change)="filter()">
+                <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{item.invid}} : {{item.fullName}}</span>
+                </ng-template>
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.invid}} - {{item.fullName}}
+                </ng-template>
+            </ng-select>
+        </div>
+    </div>
+</div>
+
+<ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="refreshingdiscussion">
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    Refreshing Messages...
+</ngb-alert>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-3"
+                        *ngFor="let dis of discussionsfilter | discussionSlice: (currentPage-1) * pageSize : currentPage * pageSize;">
+                        <div (click)="replyBox(dis)" class="mb-2 cursor-pointer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <h5 class="mt-0 mb-1">{{ dis.qtitle }}
+                                                <span *ngIf="dis.instructor_id===''"
+                                                    class="badge badge-pill badge-primary mr-1">Admin</span>
+                                                <span *ngIf="!dis.instructorshow && dis.instructor_id!==''"
+                                                    class="badge badge-pill badge-danger mr-1">Instructor Unread</span>
+                                                <span *ngIf="!dis.adminshow && employee.role==='admin'"
+                                                    class="badge badge-pill badge-danger mr-1">Unread</span>
+                                            </h5>
+                                        </div>
+                                        <span>{{ dis.date | date: 'medium'}}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <p>Posted By <b>{{ dis.askby }}</b> in <b>{{ dis.coursename?
+                                            dis.coursename:dis.productname }} | {{getcode(dis)}} </b><b
+                                            *ngIf="dis.instructor_id!==''">|
+                                            {{getinstructorname(dis.instructor_id)}}({{getinstructorid(dis.instructor_id)}})</b>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <button (click)="delete(dis)" class="btn btn-danger mr-2 btn-sm">Delete this Discussion</button>
+                        <button (click)="export(dis)" class="btn btn-primary mr-2 btn-sm">Export</button>
+                        <hr>
+                    </li>
+                </ul>
+                <ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+                    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+                    (pageChange)="pagechange()">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

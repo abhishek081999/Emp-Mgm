@@ -1,0 +1,38 @@
+<div #chartContainer id="chartContainer"></div>
+
+<div class="action-buttons">
+    <button (click)='compact()' class="btn btn-primary text-white"  ngbTooltip="Compact">
+        <i class="mdi mdi-crop-free"></i> 
+    </button>
+    <br />
+
+    <button (click)='hierarchy(this.userDetails.invid)' class="btn btn-primary text-white"  ngbTooltip="Focus on Me">
+        <i class="mdi mdi-account-search"></i> 
+    </button>
+    <br />
+
+    <button (click)="fullscreen()" class="btn btn-primary text-white" ngbTooltip="Fullscreen">
+        <i class="mdi mdi-arrow-expand-all"></i> 
+    </button>
+    <br />
+
+    <button (click)="expandAll()" class="btn btn-primary text-white" ngbTooltip="Expand All">
+        <i class="icon-md pb-3px" data-feather="maximize-2" appFeatherIcon></i>
+    </button>
+    <br />
+
+    <button (click)="colapseAll()" class="btn btn-primary text-white"  ngbTooltip="Collapse All">
+        <i class="icon-md pb-3px" data-feather="minimize-2" appFeatherIcon></i>
+    </button>
+    <br />
+
+    <button (click)="zoomout()" class="btn btn-primary text-white" ngbTooltip="Zoom Out">
+        <i class="icon-md pb-3px" data-feather="zoom-out" appFeatherIcon></i>
+    </button>
+    <br />
+
+    <button (click)="zoomin()" class="btn btn-primary text-white" ngbTooltip="Zoom In">
+        <i class="icon-md pb-3px" data-feather="zoom-in" appFeatherIcon></i>
+    </button>
+    <br />
+</div>

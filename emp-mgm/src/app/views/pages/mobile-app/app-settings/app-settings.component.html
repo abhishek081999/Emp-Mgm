@@ -1,0 +1,103 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Mobile App</a></li>
+        <li class="breadcrumb-item active" aria-current="page">App Settings</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <form #settingForm="ngForm" (ngSubmit)="settingForm.valid && postDevicesSettings(settingForm)">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <span>Name : 
+                                <br> Android Settings</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Current Version*</label>
+                                <input type="text" class="form-control" #currentVersion="ngModel"
+                                    [(ngModel)]="appSettings.current_version" name="current_version" required
+                                    placeholder=" current version">
+                                <p class="text-danger mt-1"
+                                    *ngIf="currentVersion?.errors?.required && (currentVersion.dirty || currentVersion.touched || settingForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Minimum Supported Version*</label>
+                                <input type="text" class="form-control" #minimumsupportedversion="ngModel"
+                                    [(ngModel)]="appSettings.minimum_supported_version" name="minimum_supported_version" required
+                                    placeholder="minimum supported version">
+                                <p class="text-danger mt-1"
+                                    *ngIf="minimumsupportedversion?.errors?.required && (minimumsupportedversion.dirty || minimumsupportedversion.touched || settingForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div>
+                               Is Maintainance?
+                            </div>
+                            <div>
+                                <!-- Rounded switch -->
+                                <label class="mb-0 toggle-switch">
+                                    <input type="checkbox" name="is_maintainance" #isMaintainance="ngModel"
+                                        [(ngModel)]="appSettings.is_maintainance">
+                                    <span class="toggle-slider round"></span>
+                                </label>
+                                <p class="text-danger mt-1"
+                                *ngIf="isMaintainance?.errors?.required && (isMaintainance.dirty || isMaintainance.touched || settingForm.submitted)">
+                                This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div>
+                                Is Screenshot Enable?
+                            </div>
+                            <div>
+                                <!-- Rounded switch -->
+                                <label class="mb-0 toggle-switch">
+                                    <input type="checkbox" name="isSSFeatureEnable" #isSSFeatureEnable="ngModel"
+                                        [(ngModel)]="appSettings.isSSFeatureEnable">
+                                    <span class="toggle-slider round"></span>
+                                </label>
+                                <p class="text-danger mt-1"
+                                    *ngIf="isSSFeatureEnable?.errors?.required && (isSSFeatureEnable.dirty || isSSFeatureEnable.touched || settingForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Notify Title</label>
+                                <input type="text" class="form-control" #notifyTitle="ngModel"
+                                    [(ngModel)]="appSettings.notify_title" name="notify_title" required
+                                    placeholder="Notify Title">
+                                <p class="text-danger mt-1"
+                                    *ngIf="notifyTitle?.errors?.required && (notifyTitle.dirty || notifyTitle.touched || settingForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Notify Description</label>
+                                <input type="text" class="form-control" #notifyDescription="ngModel"
+                                    [(ngModel)]="appSettings.notify_description" name="notify_description" required
+                                    placeholder="Notify Description">
+                                <p class="text-danger mt-1"
+                                    *ngIf="notifyDescription?.errors?.required && (notifyDescription.dirty || notifyDescription.touched || settingForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Submit</button>
+
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

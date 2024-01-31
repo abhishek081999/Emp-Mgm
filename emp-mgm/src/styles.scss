@@ -1,0 +1,185 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+$custom-typography: mat-typography-config($font-family: '"Overpass", sans-serif');
+@include mat-core($custom-typography);
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$nobleui-angular-primary: mat-palette($mat-indigo);
+$nobleui-angular-accent: mat-palette($mat-pink, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$nobleui-angular-warn: mat-palette($mat-red);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$nobleui-angular-theme: mat-light-theme((color: (primary: $nobleui-angular-primary,
+        accent: $nobleui-angular-accent,
+        warn: $nobleui-angular-warn,
+      )));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($nobleui-angular-theme);
+
+/* You can add global styles to this file, and also import other style files */
+.small-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/*html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }*/
+.table {
+
+  th.mat-header-cell,
+  td.mat-cell,
+  td.mat-footer-cell {
+    padding: 15px;
+  }
+}
+
+.table1 {
+
+  th.mat-header-cell,
+  td.mat-cell,
+  td.mat-footer-cell {
+    padding: 15px;
+  }
+}
+
+.table-responsive.no-fix-height {
+  max-height: max-content;
+  overflow: auto;
+
+  table {
+    border-collapse: separate;
+  }
+
+  .mat-footer-cell.mat-table-sticky {
+    background: #eee;
+    font-weight: bold;
+  }
+
+}
+
+.table-responsive {
+  max-height: 478px;
+  overflow: auto;
+
+  table {
+    border-collapse: separate;
+  }
+
+  .mat-footer-cell.mat-table-sticky {
+    background: #eee;
+    font-weight: bold;
+  }
+
+}
+
+.row quill-editor .ql-container .ql-editor {
+  min-height: 146px;
+}
+
+.follow-my-portfolio .ql-container {
+  height: max-content !important;
+
+  .ql-editor {
+    padding: 0;
+  }
+}
+
+.ng-select.ng-select-multiple.my-multiple-select .ng-select-container {
+  height: 70px !important;
+}
+
+// .my-multiple-selects{
+//   // min-height: 30px !important;
+//   // max-height: 50px !important;
+//   height: 70px !important;
+// }
+.sbt {
+  min-height: 30px !important;
+  max-height: 70px !important;
+}
+
+.cropper img {
+  max-height: 414px !important;
+}
+
+/* The toggle-switch - the box around the toggle-slider */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 23px;
+}
+
+/* Hide default HTML checkbox */
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The toggle-slider */
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.toggle-slider {
+  background-color: #2196F3;
+}
+
+input:focus+.toggle-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.toggle-slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded toggle-sliders */
+.toggle-slider.round {
+  border-radius: 34px;
+}
+
+.toggle-slider.round:before {
+  border-radius: 50%;
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  z-index: 99999 !important;
+}

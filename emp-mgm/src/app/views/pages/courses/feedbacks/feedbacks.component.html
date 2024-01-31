@@ -1,0 +1,110 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Feedbacks</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+      <h4 class="mb-3 mb-md-0">Feedbacks</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input 
+                class="form-control wd-md-200 border-0 rounded-sm" 
+                name="search"  
+                #search="ngModel" 
+                [(ngModel)]="pagefilter" 
+                type="text" 
+                placeholder="Search..."
+                (keyup)="filter()">
+        </div>
+       
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select 
+                name="orderby" 
+                #statusfilter="ngModel" 
+                [(ngModel)]="pagefilter1" 
+                class="form-control wd-md-200 border-0 rounded-sm" 
+                (change)="filter()">
+                    <option value="">All Ratings</option>
+                    <option value="4">4 Above</option>
+                    <option value="34">3 to 4</option>
+                    <option value="3">Below 3</option>
+            </select>
+        </div>
+        <button (click)="print()" class="btn btn-primary">Export</button>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled">
+					<li *ngFor=" let f of allfeedbackfinal | slice: (currentPage-1) * pageSize : currentPage * pageSize;">
+						<div>
+                            <h5>{{ f.StudentInvID }} | {{ f.StudentName }} |  {{ f.CourseCode }} | {{ f.CourseName }} | {{f.InstructorInvID}} | {{ f.InstructorName}}</h5>
+							<p>Email: {{f.StudentEmail}} | Phone: {{f.StudentMobile}}</p>
+                            <span>{{ f.date | date: 'longDate'}}</span>
+							<br>
+							<p><b>{{ f.feedback.q1 }}</b> - {{ getans(f.feedback.a1) }}</p>
+							<p><b>{{ f.feedback.q2 }}</b> - {{ getans(f.feedback.a2) }}</p>
+							<p><b>{{ f.feedback.q3 }}</b> - {{ getans(f.feedback.a3) }}</p>
+							<p><b>{{ f.feedback.q4 }}</b> - {{ getans(f.feedback.a4) }}</p>
+							<p><b>{{ f.feedback.q5 }}</b> - {{ getans(f.feedback.a5) }}</p>
+							<p><b>{{ f.feedback.q6 }}</b> - {{ getans(f.feedback.a6) }}</p>
+							<p><b>{{ f.feedback.q7 }}</b> - {{ getans(f.feedback.a7) }}</p>
+							<p><b>{{ f.feedback.q8 }}</b> - {{ getans(f.feedback.a8) }}</p>
+							<p><b>{{ f.feedback.q9 }}</b> - {{ getans(f.feedback.a9) }}</p>
+							<p><b>{{ f.feedback.q10 }}</b> - {{ getans(f.feedback.a10) }}</p>
+							<br>
+							<p><b> Rating - </b>{{ f.avgrating | number:'1.1-1' }}/5</p>
+							<br>
+							<p *ngIf="f.instructorreplied"><b>Instructor Reply</b></p>
+							<p *ngIf="f.instructorreplied">{{f.reply}}</p>
+                            <div *ngIf="f.instructorid!==payload.profileid && !f.sendtoinstructor" class="form-group">
+                                <label>Select Instructor to Send</label>
+                                <select [(ngModel)]="f.instructorid" #ins="ngModel" name="ins" class="form-control w-40">
+                                    <option *ngFor="let i of f.Instructors" [ngValue]="i._id">{{i.fullName}} ({{i.invid}})</option>
+                                </select>
+                            </div>
+							<p *ngIf="f.instructorid!==payload.profileid && !f.sendtoinstructor" class="inline-popups">
+								<a (click)="approve(f)" class="btn btn-primary"><i class="feather icon-send icon-xs mr-2"></i> Send To Instructor
+								</a>
+							</p>
+						</div>
+                        <hr>
+					</li>
+				</ul>
+                <ngb-pagination 
+                    class="d-flex justify-content-end pagination-rounded" 
+                    [collectionSize]="totalSize" 
+                    [(page)]="currentPage"
+                    [pageSize]="pageSize"
+                    [maxSize]="5"
+                    [rotate]="true" 
+                    [boundaryLinks]="true"
+                    (pageChange)="pagechange()"
+                    >
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

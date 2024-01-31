@@ -1,0 +1,287 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Pending Bookings</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Pending Bookings</h6>
+                
+                <!-- <div class="row mb-3">
+                    <div class="col-md-3">
+                        <form class="search-form">
+                            <label>Start Date</label>
+                            <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+                                <div class="input-group border rounded-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text border-0 rounded-sm">
+                                            <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                        </div>
+                                    </div>
+                                    <input type="date" #date="ngModel" [(ngModel)]="startDate" name="date"
+                                        class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-3">
+                        <form class="search-form">
+                            <label>End Date</label>
+                            <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+                                <div class="input-group border rounded-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text border-0 rounded-sm">
+                                            <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                        </div>
+                                    </div>
+                                    <input type="date" #date="ngModel" [(ngModel)]="endDate" name="date"
+                                        class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Mentor </label>
+                            <ng-select [items]="allMentor" [searchable]="true" placeholder="Search Instructor"
+                                #mentoridf="ngModel" [(ngModel)]="mentorFilter" name="mentoridf" bindValue="_id"
+                                bindLabel="fullName" (change)="filter()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Product</label>
+                            <ng-select
+                                [items]="allProduct"
+                                [searchable]="true"
+                                placeholder="Search Product"
+                                #productf="ngModel" 
+                                [(ngModel)]="productFilter"
+                                name="productf" 
+                                bindValue="productid"
+                                bindLabel="name"
+                                (change)="filter()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.productid}} - {{item.name}}</span>
+                                </ng-template>
+                            
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.productid}} - {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                </div> -->
+
+                <div class="row mb-3">
+                    <div class="col-sm-7">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <select
+                                #typeFilter="ngModel" 
+                                [(ngModel)]="typefilter" 
+                                name="typeFilter"
+                                placeholder="Filter By Type"
+                                (change)="filter1()"
+                                >
+                               <option value="">Select Type</option>
+                               <option value="Live Market Practice">Live Market Practice</option>
+                               <option value="One to One Mentorship">One to One Mentorship</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Booking Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort #sort1="matSort">
+
+                        <ng-container matColumnDef="studentname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student </th>
+                            <td mat-cell *matCellDef="let row"> {{row?.studentinvid}} <br> {{row?.studentname}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="contact">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Contact </th>
+                            <td mat-cell *matCellDef="let row">Phone: {{row?.phone}} <br> Whatsapp: {{row?.whatsapp}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_name">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Product </th>
+                            <td mat-cell *matCellDef="let row"> {{row?.product_id}} <br> {{row?.product_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_type">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Product Type</th>
+                            <td mat-cell *matCellDef="let row"> {{row?.product_type}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bookings">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Booking Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row?.bookings}}/{{row?.no_of_sessions}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="pruchasedate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Purchase Date </th>
+                            <td mat-cell *matCellDef="let row">{{row?.pruchasedate | date:'mediumDate'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expiry_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </th>
+                            <td mat-cell *matCellDef="let row">{{row?.expiry_date | date:'mediumDate'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="options">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                            <td mat-cell *matCellDef="let row">
+                                <div ngbDropdown class="dropdown">
+                                    <button type="button" id="insdropdown" ngbDropdownToggle
+                                        class="btn p-0 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="More Options"
+                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                        <button (click)="openModal(row,scheduleModal)" ngbDropdownItem><i
+                                                class="feather icon-edit icon-xs mr-2"></i> Book Slot</button>
+                                        
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let element; columns: displayedColumns;">
+                        </tr> 
+                    </table>
+                </div>
+                <mat-paginator #paginator1="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #scheduleModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Select Slot</h5>
+        <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="isSuccess" class="spinner-wrapper">
+            <div class="spinner">Loading...</div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Search </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" (keyup)="applyFilter1($event)"
+                            placeholder="Search">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <form class="search-form">
+                    <label>Date</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" #date="ngModel" [(ngModel)]="startDate" name="date" (change)="filter()">
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Mentor </label>
+                    <ng-select [items]="allMentor" [searchable]="true" placeholder="Search Instructor"
+                        #mentoridf="ngModel" [(ngModel)]="mentorFilter" name="mentoridf" bindValue="invid"
+                        bindLabel="fullName" (change)="filter()">
+                        <ng-template ng-label-tmp let-item="item">
+                            <span class="ng-value-label">{{item?.invid}} - {{item?.fullName}}</span>
+                        </ng-template>
+
+                        <ng-template ng-option-tmp let-item="item">
+                            {{item?.invid}} - {{item?.fullName}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource1"
+                        matSort #sort2="matSort">
+    
+                        <ng-container matColumnDef="select">
+                            <th mat-header-cell *matHeaderCellDef>
+                                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                                              [checked]="selection.hasValue() && isAllSelected()"
+                                              [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                              [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                              </th>
+                              <td mat-cell *matCellDef="let row; let i = index">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                              (change)="$event ? selection.toggle(row) : null"
+                                              [checked]="selection.isSelected(row)"
+                                              [aria-label]="checkboxLabel(row,i)">
+                                </mat-checkbox>
+                              </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="mentor_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Mentor </th>
+                            <td mat-cell *matCellDef="let row"> {{row?.mentor_invid}} <br> {{row?.mentor_name}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="slot">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Slot </th>
+                            <td mat-cell *matCellDef="let row"> {{row?.start_time | date:'mediumDate'}} <br>
+                                {{row?.slot}}
+                            </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="booking_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student <br> Booked </th>
+                            <td mat-cell *matCellDef="let row"> {{row?.booking_count}} </td>
+                        </ng-container>
+    
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                        <tr mat-row *matRowDef="let element; columns: displayedColumns1;"></tr>
+                    </table>
+                </div>
+                <mat-paginator #paginator2="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="selection.hasValue() && selection.selected.length == max_select" (click)="reschedule()"  class="btn btn-primary"> Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()"> Close</button>
+    </div>    
+</ng-template>

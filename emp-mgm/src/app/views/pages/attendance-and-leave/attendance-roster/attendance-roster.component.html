@@ -1,0 +1,298 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Attendance Roster</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3 mb-md-0">Attendance Roster</h4>
+                <form #lessonForm="ngForm" (ngSubmit)="lessonForm.valid && submitForm($event)">
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <ngb-datepicker #dp [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden">
+                            </ngb-datepicker>
+
+                            <ng-template #t let-date="date" let-focused="focused" let-today="today"
+                                let-disabled="disabled">
+                                <span class="custom-day" (click)="onDateSelection($event,date)"
+                                    [class.focused]="focused"
+                                    [class.range]="isFrom(date) || isTo(date) || isInside(date) || isHovered(date)"
+                                    [class.faded]="isHovered(date) || isInside(date)"
+                                    [class.selected]="isDateSelected(date)" [class.today]="today"
+                                    [class.disabled]="disabled" [class.highlight-holiday]="isHoliday(date)"
+                                    (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
+                                    {{ date.day }}
+                                </span>
+                            </ng-template>
+                            <p class="my-2">Press Ctrl to select multiple dates</p>
+                            <div class="date-picker-legend">
+                                <div class="legend-item">
+                                    <div class="legend-icon holiday"></div>
+                                    <span class="legend-label">Holiday</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label>Employee</label>
+                                        <ng-select [items]="Employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                            #employeess="ngModel" [(ngModel)]="shiftRoster.employee_id" name="employees"
+                                            placeholder=" Select Employee" bindValue="_id" required>
+                                            <ng-template ng-label-tmp let-item="item">
+                                                <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                            </ng-template>
+
+                                            <ng-template ng-option-tmp let-item="item">
+                                                {{item.fullName}} - {{item.invid}}
+                                            </ng-template>
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="employeess?.errors?.required && (lessonForm.submitted || employeess.dirty || employeess.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label>Shift Timings</label>
+                                        <ng-select [items]="shiftTimings" [searchable]="true"
+                                            placeholder="Select Shift Timings" #Shifttimings="ngModel"
+                                            [(ngModel)]="shiftRoster.shift" name="shifttimings" required>
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="Shifttimings?.errors?.required && (lessonForm.submitted || Shifttimings.dirty || Shifttimings.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label>Working Location</label>
+                                        <ng-select [items]="worklocation" [searchable]="true"
+                                            placeholder="Select Work Location" #WorkLocation="ngModel"
+                                            [(ngModel)]="shiftRoster.WorkLocation" name="WorkLocation" required>
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="Shifttimings?.errors?.required && (lessonForm.submitted || Shifttimings.dirty || Shifttimings.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="mt-5 mx-3">
+
+                                    <p class="text-danger mt-1"
+                                        *ngIf="(lessonForm.submitted || lessonForm.dirty || lessonForm.touched) && lessonForm.invalid">
+                                        You Missed Some Fields
+                                    </p>
+                                    <button class="btn btn-primary" [disabled]="!lessonForm.valid">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" #startDateAtten="ngModel" [(ngModel)]="startDateFilter"
+                                name="startDateAtten" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" #endDateAtten="ngModel" [(ngModel)]="endDateFilter" name="endDateAtten"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Department</label>
+                            <ng-select [items]="Departments" [searchable]="true" bindValue="_id" bindLabel="name"
+                                #departmentAtten="ngModel" [(ngModel)]="departmentFilter"
+                                class="wd-md-340 border-0 rounded-sm" name="departmentAtten"
+                                placeholder="Select Departments">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Manager</label>
+                            <ng-select [items]="Employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                #managerAtten="ngModel" [(ngModel)]="managerFilter" name="managerAtten"
+                                placeholder="Filter by Manager" bindValue="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.fullName}} - {{item.invid}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Employee</label>
+                            <ng-select [items]="Employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                #employeAtten="ngModel" [(ngModel)]="employeeFilter" name="employeAtten"
+                                placeholder="Filter by Employee" bindValue="_id">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.fullName}} - {{item.invid}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select #filter="ngModel" [(ngModel)]="filterQuery" (change)="employeeshifttimingsFilter()">
+                                <option value="all">All</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Working Location</label>
+                            <select #filter="ngModel" [(ngModel)]="filterworkinglocation">
+                                <option value="Work From Office">Work From Office
+                                </option>
+                                <option value="Work From Home">Work From Home</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block "
+                            (click)="employeeshifttimingsFilter()">Search</button>
+                    </div>
+
+                    <div class="col-md-3" *ngIf="selection.hasValue()">
+                        <button class="btn btn-success btn-block " (click)="Approveshiftroster()">Approve
+                            Roster</button>
+                    </div>
+                    <div class="col-md-3" *ngIf="selection.hasValue()">
+                        <button class="btn btn-danger btn-block " (click)="deleteshiftroster()">Delete
+                            Roster</button>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <input class="form-control" type="text" placeholder="Search..."
+                                (keyup)="shifttimingsFilterSearch($event)">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block "
+                            (click)="shifttimingsExport()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--  Table for Data -->
+                        <div class="table-responsive mt-4">
+                            <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                [dataSource]="dataSource" matSort>
+
+
+                                <ng-container matColumnDef="Select">
+                                    <th mat-header-cell cdkDrag *matHeaderCellDef>
+                                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                                            [checked]="selection.hasValue() && isEntirePageSelected()"
+                                            [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                            [aria-label]="checkboxLabel()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <td mat-cell *matCellDef="let row; let i = index">
+                                        <mat-checkbox (click)="$event.stopPropagation()"
+                                            (change)="$event ? selection.toggle(row) : null"
+                                            [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row,i)">
+                                        </mat-checkbox>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="employee_name">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Name
+                                    </th>
+                                    <td mat-cell *matCellDef="let row"
+                                        [ngStyle]="{'color':row.isApprove?'green':'orange' }">
+                                        {{row.employee_invid}} <br>
+                                        {{row.employee_name}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="Date">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        <p>{{row.Date | date: 'mediumDate'}}<br>{{row.toDate |
+                                            date: 'shortTime'}}</p>
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="department">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Department
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{row.department}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="manager_name">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{row.manager_invid}} <br>
+                                        {{row.manager_name}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="shift">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Shift
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{row.shift}}
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="working_location">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> working location
+                                    </th>
+                                    <td mat-cell *matCellDef="let row">
+                                        {{row.working_location}}
+                                    </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                                </tr>
+                            </table>
+                        </div>
+                        <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

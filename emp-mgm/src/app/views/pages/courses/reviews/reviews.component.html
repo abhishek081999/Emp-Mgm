@@ -1,0 +1,198 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Reviews</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+      <h4 class="mb-3 mb-md-0">Reviews</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input 
+                class="form-control wd-md-200 border-0 rounded-sm" 
+                name="search"  
+                #search="ngModel" 
+                [(ngModel)]="pagefilter" 
+                type="text" 
+                placeholder="Search..."
+                (keyup)="filter()">
+        </div>
+       
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-200 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select 
+                name="orderby" 
+                #statusfilter="ngModel" 
+                [(ngModel)]="pagefilter1" 
+                class="form-control wd-md-150 border-0 rounded-sm" 
+                (change)="filter()">
+                    <option value="">All Training Ratings</option>
+                    <option value="4">4 Above</option>
+                    <option value="34">3 to 4</option>
+                    <option value="3">Below 3</option>
+            </select>
+        </div>
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-200 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select 
+                name="orderby1" 
+                #statusfilter1="ngModel" 
+                [(ngModel)]="pagefilter2" 
+                class="form-control wd-md-150 border-0 rounded-sm" 
+                (change)="filter()">
+                    <option value="">All Course Ratings</option>
+                    <option value="4">4 Above</option>
+                    <option value="34">3 to 4</option>
+                    <option value="3">Below 3</option>
+            </select>
+        </div>
+        <button class="btn btn-primary mr-2" (click)="print()">Export</button>
+        <button class="btn btn-primary" (click)="addreview(basicModal)">Add Review</button>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li *ngFor=" let f of allDatafinal | slice: (currentPage-1) * pageSize : currentPage * pageSize;">
+						<div>
+							<h5>{{ f.student_invid }} | {{ f.student_name }} | {{ f.code }} | {{ f.name }}</h5>
+							<strong>{{ f.date | date:'medium' }}</strong>
+                            <p>{{ f.review }}</p>
+                            <p><b>Training Rating - </b>{{ f.teacherrating | number:'1.1-1' }}/5 <br>
+							<b> Course Rating - </b>{{ f.rating | number:'1.1-1' }}/5</p>
+							<p class="mt-1">
+								<a (click)="approve(f._id)" *ngIf="!f.verified" class="btn btn-primary mr-3">
+                                    <i class="feather icon-check-circle icon-xs mr-2"></i> Approve
+								</a>
+								<a (click)="delete(f._id)" class="btn btn-danger">
+                                    <i class="feather icon-trash-2 icon-xs mr-2"></i> Delete
+								</a>
+							</p>
+						</div>
+                        <hr>
+					</li>
+				</ul>
+                <ngb-pagination 
+                    class="d-flex justify-content-end pagination-rounded" 
+                    [collectionSize]="totalSize" 
+                    [(page)]="currentPage"
+                    [pageSize]="pageSize"
+                    [maxSize]="5"
+                    [rotate]="true" 
+                    [boundaryLinks]="true"
+                    (pageChange)="pagechange()"
+                    >
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<ng-template #basicModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Review</h5>
+        <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="d-flex align-items-center flex-wrap text-nowrap">
+                        <label class="mb-0 mr-2">Course Rating</label>
+                        <ngb-rating [(rate)]="sturating" [max]="5">
+                            <ng-template let-fill="fill" let-index="index">
+                                <i class="mdi mdi-star tx-25 text-gray" [class.filled]="fill === 100"></i>
+                            </ng-template>
+                        </ngb-rating>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="d-flex align-items-center flex-wrap text-nowrap">
+                        <label class="mb-0 mr-2">Training Rating</label>
+                        <ngb-rating [(rate)]="tearating" [max]="5">
+                            <ng-template let-fill="fill" let-index="index">
+                                <i class="mdi mdi-star tx-25 text-gray" [class.filled]="fill === 100"></i>
+                            </ng-template>
+                        </ngb-rating>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form #f="ngForm">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Review</label>
+                        <textarea 
+                            #review="ngModel" 
+                            [(ngModel)]="feedback" 
+                            name="review"
+                            class="form-control"
+                            rows="5" 
+                            placeholder="Review"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Student Name</label>
+                        <input 
+                            type="text"
+                            #name="ngModel" 
+                            class="form-control"
+                            [(ngModel)]="reviewname" 
+                            name="name"
+                            placeholder="Student Name">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Course/Product codes</label>
+                        <ng-select 
+                            [items]="codes"
+                            bindLabel="code"
+                            #coursecode="ngModel" 
+                            [(ngModel)]="reviewcoursecode" 
+                            name="coursecode" 
+                            placeholder="Course/Product Code"
+                            >
+                        </ng-select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit(f)">Save changes</button>
+    </div>
+</ng-template>

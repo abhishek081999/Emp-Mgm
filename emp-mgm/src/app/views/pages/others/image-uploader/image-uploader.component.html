@@ -1,0 +1,94 @@
+<div class="modal-header">
+  <h5 class="modal-title">Upload Image</h5>
+  <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col-md-11">
+      <div class="form-group">
+        <input accept="image/*" (change)="handleFileInput($event)" type="file" name="img[]" class="file-upload-default"
+          id="cropperImageUpload">
+        <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+          <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
+          <span class="input-group-append">
+            <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="img-container">
+        <angular-cropper #angularCropper [cropperOptions]="config" [imageUrl]="imageUrl"></angular-cropper>
+      </div>
+      
+    </div>
+    <div class="col-md-1">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Move">
+          <a (click)="move()" class="btn btn-primary">
+            <i class="mdi mdi-arrow-all"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Crop">
+          <a (click)="crop()" class="btn btn-primary">
+            <i class="mdi mdi-crop"></i>
+          </a>
+        </div>
+        <!-- <div class="mb-4 mb-md-0 mt-3" *ngIf="iscrop" ngbTooltip="Crop Save">
+          <a (click)="cropImage()" class="btn btn-primary">
+            <i class="mdi mdi-check"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" *ngIf="iscrop" ngbTooltip="Crop Clear">
+          <a (click)="clear()" class="btn btn-primary">
+            <i class="mdi mdi-cancel"></i>
+          </a>
+        </div> -->
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Zoom In">
+          <a (click)="zoomIn()" class="btn btn-primary">
+            <i class="mdi mdi-magnify-plus"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Zoom Out">
+          <a (click)="zoomOut()" class="btn btn-primary">
+            <i class="mdi mdi-magnify-minus"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Rotate Left">
+          <a (click)="rotateccw()" class="btn btn-primary">
+            <i class="mdi mdi-rotate-left"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Rotate Right">
+          <a (click)="rotatecw()" class="btn btn-primary">
+            <i class="mdi mdi-rotate-right"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Flip Horizontal">
+          <a (click)="fliphorizontal()" class="btn btn-primary">
+            <i class="mdi mdi-flip-horizontal"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Flip Vertical">
+          <a (click)="flipvertical()" class="btn btn-primary">
+            <i class="mdi mdi-flip-vertical"></i>
+          </a>
+        </div>
+        <div class="mb-4 mb-md-0 mt-3" ngbTooltip="Reset">
+          <a (click)="reset()" class="btn btn-primary">
+            <i class="mdi mdi-sync"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col-md-4 ml-auto">
+      <h6 class="card-description mb-2 mb-md-4">Preview: </h6>
+      <img class="cropped-img mt-2" style="max-width: 100%; max-height: 342px;" src="{{resultImage}}" alt="">
+    </div> -->
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" (click)="onSubmit()" class="btn btn-primary"> Upload</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.close()"> Close</button>
+</div>

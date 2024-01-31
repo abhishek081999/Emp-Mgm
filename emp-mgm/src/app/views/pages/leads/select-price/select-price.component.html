@@ -1,0 +1,68 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Price</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="table-responsive" *ngIf="iscourse || isinsignia">
+        <table class="table table-hover table-bordered" cellspacing="0">
+            <tr>
+                <th> Coupon Code </th>
+                <th> Mode </th>
+                <th> First Ins </th>
+                <th> Second Ins </th>
+                <th> Second Ins Date</th>
+                <th> Third Ins </th>
+                <th> Third Ins Date</th>
+                <th> Forth Ins </th>
+                <th> Forth Ins Date</th>
+                <th> Total </th>
+            </tr>
+            <tr *ngFor="let data of allData">
+                <td> {{data?.couponcode}} </td>
+                <td> {{data?.mode}} </td>
+                <td> {{data?.firstins | currency:'INR'}} </td>
+                <td> {{data?.secondins | currency:'INR'}} </td>
+                <td> {{data?.secondinsdate | date: 'mediumDate'}} </td>
+                <td> {{data?.thirdins | currency:'INR'}} </td>
+                <td> {{data?.thirdinsdate | date: 'mediumDate'}} </td>
+                <td> {{data?.forthins | currency:'INR'}} </td>
+                <td> {{data?.forthinsdate | date: 'mediumDate'}} </td>
+                <td> {{data?.total | currency:'INR'}} </td>
+            </tr>
+        </table>
+    </div>
+    <div class="table-responsive" *ngIf="isproduct || isinvesmentor">
+        <table class="table table-hover table-bordered" cellspacing="0">
+            <tr>
+                <th> Coupon Code </th>
+                <th> Total </th>
+            </tr>
+            <tr *ngFor="let data of allData">
+                <td> {{data?.couponcode}} </td>
+                <td> {{data?.total | currency:'INR'}} </td>
+            </tr>
+        </table>
+    </div>
+    <div class="table-responsive" *ngIf="issub">
+        <table class="table table-hover table-bordered" cellspacing="0">
+            <tr>
+                <th> Coupon Code </th>
+                <th> Day </th>
+                <th> Total </th>
+            </tr>
+            <tr *ngFor="let data of allData">
+                <td> {{data?.couponcode}} </td>
+                <td> {{data?.day}} </td>
+                <td> {{data?.total | currency:'INR'}} </td>
+            </tr>
+        </table>
+    </div>
+    <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="nosub">
+        No Subscription Found.
+    </ngb-alert>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+</div>

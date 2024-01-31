@@ -1,0 +1,164 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Live Course</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Course Schedule</h6>
+                <form #scheduleForm="ngForm" (ngSubmit)="scheduleForm.valid && submitForm()">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Date*<a ngbTooltip="Class Date"><i class="small-icon" data-feather="help-circle"
+                                        appFeatherIcon></i></a></label>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Start Time*<a ngbTooltip="Class Start Date & Time"><i class="small-icon"
+                                        data-feather="help-circle" appFeatherIcon></i></a></label>
+                        </div>
+                        <div class="col-md-2">
+                            <label>End Time*<a ngbTooltip="Class Start Date & Time"><i class="small-icon"
+                                        data-feather="help-circle" appFeatherIcon></i></a></label>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Instructor*</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Zoom Licence*</label>
+                        </div>
+                    </div>
+                    <div cdkDropList (cdkDropListDropped)="drop($event)">
+                        <div cdkDrag class="row" *ngFor="let s of classtimings; let i=index"
+                            [ngClass]="{'slot-error':errorList[i]}">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <!-- <label>Date*<a ngbTooltip="Class Date"><i class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label> -->
+                                    <input type="date" class="form-control" [min]="MINDATE" #class_date="ngModel"
+                                        [(ngModel)]="s.class_date" (change)="checkstatus(s,i)" required
+                                        [readonly]="s.approved" name="class_date-{{i}}">
+                                    <p class="text-danger mt-1"
+                                        *ngIf="class_date?.errors?.required && (scheduleForm.submitted || class_date.dirty || class_date.touched)">
+                                        This field is required.</p>
+                                    <p class="text-danger mt-1"
+                                        *ngIf="class_date?.errors?.min && (scheduleForm.submitted || class_date.dirty || class_date.touched)">
+                                        Min date is {{MINDATE}}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <!-- <label>Start Time*<a ngbTooltip="Class Start Time"><i class="small-icon"
+                                        data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                                <ng-select [items]="allSlots" [searchable]="true" placeholder="Select Start Time"
+                                    #start_time="ngModel" [(ngModel)]="s.start_slot" name="start_time-{{i}}"
+                                    bindValue="start_min" bindLabel="slot" required (change)="checkstatus(s,i)"
+                                    [disabled]="s.approved">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="start_time?.errors?.required && (scheduleForm.submitted || start_time.dirty || start_time.touched)">
+                                    This field is required.</p>
+                            </div>
+                            <div class="col-md-2">
+                                <!-- <label>End Time*<a ngbTooltip="Class End Time"><i class="small-icon"
+                                        data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                                <ng-select [items]="allSlots" [searchable]="true" placeholder="Select End Time"
+                                    #end_time="ngModel" [(ngModel)]="s.end_slot" name="end_time-{{i}}"
+                                    bindValue="start_min" bindLabel="slot" required (change)="checkstatus(s,i)"
+                                    [disabled]="s.approved">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="end_time?.errors?.required && (scheduleForm.submitted || end_time.dirty || end_time.touched)">
+                                    This field is required.</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <!-- <label>Instructor*</label> -->
+                                    <ng-select [items]="allIns" [searchable]="true" placeholder="Select Instructor"
+                                        #instructor="ngModel" [(ngModel)]="s.instructor_id" name="instructor-{{i}}"
+                                        bindValue="_id" required (change)="checkstatus(s,i)" [searchFn]="StaffSearchFn"
+                                        [disabled]="s.approved">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.invid}} - {{item.fullName}}
+                                        </ng-template>
+                                    </ng-select>
+                                    <p class="text-danger mt-1"
+                                        *ngIf="instructor?.errors?.required && (scheduleForm.submitted || instructor.dirty || instructor.touched)">
+                                        This field is required.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center flex-wrap text-nowrap">
+                                    <div class="form-group wd-md-200">
+                                        <!-- <label>Licence*</label> -->
+                                        <ng-select [items]="allLicence" [searchable]="true" (change)="checkstatus(s,i)"
+                                            placeholder="Select Zoom Licence" #licence="ngModel" [(ngModel)]="s.licence"
+                                            name="licence-{{i}}" bindValue="_id" bindLabel="email" required
+                                            [disabled]="isapproved && s.approved">
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="licence?.errors?.required && (scheduleForm.submitted || licence.dirty || licence.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                    <a ngbDropdown class="dropdown drop">
+                                        <button type="button" id="insdropdown" ngbDropdownToggle
+                                            class="btn p-0 mt-2 no-dropdown-toggle-icon">
+                                            <i ngbTooltip="More Options"
+                                                class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                        </button>
+                                        <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                            <a ngbDropdownItem (click)="duplicateSchedule(s)"><i
+                                                    class="feather icon-copy icon-xs mr-2"></i> Duplicate
+                                                Timing</a>
+                                            <a ngbDropdownItem (click)="postponeSchedule(s)">
+                                                <i class='feather icon-calendar icon-xs mr-2'></i> Postpone Schedule</a>
+                                            <!-- [disabled]="isapproved && s.approved" -->
+                                            <a *ngIf="classtimings?.length>1" ngbDropdownItem
+                                                (click)="deleteSchedule(i,s._id)">
+                                                <i class="feather icon-trash-2 icon-xs mr-2"></i> Delete Timing
+                                            </a>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="btn btn-primary mr-2" (click)="addSchedule()"><i class="small-icon"
+                            data-feather="plus-square" appFeatherIcon></i> Add Schedule</a>
+                    <div (click)="previewDates()" class="btn btn-primary mr-2">Preview Dates</div>
+                    <button class="btn btn-success">Continue</button>
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'" *ngIf="errormsg">
+                        {{errormsg}}
+                    </ngb-alert>
+                </form>
+                <div class="alert alert-success mt-2" *ngIf="scheduleForm.submitted && scheduleForm.valid">
+                    <div class="spinner-border spinner-border-sm text-success mr-2" role="status">
+                    </div>
+                    Saving Changes... Please Wait...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Calender</h6>
+                <full-calendar id="calendar" defaultView="dayGridMonth" [header]="{
+                        left: 'prev,today,next',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                    }" [plugins]="calendarPlugins" [deepChangeDetection]="true" [weekends]="true" [events]="events"
+                    [eventLimit]="false" [editable]="false"></full-calendar>
+            </div>
+        </div>
+    </div>
+</div>

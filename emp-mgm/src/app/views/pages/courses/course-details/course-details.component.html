@@ -1,0 +1,89 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin/courses/course-list">Courses</a></li>
+        <li class="breadcrumb-item"><a routerLink="/admin/courses/course-list">Course List</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{  course.coursename }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">{{ course.coursename }}</h2>
+            </div>
+            <div class="card-body">
+                <div style="position:relative; width:1px; min-width:100%; padding-bottom:56.25%">
+                    <iframe 
+                        allow="autoplay" 
+                        class="vooplayer" 
+                        allowtransparency="true" 
+                        style="width:1px; min-width:100%; height: 100%; position:absolute" 
+                        allowfullscreen="true" 
+                        [src]=videolink  
+                        frameborder="0" 
+                        scrolling="no"> </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <ul ngbNav #fillJustifyNav="ngbNav" class="nav-tabs nav-fill">
+                    <li [ngbNavItem]="1">
+                        <a ngbNavLink>Lessons</a>
+                        <ng-template ngbNavContent>
+                            <ngb-accordion [closeOthers]="true">
+                                <ngb-panel *ngFor="let l of courselessons; let in=index" title="{{l.title}}">
+                                    <ng-template ngbPanelContent>
+                                        <ul class="list-unstyled">
+                                            <li class="coursedetails" *ngFor="let lessons of l.section; let i=index">
+                                                <a
+                                                    (click)="setvideo(lessons)" 
+                                                    class="{{lessons.type}}">
+                                                    {{ lessons.title }}
+                                                </a>
+                                                <hr>
+                                            </li>
+                                        </ul>
+                                    </ng-template>
+                                </ngb-panel>
+                            </ngb-accordion>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="2">
+                        <a ngbNavLink>Details</a>
+                        <ng-template ngbNavContent>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="{{imageurl}}{{course.coursepicture}}" class="wd-100p" alt="{{course.coursename}}">
+                                </div>
+                                <div class="col-md-9">
+                                    <h4>{{course.coursename | titlecase}} </h4>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Course Code</strong> {{course.coursecode}}</li>
+                                        <li><strong>Duration</strong> {{course.courseduration}}</li>
+                                        <li><strong>Category</strong> {{course.coursecategory}}</li>
+                                        <li><strong>Teacher</strong> {{course.teachername}}</li>
+                                        <li><strong>Student Registered</strong> {{course.numberofstudents}}</li>
+                                        <li><strong>Ratings</strong> {{rating(course.rating) | number:'1.1-1'}}/5</li>
+                                        
+                                    </ul>
+                                </div>
+                                <div class="col-md-12">
+                                    <h6>Course description</h6> 
+                                    <p>{{course.coursedescription}}</p>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </li>
+                </ul>
+                <div [ngbNavOutlet]="fillJustifyNav" class="border border-top-0 p-3"></div>
+            </div>
+        </div>
+    </div>
+</div>

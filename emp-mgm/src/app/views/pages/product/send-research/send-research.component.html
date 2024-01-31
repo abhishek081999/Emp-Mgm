@@ -1,0 +1,368 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Send Research</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Send Market Overview</h6>
+                <form #sendResearchForm="ngForm" (ngSubmit)="sendResearchForm.valid && SendResearch(sendResearchForm)">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div *ngIf=" sendResearch.type == 'text'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Details*
+                                        </label>
+                                        <quill-editor [(ngModel)]="sendResearch.details" #details="ngModel"
+                                            name="description" placeholder="Enter Description"
+                                            [styles]="{height:'216px'}" [modules]="quillConfig" [required]="true"
+                                            (onSelectionChanged)="onSelectionChanged($event)"
+                                            (onContentChanged)="onContentChanged($event)">
+                                        </quill-editor>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="details?.errors?.required && (details.dirty || details.touched || sendResearchForm.submitted)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div *ngIf="sendResearch.type == 'video' || sendResearch.type == 'image' || sendResearch.type == ''  || sendResearch.type == 'poll' "
+                                    class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            Details
+                                        </label>
+                                        <quill-editor [(ngModel)]="sendResearch.details" #details1="ngModel"
+                                            name="description1" placeholder="Enter Description"
+                                            [styles]="{height:'216px'}" [modules]="quillConfig"
+                                            (onSelectionChanged)="onSelectionChanged($event)"
+                                            (onContentChanged)="onContentChanged($event)">
+                                        </quill-editor>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Schedule Date</label>
+                                                <input type="date" class="form-control" #schedule_time="ngModel"
+                                                    [ngModel]="sendResearch.schedule_time | date:'yyyy-MM-dd'"
+                                                    (ngModelChange)="sendResearch.schedule_time = $event"
+                                                    [(ngModel)]="sendResearch.schedule_time" name="schedule_time"
+                                                    placeholder="Schedule Date">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Hour</label>
+                                                <ng-select [items]="hours" #hour="ngModel" [(ngModel)]="scheduleHour"
+                                                    name="hour" placeholder="Hour">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Minute</label>
+                                                <ng-select [items]="minutes" #minute="ngModel" [(ngModel)]="scheduleMin"
+                                                    name="minute" placeholder="Minute">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="row">
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Type*</label>
+                                        <ng-select [items]="Type" #type="ngModel" [(ngModel)]="sendResearch.type"
+                                            name="type" placeholder="Type">
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="type?.errors?.required && (type.dirty || type.touched || sendResearchForm.submitted)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Category*</label>
+                                        <ng-select [items]="categories" #category="ngModel"
+                                            [(ngModel)]="sendResearch.category" name="category" placeholder="Category">
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="category?.errors?.required && (category.dirty || category.touched || sendResearchForm.submitted)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Language*</label>
+                                        <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                            #language="ngModel" [(ngModel)]="sendResearch.language" name="language"
+                                            required>
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="language?.errors?.required && (sendResearchForm.submitted || language.dirty || language.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div *ngIf="sendResearch.type == 'image'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Image 1</label>
+                                        <input id="img" type="file" accept="image/*" name="img"
+                                            (change)="handelFileInput($event)" class="file-upload-default" required>
+                                        <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                            <input type="text" class="form-control file-upload-info" disabled=""
+                                                placeholder="Upload Image">
+                                            <span class="input-group-append">
+                                                <button class="file-upload-browse btn btn-primary"
+                                                    type="button">Browse</button>
+                                            </span>
+                                        </div>
+
+                                        <p class="text-danger mt-1"
+                                            *ngIf="sendResearchForm.submitted && !sendResearch.image">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div *ngIf="sendResearch.type == 'image'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Image 2</label>
+                                        <input id="img1" type="file" accept="image/*" name="img"
+                                            (change)="handelFileInput1($event)" class="file-upload-default" required>
+                                        <div class="input-group col-xs-12" (click)="openFileBrowser1($event)">
+                                            <input type="text" class="form-control file-upload-info" disabled=""
+                                                placeholder="Upload Image">
+                                            <span class="input-group-append">
+                                                <button class="file-upload-browse btn btn-primary"
+                                                    type="button">Browse</button>
+                                            </span>
+                                        </div>
+
+                                        <p class="text-danger mt-1"
+                                            *ngIf="sendResearchForm.submitted && !sendResearch.image">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div *ngIf="sendResearch.type == 'image'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Image 3</label>
+                                        <input id="img2" type="file" accept="image/*" name="img"
+                                            (change)="handelFileInput2($event)" class="file-upload-default" required>
+                                        <div class="input-group col-xs-12" (click)="openFileBrowser2($event)">
+                                            <input type="text" class="form-control file-upload-info" disabled=""
+                                                placeholder="Upload Image">
+                                            <span class="input-group-append">
+                                                <button class="file-upload-browse btn btn-primary"
+                                                    type="button">Browse</button>
+                                            </span>
+                                        </div>
+
+                                        <p class="text-danger mt-1"
+                                            *ngIf="sendResearchForm.submitted && !sendResearch.image">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div *ngIf="sendResearch.type == 'image'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Image 4</label>
+                                        <input id="img3" type="file" accept="image/*" name="img"
+                                            (change)="handelFileInput3($event)" class="file-upload-default" required>
+                                        <div class="input-group col-xs-12" (click)="openFileBrowser3($event)">
+                                            <input type="text" class="form-control file-upload-info" disabled=""
+                                                placeholder="Upload Image">
+                                            <span class="input-group-append">
+                                                <button class="file-upload-browse btn btn-primary"
+                                                    type="button">Browse</button>
+                                            </span>
+                                        </div>
+
+                                        <p class="text-danger mt-1"
+                                            *ngIf="sendResearchForm.submitted && !sendResearch.image">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="sendResearch.type == 'video'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Video link*<a placement="top" ngbTooltip="Embed url"><i
+                                                    class="small-icon" data-feather="help-circle"
+                                                    appFeatherIcon></i></a></label>
+                                        <input type="text" class="form-control" #video="ngModel"
+                                            [(ngModel)]="sendResearch.video" name="video" placeholder="Video link"
+                                            required>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="video?.errors?.required && (sendResearchForm.submitted || video.dirty || video.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="sendResearch.type == 'poll'" class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Options*<a placement="top" ngbTooltip="Options separated by ;"><i
+                                                    class="small-icon" data-feather="help-circle"
+                                                    appFeatherIcon></i></a></label>
+                                        <textarea rows="5" class="form-control" style="height:100px;"
+                                            placeholder="Options separated by semicolon (;)" #polloptions="ngModel"
+                                            [(ngModel)]="options" name="polloptions" required>
+                                                                        </textarea>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="polloptions?.errors?.required && (sendResearchForm.submitted || polloptions.dirty || polloptions.touched)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary mr-2">Submit</button>
+                    <a class="btn btn-danger" (click)="clearform()">Reset</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ngb-alert [dismissible]="false" [type]="'info'">
+    Form Will be reset in {{subscribeTimer | date:'mm:ss':'UTC' }}
+</ngb-alert>
+
+<ngb-alert [dismissible]="false" [type]="'warning'" *ngIf="serverErrorMessages">
+    {{serverErrorMessages}}
+</ngb-alert>
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+<div class="row profile-body">
+    <!-- left wrapper start -->
+    <div class="d-none d-md-block col-md-4 col-xl-4 left-wrapper">
+        <div class="card rounded">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="card-title mb-0">Filter</h6>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <ng-select [items]="['All','Approved','Pending']" [searchable]="true"
+                                placeholder="Select Status" #statusf="ngModel" [(ngModel)]="statusFilter" name="statusf"
+                                (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <ng-select [items]="Type" #type="ngModel" [(ngModel)]="typeFilter" (change)="filter()"
+                                name="type" placeholder="Type">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <ng-select [items]="categories" #category="ngModel" (change)="filter()"
+                                [(ngModel)]="categoryFilter" name="category" placeholder="Category">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Language</label>
+                            <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                #language="ngModel" [(ngModel)]="languageFilter" name="language" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- left wrapper end -->
+    <!-- middle wrapper start -->
+    <div class="col-md-8 col-xl-8 middle-wrapper">
+        <div class="row">
+            <div class="col-md-12 grid-margin"
+                *ngFor="let item of filteredData | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                <div class="card rounded">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <img class="img-xs rounded-circle" [src]="getImage(item.category) | urlsanitize"
+                                    [alt]="item.category">
+                                <div class="ml-2">
+                                    <p>{{item.category}}
+                                        <span class="badge badge-pill badge-success ml-2 mr-1">{{item.language}}</span>
+                                        <span *ngIf="item.isEdited"
+                                            class="badge badge-pill badge-secondary ml-2 mr-1">Edited</span>
+                                    </p>
+                                    <p class="tx-11 text-muted">{{sendtime(item.created_date)}}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <button *ngIf="!item.approved" (click)="onApprove(item)"
+                                    class="btn btn-success mr-2">Approve</button>
+                                <button *ngIf="!item.approved" (click)="onDelete(item._id)"
+                                    class="btn btn-danger mr-2">Delete</button>
+                                <button (click)="editResearch(item)" class="btn btn-primary">Edit</button>
+                            </div>
+                        </div>
+                        <p>
+                            <span *ngIf="item.schedule_time" class="badge badge-pill badge-primary ml-2 mr-1">Schedule
+                                At: {{item.schedule_time | date:'medium'}}</span>
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <img *ngIf="item.image && item.image?.length == 1" loading="lazy" class="img-fluid mb-3"
+                            [src]="item.image[0]" style="padding: 12px;" alt="Market Overview">
+                        <div class="row" *ngIf="item.image && item.image?.length > 1">
+                            <div class="col-md-6" *ngFor="let i of item.image">
+                                <img *ngIf="i" class="img-fluid mb-3" [src]="i" loading="lazy" style="padding: 12px;"
+                                    alt="Market Overview">
+                            </div>
+                        </div>
+                        <iframe *ngIf="item.video" style="padding: 12px;" class="vooplayer wd-100p ivideo"
+                            allowtransparency="true" allowfullscreen="true" [src]="getUrl(item.video) | urlsanitize"
+                            frameborder="0" scrolling="no">
+                        </iframe>
+                        <quill-view-html class="tx-14" [content]="item.details" theme="snow">
+                        </quill-view-html>
+                        <div *ngIf="item?.type === 'poll'" class="m-3">
+                            <div *ngFor="let i of item.options" class="mb-3">
+                                {{i?.option}}
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" [ngStyle]="{'width':i.vote + '%' }"
+                                        [attr.aria-valuenow]="i.vote" aria-valuemin="0" aria-valuemax="100">{{i.vote}}%
+                                    </div>
+                                </div>
+                            </div>
+                            {{item?.voting_count}} Votes
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex post-actions">
+                            <a class="d-flex align-items-center" *ngFor="let r of item.reaction; let i=index">
+                                <span class="badge badge-pill box mr-1" *ngIf="r.count !== 0">{{getEmoji(r.emoji)}}
+                                    &nbsp;&nbsp; {{r.count}}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- middle wrapper end -->
+</div>
+<ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+    (pageChange)="pagechange()">
+</ngb-pagination>

@@ -1,0 +1,293 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insignia</a></li>
+        <li class="breadcrumb-item active" aria-current="page">BCMB BATCH WISE CONVERSION </li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">BCMB BATCH WISE CONVERSION </h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Month</label>
+                                <ng-select [items]="monthList" #monthFilter="ngModel" [(ngModel)]="month"
+                                    name="monthFilter" placeholder="Search By Month" bindLabel="name" bindValue="num">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Year</label>
+                                <ng-select [items]="yearList" #yearFilter="ngModel" [(ngModel)]="year" name="yearFilter"
+                                    placeholder="Search By Year">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="coursecode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.coursecode}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="batch_start">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Batch Start Date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.batch_start | date:'mediumDate'}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="instructor">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Instructor </th>
+                            <td mat-cell *matCellDef="let row"> {{row.instructor | titlecase}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total BCMB Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_active_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> BCMB Active Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_active_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_active_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Opted For <br> Insignia</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_opted}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Insignia <br> Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_converted}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_converted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_opted_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Opted <br> for Insignia</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_opted_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_opted_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="advance_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Opted for <br> Advance Course </th>
+                            <td mat-cell *matCellDef="let row"> {{row.advance_opted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_advance_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="advance_opted_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Opted for <br>Advance Course
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.advance_opted_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_advance_opted_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Opted for <br> Product </th>
+                            <td mat-cell *matCellDef="let row"> {{row.product_opted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_product_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_opted_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>% of Opted for <br> Product </th>
+                            <td mat-cell *matCellDef="let row"> {{row.product_opted_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_product_opted_conv | percent}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <!-- <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator> -->
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Students Data Table  -->
+
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">BCMB Students Status</h6>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Insignia Converted</label>
+                            <ng-select [items]="insigniaconverted" [searchable]="true"
+                                placeholder="Filter Insignia Converted " #Insigniaconverted="ngModel"
+                                [(ngModel)]="insigniaconvertedStatusFilter" name="insigniaconverted"
+                                (change)="Filter()">
+
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Insignia Opted</label>
+                            <ng-select [items]="insigniaopted" [searchable]="true" placeholder="Filter Insignia Opted "
+                                #Insigniaopted="ngModel" [(ngModel)]="insigniaoptedStatusFilter" name="insigniaopted"
+                                (change)="Filter()">
+
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>BCMB Active</label>
+                            <ng-select [items]="bcmbactive" [searchable]="true" placeholder="Filter BCMB Active"
+                                #bcmbActive="ngModel" [(ngModel)]="bcmbactiveStatusFilter" name="bcmbactive"
+                                (change)="Filter()">
+
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Filter By Course Code</label>
+                            <ng-select [items]="coursecodes" [searchable]="true" placeholder="Filter By Course Code "
+                                #Coursecodes="ngModel" [(ngModel)]="coursecodefilter" name="coursecodes"
+                                (change)="Filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilterstudents($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary btn-block"
+                            (click)="exportstudents()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                        [dataSource]="dataSourcestudentdata" matSort>
+                        <ng-container matColumnDef="insignia_converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> insignia converted</th>
+                            <td mat-cell *matCellDef="let row">{{row.insignia_converted}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> insignia opted</th>
+                            <td mat-cell *matCellDef="let row">{{row.insignia_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_active">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> bcmb active</th>
+                            <td mat-cell *matCellDef="let row">{{row.bcmb_active}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="instructor">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> instructor</th>
+                            <td mat-cell *matCellDef="let row"> {{row.instructor}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="coursecode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> course code</th>
+                            <td mat-cell *matCellDef="let row"> {{row.coursecode}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="employee_fullname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> employee name</th>
+                            <td mat-cell *matCellDef="let row">{{row.employee_fullname}} - {{row.employee_invid}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_employee_fullname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> insignia employee name</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_employee_fullname}} -
+                                {{row.insignia_employee_invid}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_teamlead">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> insignia team</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_teamname}} <br> {{row.insignia_teamlead}}
+                                -
+                                {{row.insignia_teamleadname}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadstatus">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Status</th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadstatus}} <br>
+                                <p>{{row.updatedate | date: 'mediumDate'}}<br>{{row.updatedate | date: 'shortTime'}}
+                                </p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="student_fullname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> student name</th>
+                            <td mat-cell *matCellDef="let row"> {{row.student_fullname}} - {{row.student_invid}} <br>
+                                {{row.student_email}} <br> {{row.student_telephone}} <br> {{row.student_Whatsapp}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="logs">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                            <td style="padding: 0px 0px 0px 11px;" mat-cell *matCellDef="let row"
+                                (click)="changehistory(row.lead_id)">
+                                <a placement="top" ngbTooltip="Activity Logs" class="mr-2">
+                                    <i data-feather="file-text" appFeatherIcon></i>
+                                </a>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsstudentdata;  sticky: true;"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsstudentdata;"
+                            [class.alert-danger]="isnottagged(row)"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

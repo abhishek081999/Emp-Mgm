@@ -1,0 +1,137 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Jobs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Job Applications</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Job Applications</h6>
+                    <form class="search-form">
+                        <div class="input-group border rounded-sm">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text border-0 rounded-sm">
+                                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                </div>
+                            </div>
+                            <ng-select 
+                                    [items]="jobids"
+                                    name="orderby" 
+                                    #statusfilter="ngModel" 
+                                    [(ngModel)]="pagefilter"
+                                    placeholder="Search By ID"
+                                    class="wd-md-200 border-0 rounded-sm"
+                                    (change)="onchange()">
+                            </ng-select>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="exportavailable" class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isfound">
+					No Job Applications Found.
+				</ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive pt-3">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+                              
+                        <ng-container matColumnDef="jobid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Job ID </th>
+                            <td mat-cell *matCellDef="let row" > {{row.jobid}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="invid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student Id </th>
+                            <td mat-cell *matCellDef="let row" > {{row.invid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="fullName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Full name </th>
+                            <td mat-cell *matCellDef="let row" > {{row.fullName}} </td>
+                        </ng-container>
+                     
+                        <ng-container matColumnDef="email">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                            <td mat-cell *matCellDef="let row" > {{row.email}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="telephone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                            <td mat-cell *matCellDef="let row"> {{row.telephone}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="alternatenumber">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Whatsapp Number </th>
+                            <td mat-cell *matCellDef="let row"> {{row.alternatenumber}} </td>
+                        </ng-container>
+        
+                        <ng-container matColumnDef="gender">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th>
+                            <td mat-cell *matCellDef="let row" > {{row.gender}} </td>
+                        </ng-container>
+                      
+                        <ng-container matColumnDef="dob">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Dob </th>
+                            <td mat-cell *matCellDef="let row" > {{row.dob}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="applicationdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Application Date </th>
+                            <td mat-cell *matCellDef="let row" > {{row.applicationdate}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="address">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Address </th>
+                            <td mat-cell *matCellDef="let row" > {{row.address}} </td>
+                        </ng-container>
+                  
+                        <ng-container matColumnDef="city">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> City </th>
+                            <td mat-cell *matCellDef="let row" > {{row.city}} </td>
+                        </ng-container>
+                      
+                        <ng-container matColumnDef="pincode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pincode </th>
+                            <td mat-cell *matCellDef="let row" > {{row.pincode}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="state">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> State </th>
+                            <td mat-cell *matCellDef="let row" > {{row.state}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="qualification">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Qualification </th>
+                            <td mat-cell *matCellDef="let row" > {{row.qualification}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="cv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> CV  </th>
+                            <td mat-cell *matCellDef="let row"><a href="{{imageurl}}{{row.cv}}" target="blank"><i class="feather icon-download icon-sm"></i></a></td>
+                        </ng-container>
+            
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[5, 10, 15, 20]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

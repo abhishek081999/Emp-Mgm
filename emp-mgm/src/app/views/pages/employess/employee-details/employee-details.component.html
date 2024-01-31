@@ -1,0 +1,775 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Employees</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Employee Profile</li>
+    </ol>
+</nav>
+
+<section style="background-color: #eee;">
+    <div class="container py-3">
+        <div class="row">
+            <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- (click)="fileDropRef.click()" -->
+                                <div class="profiledropzone" appDnd (fileDropped)="onFileDropped($event)">
+                                    <input type="file" accept="image/*" #fileDropRef id="fileDropRef"
+                                        (change)="fileBrowseHandler($event)" />
+                                    <h3 *ngIf="!profilePictureUrl">Drag and Drop profile Image Here</h3>
+                                    <h3 *ngIf="!profilePictureUrl">or</h3>
+                                    <label *ngIf="!profilePictureUrl" for="fileDropRef">Browse</label>
+                                    <h3 class="prodeshov">Drag and Drop profile Image Here</h3>
+                                    <h3 class="prodeshov">or</h3>
+                                    <label class="prodeshov" for="fileDropRef">Browse</label>
+                                    <img [src]="profilePictureUrl" class="dropimage proimghov"
+                                        *ngIf="profilePictureUrl">
+                                </div>
+                                <!-- <br>
+                                    <label class="browse" for="fileDropRef">Browse Image</label> -->
+
+                                <h5 class="my-2">{{ employee?.fullName }}</h5>
+                                <p class="text-muted mb-2">{{employee?.invid}}</p>
+                                <button type="button" class="btn btn-primary" (click)="changePassword(employee)">Change
+                                    Password</button>
+                                <!-- <button type="button" class="btn btn-outline-primary ms-1" (click)="changePicture()">Change
+                            Picture</button> -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-8 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Full Name: </p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{employee?.fullName}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Email: </p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{employee?.email}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Phone: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{employee?.countryCode}}-{{employee?.telephone}}</p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="gstin"> </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <!-- <p class="text-muted mb-0">{{employee?.gstin? employee?.gstin: 'Not available'}}</p> -->
+                            </div>
+
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Telegram Number: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{employee?.countryCode}}-{{employee?.telegram}}</p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="wp">Whatsapp Number: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{employee?.countryCode}}-{{employee?.alternatenum}}</p>
+                            </div>
+                        </div>
+                        <!-- <hr>
+                        <div class="row">
+                           
+                        </div> -->
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Address: </p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{address}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-2">
+                            <div class="col-sm-3">
+                                <p>Date of birth: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <span class="text-muted"> {{employee?.dob}}</span>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="gender">Gender: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <span class="text-muted"> {{employee?.gender}}</span>
+                            </div>
+                        </div>
+                                                        
+                                <div class="d-flex justify-content-start">
+                                    <div class="m-1 mb-3">
+                                        <button type="button" class="btn btn-outline-primary " (click)="edit(employee,changeModal)">
+                                            Edit Profile
+                                        </button>
+                                    </div>
+                                    <div class="m-1 mb-3">
+                                        <button  *ngIf="employee.profileid" type="button" class="btn btn-outline-success " [routerLink]="['/admin/instructor/instructor-list', employee.profileid]">
+                                            Go To Instructor Profile
+                                        </button>
+                                    </div>
+                                    <div class="m-1 mb-3">
+                                        <button type="button" class="btn btn-outline-danger " (click)="OffBoarding()">
+                                            Initiate Off-Boarding
+                                        </button>
+                                    </div>
+                                </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <ul ngbNav #EmployeeProfileNav="ngbNav" class="nav-tabs nav-fill">
+                            <li [ngbNavItem]="1">
+                                <a ngbNavLink>Allocation</a>
+                                <ng-template ngbNavContent>
+                                    <form #allocationForm="ngForm"
+                                        (ngSubmit)="allocationForm.valid && submitAllocation(allocationForm)">
+                                        <div class="row">
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Department*</label>
+                                                    <ng-select [items]="departments" [searchable]="true" bindValue="_id"
+                                                        bindLabel="name" #departmentid="ngModel"
+                                                        [(ngModel)]="AllocationDetails.department_id"
+                                                        (change)="selectManager(AllocationDetails.department_id)"
+                                                        class="wd-md-340 border-0 rounded-sm" name="department_id"
+                                                        placeholder="Select departments">
+                                                    </ng-select>
+
+                                                    <!-- <ng-select [items]="departments" [searchable]="true" #department_id="ngModel"
+                                                    [(ngModel)]="designation.department_id" name="department_id"
+                                                    placeholder="Select Department" bindValue="_id" bindLabel="name">
+                                                </ng-select> -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Manager*</label>
+                                                    <ng-select [items]="manager" [searchable]="true" bindValue="invid"
+                                                        #Manager="ngModel" [(ngModel)]="AllocationDetails.Manager"
+                                                        [searchFn]="StaffSearchFn" class="wd-md-340 border-0 rounded-sm"
+                                                        name="manager" placeholder="Select Manager">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.fullName}} -
+                                                                {{item.invid}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.fullName}} - {{item.invid}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Team*</label>
+                                                    <ng-select [items]="TeamsDrop" [searchable]="true" bindValue="_id"
+                                                        bindLabel="_id" #Teamid="ngModel"
+                                                        [(ngModel)]="AllocationDetails.team_id"
+                                                        class="wd-md-340 border-0 rounded-sm" name="team"
+                                                        placeholder="Select Team">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.name}}
+                                                        </ng-template>
+                                                    </ng-select>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Designation*</label>
+                                                    <ng-select [items]="DesignationDrop" [searchable]="true"
+                                                        bindValue="_id" bindLabel="_id" #designationsid="ngModel"
+                                                        [(ngModel)]="AllocationDetails.designation_id"
+                                                        class="wd-md-340 border-0 rounded-sm" name="designations"
+                                                        placeholder="Select designations">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.name}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Role*</label>
+                                                    <ng-select [items]="allRoles" [searchable]="true" bindValue="name"
+                                                        bindLabel="name" #role="ngModel"
+                                                        [(ngModel)]="AllocationDetails.role"
+                                                        class="wd-md-340 border-0 rounded-sm" name="role"
+                                                        placeholder="Select Role">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.name}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Hr*</label>
+                                                    <ng-select [items]="hr" [searchable]="true" bindValue="invid"
+                                                        #Hr="ngModel" [(ngModel)]="AllocationDetails.Hr"
+                                                        [searchFn]="StaffSearchFn" class="wd-md-340 border-0 rounded-sm"
+                                                        name="hr" placeholder="Select Hr">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.fullName}} -
+                                                                {{item.invid}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.fullName}} - {{item.invid}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Approver*</label>
+                                                    <ng-select [items]="ApproverDrop" [searchable]="true"
+                                                        bindValue="invid" #approver="ngModel" [searchFn]="StaffSearchFn"
+                                                        [(ngModel)]="AllocationDetails.Approver"
+                                                        class="wd-md-340 border-0 rounded-sm" name="Approver"
+                                                        placeholder="Select Approver">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.fullName}} -
+                                                                {{item.invid}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.fullName}} - {{item.invid}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Employee Type*</label>
+                                                    <ng-select [items]="empType" [searchable]="true" #EmpType="ngModel"
+                                                        [(ngModel)]="AllocationDetails.employeeType"
+                                                        class="wd-md-340 border-0 rounded-sm" name="empType"
+                                                        placeholder="Select Employee type">
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Select Policy*</label>
+                                                    <ng-select [items]="policyType" [multiple]="true"
+                                                        [closeOnSelect]="false" [searchable]="true"
+                                                        #policy_Type="ngModel"
+                                                        [(ngModel)]="AllocationDetails.leave_policy" bindValue="_id"
+                                                        class="wd-md-340 border-0 rounded-sm" name="policy_Type"
+                                                        placeholder="Select Policy">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item.policy_name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.policy_name}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Active/Inactive Account*</label>
+                                                    <label class="mb-0 toggle-switch">
+                                                        <input type="checkbox" name="activty"
+                                                            [(ngModel)]="AllocationDetails.isActive"
+                                                            class="form-control">
+                                                        <span class="toggle-slider round"></span> </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <button type="submit" class="btn btn-primary mt-4 animated-button"
+                                                    style="align-self: center;">Submit</button>
+                                            </div>
+                                        </div>
+
+                                    </form>
+
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="2">
+                                <a ngbNavLink>Personal Details</a>
+                                <ng-template ngbNavContent>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="passportPic">
+                                                    Passport Image*</label>
+                                                <input id="passportPic" class="form-control" type="file"
+                                                    name="passportPic" accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'passport','Passport_image')">
+                                                <a class="mt-2" *ngIf="this.employeeDetails.passport"
+                                                    (click)="view_image(this.employeeDetails.passport)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View Passport</a>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="pancard">Pancard* </label>
+                                                <input id="pancard" class="form-control" type="file" name="pancard"
+                                                    accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'pancard','Pancard')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.pancard"
+                                                    (click)="view_image(this.employeeDetails.pancard)" target="blank"><i
+                                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i>
+                                                    View Pancard</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="Adhaar">Aadhaar Card*</label>
+                                                <input id="Adhaar" class="form-control" type="file" name="Adhaar"
+                                                    accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'adhaarcard','Adhaarcard')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.adhaarcard"
+                                                    (click)="view_image(this.employeeDetails.adhaarcard)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View Aadhaar Card</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="cancelcheque">Cancel Cheque*</label>
+                                                <input id="cancelcheque" class="form-control" type="file"
+                                                    name="cancelcheque" accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'cancelCheque','Cancel_cheque')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.cancelCheque"
+                                                    (click)="view_image(this.employeeDetails.cancelCheque)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View Cancel Cheque</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="Madhyamik">Secondary Result*</label>
+                                                <input id="Madhyamik" class="form-control" type="file" name="Madhyamik"
+                                                    accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'secondary','Secondary')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.secondary"
+                                                    (click)="view_image(this.employeeDetails.secondary)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View 10th Result</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="Hs">Higher Secondary Result*</label>
+                                                <input id="Hs" class="form-control" type="file" name="Hs"
+                                                    accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'higherSecondary','Higher_secondary')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.higherSecondary"
+                                                    (click)="view_image(this.employeeDetails.higherSecondary)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View 12th Result</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="graduation">Graduation Result*</label>
+                                                <input id="graduation" class="form-control" type="file"
+                                                    name="graduation" accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'graduation','Graduation')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.graduation"
+                                                    (click)="view_image(this.employeeDetails.graduation)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View Graduation Result</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="graduation">Higher Study</label>
+                                                <input id="higer-study" class="form-control" type="file"
+                                                    name="higer-study" accept="image/jpeg,image/png,image/jpg"
+                                                    (change)="personalFileHandler($event,'higherStudy','Higher_study')">
+                                                <a class="ml-3" *ngIf="this.employeeDetails.higherStudy"
+                                                    (click)="view_image(this.employeeDetails.higherStudy)"
+                                                    target="blank"><i class="icon-md pb-3px" data-feather="eye"
+                                                        appFeatherIcon></i> View Higher Study Certificate</a>
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <form #personaldetailsForm="ngForm"
+                                        (ngSubmit)="personaldetailsForm.valid && submitPersonalDetails(personaldetailsForm)">
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="bloodGroup">Blood Group*</label>
+                                                    <!-- <input type="text" name="bloodGroup"> -->
+
+                                                    <ng-select [items]="bloodGroups" placeholder="Select blood group"
+                                                        name="bloodgroup" [(ngModel)]="employeeDetails.bloodGroup"
+                                                        #bloodgroup="ngModel" required>
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="bloodgroup?.errors?.required && (bloodgroup.dirty || bloodgroup.touched || personaldetailsForm.submitted)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="Marital">Marital Status*</label>
+                                                    <ng-select [items]="Marital" #marrital="ngModel"
+                                                        [(ngModel)]="employeeDetails.maritalStatus"
+                                                        class="wd-md-340 border-0 rounded-sm" name="Marital"
+                                                        placeholder="Select Marital Status" required>
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="marrital?.errors?.required && (marrital.dirty || marrital.touched || personaldetailsForm.submitted)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 mb-2">
+                                                <h5 class="mb-3 mb-md-0" id="emergency">Emergency Contact
+                                                    Details*
+                                                </h5>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="name">Emergency Contact Name*</label>
+                                                    <input type="text" name="Name" class="form-control"
+                                                        placeholder="Emergency Contact Name"
+                                                        [(ngModel)]="employeeDetails.emergencyContact.name"
+                                                        #Name="ngModel" required>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="Name?.errors?.required && (Name.dirty || Name.touched || personaldetailsForm.submitted)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="Relation">Relation*</label>
+                                                    <ng-select [items]="Relation"
+                                                        [(ngModel)]="employeeDetails.emergencyContact.relation"
+                                                        class="wd-md-340 border-0 rounded-sm" name="relation"
+                                                        placeholder="Select Relation" #relationsip="ngModel" required>
+
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="relationsip?.errors?.required && (relationsip.dirty || relationsip.touched || personaldetailsForm.submitted)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="Phone">Phone No*</label>
+                                                    <input type="text" name="Phone" maxlength="10" minlength="10"
+                                                        class="form-control" placeholder="Phone Number"
+                                                        [(ngModel)]="employeeDetails.emergencyContact.phone"
+                                                        #Phone="ngModel" required>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="Phone?.errors?.required && (Phone.dirty || Phone.touched || personaldetailsForm.submitted)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-primary"
+                                                style="width: 100%;">Submit</button>
+                                        </div>
+                                    </form>
+                                </ng-template>
+                            </li>
+                        </ul>
+                        <div [ngbNavOutlet]="EmployeeProfileNav" class="border border-top-0 p-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<ng-template #changeModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Employee Details</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #updateForm="ngForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Full Name*</label>
+                        <!--full name-->
+                        <input type="text" #name="ngModel" [(ngModel)]="editEmployee.fullName" name="fullName"
+                            pattern="^([a-zA-Z]+\s)*[a-zA-Z]+$" placeholder="Your Full Name" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="name?.errors?.required && (updateForm.submitted || name.dirty || name.touched)">This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="name?.errors?.pattern && (updateForm.submitted || name.dirty || name.touched)">Remove
+                            space from start and end . Numbers Not Allowed</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>ID</label>
+                        <!--full name-->
+                        <input type="text" #invid="ngModel" [(ngModel)]="editEmployee.invid" name="invid"
+                            placeholder="Your ID" disabled class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Country Code*</label>
+                        <ng-select [items]="countries" #country="ngModel" [(ngModel)]="editEmployee.countryCode"
+                            name="country" placeholder="Select Country code" bindValue="code" [searchFn]="SearchFncode"
+                            bindLabel="code" required>
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.name | uppercase}} ({{item.code}})</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.name | uppercase}} ({{item.code}})
+                            </ng-template>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="country?.errors?.required && (updateForm.submitted || country.dirty || country.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Mobile Number*</label>
+                        <!--telephone-->
+                        <input type="text" #phone="ngModel" [(ngModel)]="editEmployee.telephone" name="telephone"
+                            placeholder="Your Mobile number" required pattern="^[0-9]*$" minlength="10" maxlength="10"
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.required && (updateForm.submitted || phone.dirty || phone.touched)">
+                            This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.minlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                            Min
+                            length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.maxlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                            Max
+                            length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.pattern && (updateForm.submitted || phone.dirty || phone.touched)">Max
+                            length mustbe 10.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Whatsapp Number*</label>
+                        <!--telephone-->
+                        <input type="text" #alternativenumber="ngModel" [(ngModel)]="editEmployee.alternatenum"
+                            name="alternativenumber" placeholder="Your Whatsapp number" pattern="^[0-9]*$"
+                            minlength="10" maxlength="10" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.required && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.minlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.maxlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.pattern && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Please Enter
+                            Correct 10 digit Mobile Number</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Telegram Number*</label>
+                        <!--telephone-->
+                        <input type="text" #telegram="ngModel" [(ngModel)]="editEmployee.telegram" name="telegramnumber"
+                            placeholder="Your Telegram number" pattern="^[0-9]*$" minlength="10" maxlength="10" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.required && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.minlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.maxlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.pattern && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Please Enter
+                            Correct 10 digit Mobile Number</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Email*</label>
+                        <!--email-->
+                        <input type="text" #email="ngModel" [(ngModel)]="editEmployee.email" name="email"
+                            class="form-control" placeholder="Your Email" required [pattern]="emailRegex">
+                        <p class="text-danger mt-1"
+                            *ngIf="email?.errors?.required && (updateForm.submitted || email.dirty || email.touched)">
+                            This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="email?.errors?.pattern && (updateForm.submitted || email.dirty || email.touched)">
+                            Invalid
+                            email address.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Address*</label>
+                        <input type="text" #address="ngModel" [(ngModel)]="editEmployee.address" name="address"
+                            class="form-control" placeholder="Your Addesss" required pattern=".*\S+.*">
+                        <p class="text-danger mt-1"
+                            *ngIf="address?.errors?.required && (updateForm.submitted || address.dirty || address.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>State*</label>
+                        <ng-select [items]="states" #state="ngModel" [(ngModel)]="editEmployee.state" name="state"
+                            placeholder="Select State" required (change)="onstateChange()">
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="state?.errors?.required && (updateForm.submitted || state.dirty || state.touched)">
+                            This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>District*</label>
+                        <ng-select [items]="districts" #city="ngModel" [(ngModel)]="editEmployee.city" name="city"
+                            placeholder="Select City" required>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="city?.errors?.required && (updateForm.submitted || city.dirty || city.touched)">This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Pincode*</label>
+                        <input type="text" #pincode="ngModel" [(ngModel)]="editEmployee.pincode" name="pincode"
+                            class="form-control" placeholder="Your Pincode" required maxlength="6" minlength="6"
+                            pattern="^[0-9]+$">
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.required && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.minlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            Min length mustbe 6.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.maxlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            Max length mustbe 6.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.pattern && (pincode.dirty || pincode.touched || updateForm.submitted)">
+                            Only Numbers are allowed.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" #dob="ngModel" [(ngModel)]="editEmployee.dob" name="dob"
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="dob?.errors?.required && (updateForm.submitted || dob.dirty || dob.touched)">This
+                            field
+                            is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select #gender="ngModel" [(ngModel)]="editEmployee.gender" name="gender" class="form-control">
+                            <option value='' selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="gender?.errors?.required && (updateForm.submitted || gender.dirty || gender.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="!updateForm.valid" class="btn btn-primary"
+            (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>

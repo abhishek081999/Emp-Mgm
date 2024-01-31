@@ -1,0 +1,184 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Purchase History</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">All Products Purchase History</h6>
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Purchase History Found.
+                </ngb-alert>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Student</label>
+                            <ng-select [items]="allStudent" [searchable]="true" placeholder="Search Student"
+                                #Studentidf="ngModel" [(ngModel)]="studentFilter" name="Studentidf" bindValue="invid"
+                                [searchFn]="StaffSearchFn" bindLabel="fullName" (change)="filter()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Staff</label>
+                            <ng-select [items]="allStaff" [searchable]="true" placeholder="Search Staff"
+                                #Studentidf="ngModel" [(ngModel)]="staffFilter" [searchFn]="StaffSearchFn"
+                                name="Studentidf" bindValue="invid" bindLabel="fullName" (change)="filter()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div> -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Product</label>
+                            <ng-select [items]="allProduct" [searchable]="true" placeholder="Search Product"
+                                #productf="ngModel" [(ngModel)]="productFilter" name="productf" bindValue="productid"
+                                bindLabel="name" (change)="filter()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.productid}} - {{item.name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.productid}} - {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Filter By Status</label>
+                            <select
+                                #statusfilter="ngModel" 
+                                [(ngModel)]="statusFilter" 
+                                name="statusfilter"
+                                placeholder="Filter By Status"
+                                (change)="filter()"
+                                >
+                               <option value="">Select Status</option>
+                               <option value="Active">Active</option>
+                               <option value="Expired">Expired</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="staff_id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff Id </th>
+                            <td mat-cell *matCellDef="let row"> {{row.staff_id}} <br> {{row.staff_name}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student Id </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status==='Expired'?'red':'green'
+                                }"> {{row.studentinvid}} <br> {{row.studentname}} <br> {{row.phone}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Product Name </th>
+                            <td mat-cell *matCellDef="let row">{{row.product_code}} <br> {{row.product_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="pruchasedate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Purchase Date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.pruchasedate | date: 'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expiry_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status==='Expired'?'red':'green'
+                                }"> {{row.expiry_date | date: 'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status==='Expired'?'red':'green'
+                                }"> {{row.status}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                            <td mat-cell *matCellDef="let row">
+                                <div ngbDropdown class="dropdown"  container="body">
+                                    <button type="button" id="insdropdown" ngbDropdownToggle
+                                        class="btn p-0 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="More Options"
+                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                        <button (click)="changeexpiry(changeModal,row)" ngbDropdownItem><i
+                                                class="feather icon-calendar icon-xs mr-2"></i> Change
+                                            Expiry Date</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<ng-template #changeModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change Expiry Date</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="date" #expdate="ngModel" [(ngModel)]="exp" name="expdate" class="form-control">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>

@@ -1,0 +1,78 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Support</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Settings</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Support Category</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" name="newcategory" placeholder="Create New category" #category="ngModel"
+                                [(ngModel)]="newcategory" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <input type="text" name="category_short" placeholder="Short Name" #category_short="ngModel"
+                                [(ngModel)]="newcategory_short" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button [disabled]="category.invalid || category_short.invalid" class="btn btn-primary btn-block"
+                            (click)="createcategory()">Submit</button>
+                    </div>
+                </div>
+                <ul class="list-group">
+                    <li *ngFor="let s of categorySettings.lists; let i=index"
+                        class="list-group-item align-items-center d-flex justify-content-between">
+                        <div>{{s.name}} - {{s.short_name}}</div>
+                        <div>
+                            <!-- Rounded switch -->
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" (change)="updatestatus(s)" name="isActive-{{i}}" #isActive="ngModel"
+                                    [(ngModel)]="s.isActive" required>
+                                <span class="toggle-slider round"></span>
+                            </label>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Settings</h6>
+                <form #settings="ngForm" (ngSubmit)="settings.valid && saveSettings()">
+                    <div class="align-items-center d-flex justify-content-between">
+                        <div>
+                            Live Market Chat Support
+                        </div>
+                        <div>
+                            <!-- Rounded switch -->
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="isLiveMarketChatActive" #isLiveMarketChatActive="ngModel"
+                                    [(ngModel)]="supportSettings.isLiveMarketChatActive" required>
+                                <span class="toggle-slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Display Message</label>
+                        <input type="text" name="reason" placeholder="Display Message" #reason="ngModel"
+                            [(ngModel)]="supportSettings.reason" [required]="!supportSettings.isLiveMarketChatActive"
+                            [disabled]="supportSettings.isLiveMarketChatActive" class="form-control">
+                    </div>
+                    <button class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

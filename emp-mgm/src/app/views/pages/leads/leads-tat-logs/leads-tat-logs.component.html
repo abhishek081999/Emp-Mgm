@@ -1,0 +1,230 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Leads Tat Logs</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Leads Report</h6>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" #date="ngModel" [(ngModel)]="startDate" name="date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" #date="ngModel" [(ngModel)]="endDate" name="date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Language</label>
+                            <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                #leadtatlang="ngModel" [(ngModel)]="Lang" name="leadtatlang" (change)="onChange()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Level</label>
+                            <ng-select [items]="LeadLevelDrop" bindValue="_id" [searchable]="true"
+                                placeholder="Select Level" #tatlevel="ngModel" [(ngModel)]="Level" name="tatlevel"
+                                (change)="onChange()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">
+                                        {{item.name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Stage</label>
+                            <ng-select [items]="LeadStage" #stagefilter="ngModel" [(ngModel)]="stageFilter"
+                                class="wd-md-340 border-0 rounded-sm" name="stagefilter" placeholder="Filter By Stage"
+                                bindLabel="name" bindValue="_id">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Team</label>
+                            <ng-select [items]="allTeams" bindValue="name" #teamid="ngModel" [(ngModel)]="teamFilter"
+                                name="teamid" placeholder="Search By Team Name">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.name}} - {{item.team_lead}} -
+                                        {{item.team_lead_name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Lead Owner</label>
+                        <ng-select [items]="allStaff" bindLabel="invid" bindValue="invid" #fstaffids="ngModel"
+                            name="fstaffids" [(ngModel)]="leadownerFilter" [searchFn]="StaffSearchFn"
+                            placeholder="Search By ID or Name">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By TAT</label>
+                            <select #tatfilter="ngModel" [(ngModel)]="tatFilter" name="mode" class="form-control"
+                                placeholder="Filter By TAT">
+                                <option value="" selected>Select TAT</option>
+                                <option value="ideal">Ideal</option>
+                                <option value="intoday">Due Today</option>
+                                <option value="inoneday">Due in 1 days</option>
+                                <option value="intwoday">Due in 2 days</option>
+                                <option value="inthreeday">Due in 3 days</option>
+                                <option value="infourday">Due in 4 days</option>
+                                <option value="infiveday">Due in 5 days</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary btn-block mt-4" (click)="submit()">Search</button>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="teamName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer"> {{row.teamName}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="teamLeadName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer"> {{row.teamLead}} <br> {{row.teamLeadName}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadOwner">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Owner </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer"> {{row.leadOwner}} <br> {{row.leadOwnerName}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer"> {{row.studentName}} <br> {{row.phone}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="stageName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Stage <br> Level <br> Language</th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer">
+                                {{row.stageName}} <br>
+                                <span class="text-uppercase badge badge-success mb-1">{{row?.level}}</span>
+                                <br> {{row.language}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="start">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Start </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer"> 
+                            <p>{{row.start | date: 'mediumDate'}}<br>{{row.start | date:
+                                'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="end">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> End </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)" class="cursor-pointer">
+                                <p *ngIf="row.end">{{row.end | date: 'mediumDate'}}<br>{{row.end | date:
+                                    'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="ctt">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Time Elapsed </th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="text-uppercase badge" [ngClass]="{
+                                    'badge-success': row.color === 'green', 
+                                    'badge-warning' : row.color === 'yellow',
+                                    'badge-danger' : row.color === 'red' 
+                                }">{{ timeElapsed(row)}}</span>
+                                <br>
+                                <span>
+                                    <i *ngIf="!row.isBreached" class="text-success" data-feather="check" appFeatherIcon></i>
+                                    <i *ngIf="row.isBreached" class="text-danger" data-feather="x" appFeatherIcon></i>
+                                    Within {{ row.maxTime }} Days
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="is_active">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                            <td mat-cell *matCellDef="let row">
+                                <span *ngIf="isTimerStopped && row.is_active"
+                                    class="text-uppercase badge badge-secondary">
+                                    <i class="mdi mdi-pause-circle-outline"></i> Timer <br> Paused
+                                </span>
+                                <span *ngIf="!isTimerStopped && row.is_active"
+                                    class="text-uppercase badge badge-success">
+                                    <i class="mdi mdi-timer"></i> Timer <br> Running
+                                </span>
+                                <span *ngIf="!row.is_active" class="text-uppercase badge badge-primary">
+                                    <i class="mdi mdi-timer-off"></i> Timer <br> Stopped
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="logs" stickyEnd>
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header></th>
+                            <td style="padding: 0px 0px 0px 11px;" mat-cell *matCellDef="let row"
+                                (click)="changehistory(row.lead_id)">
+                                <a placement="top" ngbTooltip="Activity Logs" class="mr-2">
+                                    <i data-feather="file-text" appFeatherIcon></i>
+                                </a>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

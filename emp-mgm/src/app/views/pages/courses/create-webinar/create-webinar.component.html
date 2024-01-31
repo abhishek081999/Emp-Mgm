@@ -1,0 +1,66 @@
+<div class="modal-header">
+    <h5 class="modal-title">Webinar</h5>
+    <button type="button" class="close" (click)="activeModal.close('by: close icon')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div *ngIf="submit && !hide" class="spinner-wrapper">
+        <div class="spinner">Loading...</div>
+    </div>
+    <form #scheduleForm="ngForm" (ngSubmit)="scheduleForm.valid && submitForm()">
+        <p style="color: red;padding: 0px;" *ngIf="!submit">All * Fields are Mandatory</p>
+        <div class="row" *ngIf="!submit">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>Topic*</label>
+                    <input 
+                        type="text"
+                        class="form-control" 
+                        #topic="ngModel" 
+                        [(ngModel)]="webinar.topic" 
+                        name="topic"
+                        required
+                        maxlength="200"
+                    >  
+                    <p class="text-danger mt-1" *ngIf="topic?.errors?.required && (topic.dirty || topic.touched || scheduleForm.submitted)">This field is required.</p>
+                    <p class="text-danger mt-1" *ngIf="topic?.errors?.maxlength && (topic.dirty || topic.touched || scheduleForm.submitted)">Max Length 200 Charecters</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Duration (in min)</label>
+                    <input 
+                        type="text"
+                        class="form-control" 
+                        #duration="ngModel" 
+                        [(ngModel)]="webinar.duration" 
+                        name="duration" 
+                        disabled>  
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label>Start Time*</label>
+                    <input 
+                        type="datetime-local"
+                        class="form-control"
+                        #starttime="ngModel" 
+                        [(ngModel)]="webinar.start_time"
+                        required 
+                        name="starttime">
+                    <p class="text-danger mt-1" *ngIf="starttime?.errors?.required && (starttime.dirty || starttime.touched || scheduleForm.submitted)">This field is required.</p>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div *ngIf="hide">
+      <h3>Webinar ID: {{webinarres.id}}</h3><br>
+      <h3>Webinar Password: {{webinarres.password}}</h3>
+      <h3>Time: {{webinarres.start_time | date:'medium'}}</h3>
+    </div>
+</div>
+<div class="modal-footer">
+    <button *ngIf="!hide" [disabled]="scheduleForm.invalid" (click)="submitForm()"  class="btn btn-primary"> Submit</button>
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()"> Close</button>
+</div>

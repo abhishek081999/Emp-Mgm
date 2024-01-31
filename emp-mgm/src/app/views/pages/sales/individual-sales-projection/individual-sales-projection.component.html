@@ -1,0 +1,228 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Sales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Sales Projection</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Individual Sales Projection Report</h6>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Staff ID</label>
+                        <ng-select [items]="allStaff" bindLabel="invid" bindValue="invid" #fstaffids="ngModel"
+                            name="fstaffids" [(ngModel)]="selectStaff" [searchFn]="StaffSearchFn"
+                            placeholder="Search By ID or Name" (change)="onchange()">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Month</label>
+                            <select class="form-control" #fmonth="ngModel" [(ngModel)]="selectMonth" name="fmonth"
+                                (change)="onchange()">
+                                <option value="" selected>Select Month</option>
+                                <option *ngFor="let m of monthList" [value]="m.num">{{m.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Year</label>
+                            <select class="form-control" #fyear="ngModel" [(ngModel)]="selectYear" name="fyear"
+                                (change)="onchange()">
+                                <option value="" selected>Select year</option>
+                                <option *ngFor="let m of years" [value]="m">{{m}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="Team_Lead_ID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead ID</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Team_Lead_ID}} <br> {{row.Team_Lead_Name}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Staff_ID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Staff_ID}} <br> {{row.Staff_Name}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Month">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Month </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Month}} - {{row.Year}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="ServiceName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Service</th>
+                            <td mat-cell *matCellDef="let row"> {{row.ServiceName}} <br> {{row.ServiceCode}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Fees">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fees</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Fees | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Commit_Counts">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Counts </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Commit_Counts}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalCommit_Counts}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Commit_Booked_Rev">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Booked Revenue(Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Commit_Booked_Rev | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalCommit_Booked_Rev | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Commit_Payment_Recv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment Received(Without GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Commit_Payment_Recv | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalCommit_Payment_Recv | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Pro_Rata_Booked_Rev">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pro Rata Booked Revenue(Incl. GST)
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Pro_Rata_Booked_Rev | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalPro_Rata_Booked_Rev | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Pro_Rata_Payment_Recv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pro Rata Payment Received(Without. GST)
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Pro_Rata_Payment_Recv | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalPro_Rata_Payment_Recv | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Actual_Counts">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Counts</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Actual_Counts}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalActual_Counts}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Converted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalConverted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Partially_Converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Partially Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Partially_Converted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalPartially_Converted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Seat_Booked">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Seat Booked</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Seat_Booked}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalSeat_Booked}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Actual_Booked_Rev">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Booked Revenue(Incl. GST) </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Actual_Booked_Rev | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalActual_Booked_Rev | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Actual_Payment_Recv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment Received(Without. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Actual_Payment_Recv | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalActual_Payment_Recv | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Defecit_or_Surplus_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Defecit/Surplus Count</th>
+                            <td mat-cell *matCellDef="let row"
+                                [style.color]="row.Defecit_or_Surplus_Count>=0?'green':'red'">
+                                {{row.Defecit_or_Surplus_Count}} </td>
+                            <td mat-footer-cell *matFooterCellDef
+                                [style.color]="totalDefecit_or_Surplus_Count>=0?'green':'red'">
+                                {{totalDefecit_or_Surplus_Count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Defecit_or_Surplus_Payment">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Defecit/Surplus Payment (Without. GST)
+                            </th>
+                            <td mat-cell *matCellDef="let row"
+                                [style.color]="row.Defecit_or_Surplus_Payment>=0?'green':'red'">
+                                {{row.Defecit_or_Surplus_Payment | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef
+                                [style.color]="totalDefecit_or_Surplus_Payment>=0?'green':'red'">
+                                {{totalDefecit_or_Surplus_Payment |
+                                currency:'INR'}}</td>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="staff-details">
+                            <th mat-header-cell *matHeaderCellDef colspan="2"> Staff Details </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="service-details">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Service Details </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="commit">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Projection Report </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="pro_rata">
+                            <th mat-header-cell *matHeaderCellDef colspan="2"> Pro Rata Report</th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="actual">
+                            <th mat-header-cell *matHeaderCellDef colspan="6"> Actual Report</th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="dors">
+                            <th mat-header-cell *matHeaderCellDef colspan="2"> Defecit/Surplus </th>
+                        </ng-container>
+
+                        <tr mat-header-row
+                            *matHeaderRowDef="['staff-details','service-details','commit','pro_rata','actual','dors']; sticky: true"
+                            class="first-header-row"></tr>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

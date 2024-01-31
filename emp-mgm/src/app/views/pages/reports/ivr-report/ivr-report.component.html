@@ -1,0 +1,240 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">IVR-Report</li>
+    </ol>
+</nav>
+
+
+<!-- ----------------------  Filters   ---------------------- -->
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" #startDateAtten="ngModel" [(ngModel)]="startDate" name="startDateAtten"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" #endDateAtten="ngModel" [(ngModel)]="endDate" name="endDateAtten"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Call Type</label>
+                            <ng-select [items]="calltype" [searchable]="true" placeholder="Filter Call Type"
+                                #Calltype="ngModel" [(ngModel)]="calltypeFilter" name="calltype">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Department</label>
+                            <ng-select [items]="departments" [searchable]="true" bindValue="_id" bindLabel="name" #Department="ngModel"
+                                [(ngModel)]="department" class="wd-md-340 border-0 rounded-sm" name="department"
+                                placeholder="Select Departments">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Team</label>
+                        <ng-select [items]="allTeams" bindValue="_id" #teamid="ngModel" [(ngModel)]="team" name="teamid"
+                            placeholder="Search By Team Name">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.name}} - {{item.team_lead}} -
+                                    {{item.team_lead_name}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Staff Name</label>
+                            <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                #dept_head="ngModel" [(ngModel)]="employee" name="dept_head"
+                                placeholder="Filter by Staff Name" bindValue="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label"> {{item.invid}} - {{item.fullName}} </span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="filter()">Search</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="export()">Export</button>
+                    </div>
+
+                    <div class="col-md-12 mt-5">
+                        <input class="form-control" name="search" type="text" placeholder="Search..."
+                            (keyup)="filtersearch($event)">
+                    </div>
+
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <!-- ------------------   Table   ------------------- -->
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="dept_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> department
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.dept_name}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="team_lead_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> team lead name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.team_lead_id}} - {{row.team_lead_name}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="team_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> team name </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.team_name}}
+                            </td>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="staff_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> staff name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.staff_id}} - {{row.staff_name}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="queueName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Queue Name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.queueName}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="endCallCause">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> end Call Cause
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.endCallCause}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="endedBy">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> ended By </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.endedBy}}
+                            </td>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="callType">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> call Type
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.callType}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="duration">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> duration
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getDuration(row.duration)}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="date_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> date
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.date_time | date: 'mediumDate'}}<br>{{row.date_time |
+                                    date: 'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="from_alias">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> from
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.from_alias}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="to_alias">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>to
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.to_alias}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="callCreatedReason">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> call Created Reason
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.callCreatedReason}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="answerDuration">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> answer Duration
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getDuration(row.answerDuration)}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="option">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Recording
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <button *ngIf="row.answerDuration > 0" (click)="getAudioLink(row.audio_link, modal)"
+                                    class="btn btn-primary btn-block ">Play</button>
+
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns;  sticky: true;"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                        </tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Employee Model -->
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <audio controls>
+            <source [src]="audioBlobLink" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+</ng-template>

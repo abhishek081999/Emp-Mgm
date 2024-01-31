@@ -1,0 +1,197 @@
+<nav class="page-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a routerLink=".">Others</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Short Url</li>
+	</ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Add Short Url</h6>
+                <form #shorturlForm="ngForm" (ngSubmit)="shorturlForm.valid && submit(shorturlForm)">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Url*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    autocomplete="off" 
+                                    placeholder="URL"
+                                    #url="ngModel" 
+                                    [(ngModel)]="short.url" 
+                                    name="url"
+                                    required>
+                                <p class="text-danger mt-1" *ngIf="url?.errors?.required && (url.dirty || url.touched || shorturlForm.submitted)">This field is required.</p>
+                            </div>
+                        </div><!-- Col -->
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">Url For*</label>
+                                <select 
+                                    type="text" 
+                                    class="form-control"
+                                    autocomplete="off"
+                                    #type="ngModel" 
+                                    [(ngModel)]="short.type" 
+                                    name="type"
+                                    required
+                                    (change)="onchange()">
+                                    <option value="">Select Url For</option>
+                                    <option value="course">Course</option>
+                                    <!-- <option value="coursebundle">Course Bundle</option> -->
+                                    <option value="job">Job</option>
+                                    <option value="others">Others</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="type?.errors?.required && (type.dirty || type.touched || shorturlForm.submitted)">This field is required.</p>
+                            </div>
+                        </div><!-- Col -->
+                    </div><!-- Row -->
+                    <div class="row">
+                        <div class="col-sm-6" *ngIf="short.type && short.type!=='others'">
+                            <div class="form-group">  
+                                <label class="control-label">Course Code/Job ID*</label>
+                                <ng-select 
+                                    [items]="list"
+                                    #id="ngModel" 
+                                    name="id"
+                                    required
+                                    placeholder="Search By ID"
+                                    [(ngModel)]="short.id">
+                                </ng-select>
+                                <p class="text-danger mt-1" *ngIf="id?.errors?.required && (id.dirty || id.touched || shorturlForm.submitted)">This field is required.</p>
+                            </div>
+                        </div><!-- Col -->
+                        <div class="col-sm-6" *ngIf="short.type==='others'">
+                            <div class="row">
+                                <div class="col-sm-12" >
+                                    <div class="form-group">
+                                        <label class="control-label">Title* <a placement="top" ngbTooltip="Title in 20-60 letters"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                        <input 
+                                        type="text" 
+                                        class="form-control"
+                                        autocomplete="off"
+                                        #title="ngModel" 
+                                        [(ngModel)]="short.title" 
+                                        name="title"
+                                        maxlength="60"
+                                        minlength="20"
+                                        required
+                                        placeholder="Title">
+                                        Letter Count: {{short?.title?.length}}/60<i *ngIf="short?.title?.length>=20" class="small-icon" data-feather="check-circle" appFeatherIcon></i>
+                                        <p class="text-danger mt-1" *ngIf="title?.errors?.required && (title.dirty || title.touched || shorturlForm.submitted)">This field is required.</p>
+                                        <p class="text-danger mt-1" *ngIf="title?.errors?.minlength && (title.dirty || title.touched || shorturlForm.submitted)">Min length mustbe 20.</p>
+                                        <p class="text-danger mt-1" *ngIf="title?.errors?.maxlength && (title.dirty || title.touched || shorturlForm.submitted)">Max length mustbe 60.</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label">Image  <a  placement="top" ngbTooltip="Recommended Size 1200px X 628px" ><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                        <input 
+                                            id="imageup"
+                                            type="file" 
+                                            accept="image/*"
+                                            name="image"
+                                            (change)="handelFile($event)"
+                                            class="file-upload-default" 
+                                            required
+                                        >
+                                        <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                            <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
+                                            <span class="input-group-append">
+                                                <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="short.type==='others'">
+                            <div class="form-group">
+                                <label class="control-label">Description* <a placement="top" ngbTooltip="Description in 50-160 Letters"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea 
+                                    rows="5" 
+                                    class="form-control" 
+                                    style="height:140px;" 
+                                    placeholder="Description in 50-160 Letters"
+                                    #description="ngModel" 
+                                    [(ngModel)]="short.description" 
+                                    name="description"
+                                    minlength="50"
+                                    maxlength="160"
+                                    required
+                                ></textarea>
+                                Letter Count: {{short.description.length}}/160 <i *ngIf="short.description.length>=50" class="small-icon" data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1" *ngIf="description?.errors?.required && (description.dirty || description.touched || shorturlForm.submitted)">This field is required.</p>
+                                <p class="text-danger mt-1" *ngIf="description?.errors?.minlength && (description.dirty || description.touched || shorturlForm.submitted)">Min length mustbe 20.</p>
+                                <p class="text-danger mt-1" *ngIf="description?.errors?.maxlength && (description.dirty || description.touched || shorturlForm.submitted)">Max length mustbe 60.</p>
+                            </div>
+                        </div><!-- Col -->
+                    </div><!-- Row -->
+                    <button type="submit" class="btn btn-primary submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Short Urls</h6>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+                              
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Url For </th>
+                            <td class="tdclass" mat-cell *matCellDef="let row" > {{row.type}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="url">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Url </th>
+                            <td class="tdclass" mat-cell *matCellDef="let row" > <a [href]="row.url">{{row.url}}</a> </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="shorturl">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Short Url </th>
+                            <td class="tdclass" mat-cell *matCellDef="let row" > <a [href]="row.shorturl">{{row.shorturl}}</a></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                            <td class="tdclass" mat-cell *matCellDef="let row">
+                                <a placement="top" ngbTooltip="Copy to Clipboard" ngxClipboard [cbContent]="row.shorturl" class="mr-2" (click)="copied()"> 
+                                    <i class="small-icon" data-feather="copy" appFeatherIcon></i>
+                                </a>
+                                <a placement="top" ngbTooltip="Edit Shorturl" class="mr-2" (click)="onEdit(row)"> 
+                                    <i class="small-icon" data-feather="edit" appFeatherIcon></i>
+                                </a>
+                                <a placement="top" ngbTooltip="Delete Shorturl" class="mr-2" (click)="onDelete(row._id)"> 
+                                    <i class="small-icon" data-feather="trash-2" appFeatherIcon></i>
+                                </a>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[5, 10, 15, 20]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

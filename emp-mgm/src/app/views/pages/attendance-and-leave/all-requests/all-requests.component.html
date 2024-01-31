@@ -1,0 +1,859 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+        <li class="breadcrumb-item active" aria-current="page">All Request</li>
+    </ol>
+</nav>
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card mb-4">
+        <div class="card-body">
+            <ul ngbNav #StudentProfileNav="ngbNav" class="nav-tabs nav-fill">
+                <li [ngbNavItem]="1"
+                    [style.background-color]="StudentProfileNav.activeId != 1 ? '#8aed8f' : 'transparent'">
+                    <a ngbNavLink [style.font-weight]="StudentProfileNav.activeId === 1 ? '900' : 'normal'">Attendance
+                        Request</a>
+                    <ng-template ngbNavContent>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" #startDateAtten="ngModel" [(ngModel)]="startDateAttendance"
+                                        name="startDateAtten" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="date" #endDateAtten="ngModel" [(ngModel)]="endDateAttendance"
+                                        name="endDateAtten" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Department</label>
+                                    <ng-select [items]="departments" [searchable]="true" bindValue="_id"
+                                        bindLabel="name" #departmentAtten="ngModel" [(ngModel)]="departmentAttendance"
+                                        class="wd-md-340 border-0 rounded-sm" name="departmentAtten"
+                                        placeholder="Select Departments">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Manager</label>
+                                    <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                        #managerAtten="ngModel" [(ngModel)]="managerAttendance" name="managerAtten"
+                                        placeholder="Filter by Manager" bindValue="invid">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.fullName}} - {{item.invid}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Attendance Status</label>
+                                    <ng-select [items]="attendanceStatusItems" [searchable]="true"
+                                        placeholder="Filter Attendance Status" #attendanceStatus="ngModel"
+                                        [(ngModel)]="attendanceStatusFilter" name="attendanceStatus">
+
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Employee</label>
+                                    <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                        #employeAtten="ngModel" [(ngModel)]="employeeAttendance" name="employeAtten"
+                                        placeholder="Filter by Employee" bindValue="_id">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.fullName}} - {{item.invid}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary mt-30px btn-block "
+                                    (click)="attendanceFilter()">Search</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary mt-30px btn-block "
+                                    (click)="attendanceExport()">Export</button>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Search</label>
+                                    <input class="form-control" type="text" placeholder="Search..."
+                                        (keyup)="attendanceFilterSearch($event)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="selection.hasValue()">
+                                    <div class="align-items-center align-items-start d-flex justify-content-between">
+                                        <p>{{selection?.selected?.length}} Attendance Selected</p>
+                                        <div class="d-flex">
+                                            <div ngbDropdown>
+                                                <button class="btn btn-primary" placement="left-top"
+                                                    id="attendanceDropDown" ngbDropdownToggle>Options</button>
+                                                <div ngbDropdownMenu aria-labelledby="attendanceDropDown">
+                                                    <button ngbDropdownItem (click)="approveAttendance(modal)">Approve
+                                                        Attendance</button>
+                                                    <button ngbDropdownItem (click)="editAttandance()">Edit
+                                                        Attendance</button>
+                                                    <!-- <button ngbDropdownItem (click)="deleteAttendance()">Delete Attendance</button> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </ngb-alert>
+                            </div>
+                        </div>
+                        <div *ngIf="isLoading" class="spinner-wrapper">
+                            <div class="spinner">Loading...</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!--  Table for Data -->
+                                <div class="table-responsive mt-4">
+                                    <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                        [dataSource]="dataSource" matSort>
+                                        <ng-container matColumnDef="Select">
+                                            <th mat-header-cell cdkDrag *matHeaderCellDef>
+                                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                                    [checked]="selection.hasValue() && isEntirePageSelected()"
+                                                    [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                                    [aria-label]="checkboxLabel()">
+                                                </mat-checkbox>
+                                            </th>
+                                            <td mat-cell *matCellDef="let row; let i = index">
+                                                <mat-checkbox (click)="$event.stopPropagation()"
+                                                    (change)="$event ? selection.toggle(row) : null"
+                                                    [checked]="selection.isSelected(row)"
+                                                    [aria-label]="checkboxLabel(row,i)" *ngIf="!row.isApprove">
+                                                </mat-checkbox>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="employee_name">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Name
+                                            </th>
+                                            <td mat-cell *matCellDef="let row"
+                                                [ngStyle]="{'color':row.isApprove?'green':'orange' }">
+                                                {{row.employee_invid}} <br>
+                                                {{row.employee_name}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="attendance">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Attendance
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.attendance}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="attendanceTime">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Attendance Time
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <p>{{row.attendanceTime | date: 'mediumDate'}}<br>{{row.attendanceTime |
+                                                    date: 'shortTime'}}</p>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="department">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Department
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.department}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="manager_name">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.manager_invid}} <br>
+                                                {{row.manager_name}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="comments">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comments
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.comments}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="approveBy_name">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Approved By
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.approveBy_invid}} <br>
+                                                {{row.approveBy_name}} <br>
+                                                {{row.approveAt | date:'medium'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </li>
+
+                <!-- Regularize Request -->
+
+                <li [ngbNavItem]="2"
+                    [style.background-color]="StudentProfileNav.activeId != 2 ? '#FFBF00' : 'transparent'">
+                    <a ngbNavLink [style.font-weight]="StudentProfileNav.activeId === 2 ? '900' : 'normal'">Regularize
+                        Request</a>
+                    <ng-template ngbNavContent>
+                        <!-- Filters -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" #startDateReg="ngModel" [(ngModel)]="startDateRegularize"
+                                        name="startDateReg" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="date" #endDateReg="ngModel" [(ngModel)]="endDateRegularize"
+                                        name="endDateReg" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Department</label>
+                                    <ng-select [items]="departments" [searchable]="true" bindValue="_id"
+                                        bindLabel="name" #departmentReg="ngModel" [(ngModel)]="departmentRegularize"
+                                        class="wd-md-340 border-0 rounded-sm" name="departmentReg"
+                                        placeholder="Select Departments">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Manager</label>
+                                    <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                        #managerReg="ngModel" [(ngModel)]="managerRegularize" name="managerReg"
+                                        placeholder="Filter by Manager" bindValue="invid">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.fullName}} - {{item.invid}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Filter Regularize Status</label>
+                                    <ng-select [items]="regularizeStatusItems" [searchable]="true"
+                                        placeholder="Filter Status" #regularizeStatus="ngModel"
+                                        [(ngModel)]="regularizeStatusFilter" name="regularizeStatus">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label> Employee</label>
+                                    <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                        #employeeReg="ngModel" [(ngModel)]="employeeRegularize" name="employeeReg"
+                                        placeholder="Filter by Employee" bindValue="_id">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.fullName}} - {{item.invid}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary mt-30px btn-block "
+                                    (click)="regularizeFilter()">Search</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary mt-30px btn-block "
+                                    (click)="regularizeExport()">Export</button>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Search</label>
+                                    <input class="form-control" type="text" placeholder="Search..."
+                                        (keyup)="regularizeFilterSearch($event)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="selection2.hasValue()">
+                                    <div class="align-items-center align-items-start d-flex justify-content-between">
+                                        <p>{{selection2?.selected?.length}} Regularize Attendance Request Selected</p>
+                                        <div class="d-flex">
+                                            <div ngbDropdown>
+                                                <button class="btn btn-primary" placement="left-top"
+                                                    id="attendanceDropDown" ngbDropdownToggle>Options</button>
+                                                <div ngbDropdownMenu aria-labelledby="attendanceDropDown">
+                                                    <button ngbDropdownItem (click)="approveRegularize(modal)">Approve
+                                                        Regularize Attendance</button>
+                                                    <button ngbDropdownItem (click)="rejectRegularize(modal)">Reject
+                                                        Regularize Attendance</button>
+                                                    <button ngbDropdownItem
+                                                        (click)="editRegularizeAttendance(changeModal2)"
+                                                        *ngIf="selection2.selected.length === 1">Edit
+                                                        Regularize Attendance</button>
+                                                    <button ngbDropdownItem (click)="deleteRegularizerequest()">Delete
+                                                        Regularize Attendance</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </ngb-alert>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!--  Approve Buttons -->
+                            <div class="col-md-12">
+                                <div *ngIf="isLoading" class="spinner-wrapper">
+                                    <div class="spinner">Loading...</div>
+                                </div>
+                                <!--  Table for Data -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                        [dataSource]="dataSource2" matSort>
+                                        <ng-container matColumnDef="Select" sticky>
+                                            <th mat-header-cell cdkDrag *matHeaderCellDef>
+                                                <mat-checkbox (change)="$event ? masterToggle2() : null"
+                                                    [checked]="selection2.hasValue() && isEntirePageSelected2()"
+                                                    [indeterminate]="selection2.hasValue() && !isEntirePageSelected2()"
+                                                    [aria-label]="checkboxLabel2()">
+                                                </mat-checkbox>
+                                            </th>
+                                            <td mat-cell *matCellDef="let row; let i = index">
+                                                <mat-checkbox (click)="$event.stopPropagation()"
+                                                    (change)="$event ? selection2.toggle(row) : null"
+                                                    [checked]="selection2.isSelected(row)"
+                                                    [aria-label]="checkboxLabel2(row,i)"
+                                                    *ngIf="!row.isApprove && !row.isReject">
+                                                </mat-checkbox>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="employee_name">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Name
+                                            </th>
+                                            <td mat-cell *matCellDef="let row"
+                                                [style.color]="(row.isApprove && !row.isReject)?'green':(!row.isApprove && !row.isReject)?'orange':'red'">
+                                                {{row.employee_invid}}<br>
+                                                {{row.employee_name}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="attendance">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Attendance
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.attendance}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="attendance_date">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Attendance Date
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.attendance_date | date: 'mediumDate'}}
+                                            </td>
+                                        </ng-container>
+
+
+                                        <ng-container matColumnDef="request_date">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Request Date
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <p>{{row.request_date | date: 'mediumDate'}}<br>{{row.request_date |
+                                                    date: 'shortTime'}}</p>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="department">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Department
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.department}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="manager">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.manager_invid }}<br>{{row.manager_name }}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="comments">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comments
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.comments}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="reason">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Reason
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.reason}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="approveBy_name">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Approve/Reject By
+                                            </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                {{row.approveBy_invid}} <br>
+                                                {{row.approveBy_name}} <br>
+                                                {{row.approveAt | date:'medium'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumns2; sticky: true"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: displayedColumns2;">
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-template>
+                </li>
+                <!-- -------------------------------------  Leave Request    -------------------------------------- -->
+                <li [ngbNavItem]="3"
+                    [style.background-color]="StudentProfileNav.activeId != 3 ? '#f2a19b' : 'transparent'">
+                    <a ngbNavLink [style.font-weight]="StudentProfileNav.activeId === 3 ? '900' : 'normal'">Leave
+                        Request</a>
+                    <ng-template ngbNavContent>
+                        <!-- Filters -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" #startDateLea="ngModel" [(ngModel)]="startDateLeave"
+                                        name="startDateLea" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="date" #endDateLea="ngModel" [(ngModel)]="endDateLeave"
+                                        name="endDateLea" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Department</label>
+                                    <ng-select [items]="departments" [searchable]="true" bindValue="_id"
+                                        bindLabel="name" #departmentLea="ngModel" [(ngModel)]="departmentLeave"
+                                        class="wd-md-340 border-0 rounded-sm" name="departmentLea"
+                                        placeholder="Select Departments">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Manager</label>
+                                    <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                        #managerLea="ngModel" [(ngModel)]="managerLeave" name="managerLea"
+                                        placeholder="Select Manager" bindValue="invid">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.fullName}} - {{item.invid}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>HR Approval Status</label>
+                                    <ng-select [items]="leaveStatusItems" [searchable]="true" #hrLea="ngModel"
+                                        [(ngModel)]="hrLeaveFilter" name="hrLea" placeholder="Select Status">
+                                    </ng-select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Manager Approval Status</label>
+                                    <ng-select [items]="leaveStatusItems" [searchable]="true"
+                                        #managerStatusLea="ngModel" [(ngModel)]="managerStatusLeave"
+                                        name="managerStatusLea" placeholder="Select Status">
+                                    </ng-select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Employee</label>
+                                    <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                        #employeeLea="ngModel" [(ngModel)]="employeeLeave" name="employeeLea"
+                                        placeholder="Filter by Employee" bindValue="_id">
+                                        <ng-template ng-label-tmp let-item="item">
+                                            <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                        </ng-template>
+
+                                        <ng-template ng-option-tmp let-item="item">
+                                            {{item.fullName}} - {{item.invid}}
+                                        </ng-template>
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary mt-30px btn-block "
+                                    (click)="leaveFilter()">Search</button>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label>Search</label>
+                                    <input class="form-control" type="text" placeholder="Search..."
+                                        (keyup)="leaveFilterSearch($event)">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary mt-30px btn-block "
+                                    (click)="leaveExport()">Export</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!--  Approve Buttons -->
+                            <div class="col-md-12">
+                                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="selection3.hasValue()">
+                                    <div class="align-items-center align-items-start d-flex justify-content-between">
+                                        <p>{{selection3?.selected?.length}} Leave Reques Selected</p>
+                                        <div class="d-flex">
+                                            <div ngbDropdown>
+                                                <button class="btn btn-primary" placement="left-top" id="leaveDropDown"
+                                                    ngbDropdownToggle>Options</button>
+                                                <div ngbDropdownMenu aria-labelledby="leaveDropDown">
+                                                    <button ngbDropdownItem (click)="approveLeaverequest(modal)">Approve
+                                                        Leave Request</button>
+                                                    <button ngbDropdownItem (click)="rejectLeaveRequest(modal)">Reject
+                                                        Leave Request</button>
+                                                    <!-- <button ngbDropdownItem (click)="editLeaverequest()">Edit
+                                                        Leave Request</button> -->
+                                                    <button ngbDropdownItem (click)="deleteLeaverequest()">Delete Leave
+                                                        Request</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ngb-alert>
+                            </div>
+                            <div *ngIf="isLoading" class="spinner-wrapper">
+                                <div class="spinner">Loading...</div>
+                            </div>
+                            <!--  Table for Data -->
+                            <div class="table-responsive mt-4">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSource3" matSort>
+                                    <ng-container matColumnDef="Select" sticky>
+                                        <th mat-header-cell cdkDrag *matHeaderCellDef>
+                                            <mat-checkbox (change)="$event ? masterToggle3() : null"
+                                                [checked]="selection3.hasValue() && isEntirePageSelected3()"
+                                                [indeterminate]="selection3.hasValue() && !isEntirePageSelected3()"
+                                                [aria-label]="checkboxLabel3()">
+                                            </mat-checkbox>
+                                        </th>
+                                        <td mat-cell *matCellDef="let row; let i = index">
+                                            <mat-checkbox (click)="$event.stopPropagation()"
+                                                (change)="$event ? selection3.toggle(row) : null"
+                                                [checked]="selection3.isSelected(row)"
+                                                [aria-label]="checkboxLabel3(row,i)"
+                                                [disabled]="row.isApproveHr && row.isApproveManager"
+                                                *ngIf="!row.isApproveHr && !row.isApproveManager">
+                                            </mat-checkbox>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="employee_name">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"
+                                            [ngStyle]="{'color':row.isApproveHr && row.isApproveManager && !row.isRejectHr && !row.isRejectManager?'green':(row.isRejectHr || row.isRejectManager)?'red':'orange' }">
+                                            {{row.employee_invid}}<br>
+                                            {{row.employee_name}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="leaveType">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Leave Type
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.leaveType}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="department">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Department
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.department}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="request_date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Request Date
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <p>{{row.request_date | date: 'mediumDate'}}<br>{{row.request_date |
+                                                date: 'shortTime'}}</p>
+                                        </td>
+                                    </ng-container>
+
+
+                                    <ng-container matColumnDef="fromDate">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> From Date
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.fromDate | date: 'mediumDate'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="toDate">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> To Date
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.toDate | date: 'mediumDate'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="manager">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.manager_invid }}<br>{{row.manager_name }}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="hr">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Hr
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.hr_invid }}<br>{{row.hr_name }}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="comments">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager Comments
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.comments}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="reason">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Reason
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.reason}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="is_half_day">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Half Day?
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.is_half_day ? 'Yes': 'No'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="days_count">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Days Count
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            {{row.days_count}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="supportingDocument">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Supporting Document
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <a *ngIf="row.supportingDocument" target="_blank"
+                                                [href]="row.supportingDocument"><i class="small-icon"
+                                                    data-feather="download" appFeatherIcon></i>
+                                                Download</a>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="approveByManager_name">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager Approver
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"
+                                            [ngStyle]="{'color':row.isApproveManager?'green':row.isRejectManager?'red':'orange' }">
+                                            {{!row.isApproveManager && !row.isRejectManager ? 'Pending' :
+                                            row.isRejectManager? 'Rejected ':''}}
+                                            {{row.approveByManager_invid }}<br>{{row.approveByManager_name }}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="approveByHr_name">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Hr Approver
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"
+                                            [ngStyle]="{'color':row.isApproveHr?'green':row.isRejectHr?'red':'orange' }">
+                                            {{!row.isApproveHr && !row.isRejectHr? 'Pending' : row.isRejectHr?
+                                            'Rejected ':''}}
+                                            {{row.approveByHr_invid }}<br>{{row.approveByHr_name }}
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns3; sticky: true"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns3;">
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </ng-template>
+                </li>
+
+            </ul>
+            <div [ngbNavOutlet]="StudentProfileNav" class="border border-top-0 p-3"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- End -->
+
+
+<!-- Attendance Edit Model -->
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <div class="col-md-12">
+                <label> Comment</label>
+                <input type="text" placeholder="Any comments.." [(ngModel)]="comments" name="comments"
+                    class="form-control">
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>
+
+<!-- Regularize Attendance Edit Model -->
+
+<ng-template #changeModal2 let-modal>
+    <!-- <form #attendanceForm="ngForm"> -->
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Regularize Attendance</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Set Your Attendance</label>
+                            <ng-select [items]="attendanceType" #Attendance="ngModel"
+                                [(ngModel)]="regularize.attendance" name="state" placeholder="Set your Attendance"
+                                required>
+                            </ng-select>
+                            <p class="text-danger mt-1"
+                                *ngIf="Attendance?.errors?.required && ( Attendance.dirty || Attendance.touched )">
+                                This
+                                field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Reason</label>
+
+                            <textarea class="form-control" name="comments" placeholder="Reason"
+                                [(ngModel)]="regularize.reason" required></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Close</button>
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Save changes</button>
+    </div>
+    <!-- </form> -->
+</ng-template>
+
+
+
+<!-- leave approvel Edit Model -->
+
+<ng-template #modal3 let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Attendance</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body" style="height: 400px;">
+        <div class="form-group">
+            <div class="col-md-12">
+                <label> Comment</label>
+                <input type="text" placeholder="Any comments.." [(ngModel)]="attendance.comments" name="comments"
+                    class="form-control">
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>

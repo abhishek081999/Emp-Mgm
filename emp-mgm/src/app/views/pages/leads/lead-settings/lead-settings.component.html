@@ -1,0 +1,365 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Lead Settings</li>
+    </ol>
+</nav>
+
+<div class="row">
+
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Lead Level & Language</h6>
+                <form #levelform="ngForm" class="my-2" (ngSubmit)="levelform.valid && createLevel()">
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Language*</label>
+                                <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                    #language="ngModel" [(ngModel)]="AddLevel.language" (change)="onChange()"
+                                    name="language" required>
+                                </ng-select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Level*</label>
+                                <input type="text" name="level" placeholder="Add new level" #addLevel="ngModel"
+                                    [(ngModel)]="AddLevel.name" required class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button [disabled]="levelform.invalid"
+                                class="btn btn-primary btn-block mt-4">Create</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row mt-3" *ngIf="AddLevel.language">
+                    <div class="col-5 col-md-3">
+                        <ul ngbNav #verticalNav="ngbNav" cdkDropList (cdkDropListDropped)="dropLabel($event)"
+                            class="nav-tabs nav-tabs-vertical">
+                            <li *ngFor="let element of getLeadLevels; let i = index" [ngbNavItem]="i" cdkDrag>
+                                <a ngbNavLink (click)="onNavChange(element)">{{element.name}}</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="mb-2">{{element.name}}</h6>
+                                    <form #LVLstageForm="ngForm" (ngSubmit)="LVLstageForm.valid && patchLevel(element)">
+                                        <div class="row">
+
+                                            <div *ngIf="element.IsautoPromote" class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Auto Promote Level*</label>
+                                                    <ng-select [items]="Lvldropdwn" bindValue="_id"
+                                                        [searchFn]="SearchFn" placeholder="Select element"
+                                                        #lvl_id="ngModel" [(ngModel)]="element.autoPromoteLevel"
+                                                        name="autoPromoteLevel{{i}}" required>
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">
+                                                                {{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.name}}
+                                                        </ng-template>
+
+                                                    </ng-select>
+
+
+                                                </div>
+                                            </div>
+                                            <div *ngIf="element.IsautoPromote" class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Auto Promote Stage Name*</label>
+                                                    <ng-select [items]="element.stages" bindValue="_id"
+                                                        [searchable]="true" placeholder="Select Level"
+                                                        #Stagedrop="ngModel" [(ngModel)]="element.autoPromoteStageName"
+                                                        name="autoPromoteStageName{{i}}" required [multiple]="true">
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">
+                                                                {{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item.name}}
+                                                        </ng-template>
+
+                                                    </ng-select>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <div class="form-check">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" name="IsautoPromote{{i}}"
+                                                                #Isautopromote="ngModel"
+                                                                [(ngModel)]="element.IsautoPromote"
+                                                                class="form-check-input">
+                                                            <i class="input-frame"></i>
+                                                            Is Auto Promote?
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button [disabled]="LVLstageForm.invalid"
+                                                    class="btn btn-primary btn-block">Save</button>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                    <div class="row mt-2">
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                <input type="text" name="newstage" placeholder="Create New Stage"
+                                                    #LvlStage="ngModel" [(ngModel)]="newstage" required
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <button [disabled]="LvlStage.invalid" class="btn btn-primary btn-block"
+                                                (click)="createStage(element)">Add New
+                                                Stage</button>
+                                        </div>
+
+                                        <div class="my-2">
+
+                                            <mat-accordion cdkDropList
+                                                (cdkDropListDropped)="drop1($event, element.stages)" multi>
+                                                <mat-expansion-panel *ngFor="let stage of element.stages; let i = index"
+                                                    cdkDrag>
+                                                    <mat-expansion-panel-header>
+                                                        <mat-panel-title>
+                                                            {{stage.name}}
+                                                        </mat-panel-title>
+                                                    </mat-expansion-panel-header>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <div class="form-check">
+                                                                    <label class="form-check-label">
+                                                                        <input type="checkbox" name="laststage{{i}}"
+                                                                            #laststage="ngModel"
+                                                                            [(ngModel)]="stage.islaststage"
+                                                                            class="form-check-input">
+                                                                        <i class="input-frame"></i>
+                                                                        Is Last Stage?
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <div class="form-check">
+                                                                    <label class="form-check-label">
+                                                                        <input type="checkbox" name="followup{{i}}"
+                                                                            #followup="ngModel"
+                                                                            [(ngModel)]="stage.followup"
+                                                                            class="form-check-input">
+                                                                        <i class="input-frame"></i>
+                                                                        Follow Up?
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="row">
+                                                                <div class="col-md-7">
+                                                                    Maximum Days
+                                                                </div>
+                                                                <div class="col-md-5">
+                                                                    <div class="form-group">
+                                                                        <input type="number" name="maxtime{{i}}"
+                                                                            placeholder="Maximum Days"
+                                                                            #maxtime="ngModel"
+                                                                            [(ngModel)]="stage.maxtime" required
+                                                                            class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="row">
+                                                                <div class="col-md-7">
+                                                                    Ideal Days
+                                                                </div>
+                                                                <div class="col-md-5">
+                                                                    <div class="form-group">
+                                                                        <input type="number" name="idealtime{{i}}"
+                                                                            placeholder="Ideal Days"
+                                                                            #idealtime="ngModel"
+                                                                            [(ngModel)]="stage.idealtime" required
+                                                                            class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <ul cdkDropList id="{{stagename(stage.name)}}"
+                                                        [cdkDropListData]="stage.status"
+                                                        [cdkDropListConnectedTo]="stagesList" class="drop-list"
+                                                        (cdkDropListDropped)="drop($event,element.stages)">
+                                                        <li *ngFor="let s of stage.status" cdkDrag>{{s}}</li>
+                                                    </ul>
+                                                    <div class="row">
+                                                        <div class="col-md-7">
+                                                            <div class="form-group">
+                                                                <input type="text" name="newstatus"
+                                                                    placeholder="Create New Status" #status="ngModel"
+                                                                    [(ngModel)]="newstatus" required
+                                                                    class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <button [disabled]="status.invalid"
+                                                                class="btn btn-primary btn-block"
+                                                                (click)="createStatus(stage)">Add New Status</button>
+                                                        </div>
+                                                        <div class="col-md-12 mt-2">
+                                                            <button class="btn btn-primary btn-block"
+                                                                (click)="saveStage(stage)">Save</button>
+                                                        </div>
+                                                    </div>
+                                                </mat-expansion-panel>
+                                            </mat-accordion>
+                                        </div>
+
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-7 col-md-9">
+                        <div [ngbNavOutlet]="verticalNav" class="tab-content-vertical border p-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Lead Emp Selection</h6>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Language*</label>
+                            <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                #language2="ngModel" [(ngModel)]="empLang" (change)="emplangchange(empLang)"
+                                name="language">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <ngb-accordion [closeOthers]="true" (panelChange)="empAdd = null">
+                    <ngb-panel title="{{level.name}}" *ngFor="let level of EmpLevelDrop; let ie = index">
+                        <ng-template ngbPanelContent>
+
+                            <ul id="{{level.name}}">
+                                <li *ngFor="let s of level.employee; let eis = index">{{s}} <i
+                                        class="feather icon-x-circle icon-xs mr-2"
+                                        (click)="removeuser(level,eis,s)"></i>
+                                </li>
+                            </ul>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="form-group">
+                                        <ng-select [clearable]="true" [searchable]="true" [searchFn]="SearchFnEmp"
+                                            placeholder="Select Employee" #Emp="ngModel" [(ngModel)]="empAdd"
+                                            name="Emp-{{ie}}" required appendTo=".accordion">
+                                            <ng-option *ngFor="let item of employee" [value]="item.invid"
+                                                [disabled]="item.disabled">{{item.fullName}} -
+                                                {{item.invid}}</ng-option>
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <button class="btn btn-primary btn-block" (click)="CreateEmp(level)">Select
+                                        Employee</button>
+                                </div>
+
+                            </div>
+                        </ng-template>
+                    </ngb-panel>
+                </ngb-accordion>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Lead Sources</h6>
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <input type="text" name="newsource" placeholder="Create New Source" #source="ngModel"
+                                [(ngModel)]="newsource" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <button [disabled]="source.invalid" class="btn btn-primary btn-block"
+                            (click)="createSource()">Create New Source</button>
+                    </div>
+                </div>
+                <ul>
+                    <li *ngFor="let s of leadsource.sources">{{s}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Occupation List</h6>
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <input type="text" name="newoccupation" placeholder="Add Occupation" #occupation="ngModel"
+                                [(ngModel)]="newoccupation" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <button [disabled]="occupation.invalid" class="btn btn-primary btn-block"
+                            (click)="createoccupation()">Add Occupation</button>
+                    </div>
+                </div>
+                <ul>
+                    <li *ngFor="let s of occupations.lists">{{s}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Lead Settings</h6>
+                <ul>
+                    <li *ngFor="let s of settings.settings; let i=index">
+
+                        <div class="row">
+                            <div class="col-md-7">
+                                {{s.name}}
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="number" name="settings{{i}}" placeholder="Days" #occupation="ngModel"
+                                        [(ngModel)]="s.value" required class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-2">Days</div>
+                        </div>
+                    </li>
+                </ul>
+                <button class="btn btn-primary btn-block" (click)="updateleadsettings()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

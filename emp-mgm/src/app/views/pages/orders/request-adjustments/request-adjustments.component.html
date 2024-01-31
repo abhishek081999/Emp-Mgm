@@ -1,0 +1,129 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Request Adjustment</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <h4>Order ID {{requestAdjustment.orderID}}</h4>
+    <form #adjustmentForm="ngForm">
+        <div class="row">
+            <div class="col-md-3 pt-4">
+                Total Amount: {{requestAdjustment.total_amount | currency:'INR'}} ({{requestAdjustment.prev_total_amount
+                | currency:'INR'}})<br>
+                Original Amount: {{requestAdjustment.original_amount | currency:'INR'}}
+                ({{requestAdjustment.prev_original_amount | currency:'INR'}})
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Discount</label>
+                    <input type="number" class="form-control" name="discount" #discount="ngModel"
+                        [disabled]="requestAdjustment.isApproved" [(ngModel)]="requestAdjustment.total_discount"
+                        (change)="calculateInsTotals()">
+                    ({{requestAdjustment.prev_total_discount | currency:'INR'}})
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Adjustment Request Reason*</label>
+                    <textarea name="reason" cols="30" class="form-control" #reason="ngModel" required
+                        [disabled]="requestAdjustment.isApproved" [(ngModel)]="requestAdjustment.requestReason"
+                        placeholder="Reason" rows="10"></textarea>
+                    <p class="text-danger mt-1"
+                        *ngIf="reason?.errors?.required && (reason.dirty || reason.touched || adjustmentForm.submitted)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <h5>Order Lines</h5><br>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" [cellSpacing]="0">
+                        <tr>
+                            <td>Item</td>
+                            <td>Original Amount*</td>
+                            <td>Discounted Amount*</td>
+                        </tr>
+                        <tr *ngFor="let ol of requestAdjustment.orderLines; let i=index">
+                            <td>{{ol.item_code}}<br>{{ol.item_name}}</td>
+                            <td>
+                                <input type="number" class="form-control" name="lineoriamount-{{i}}"
+                                    #lineoriamount="ngModel" [disabled]="requestAdjustment.isApproved"
+                                    [(ngModel)]="ol.original_amount" required
+                                    (change)="calculateInsTotals()"><br>({{ol.prev_original_amount | currency:'INR'}})
+                                <p class="text-danger mt-1"
+                                    *ngIf="lineoriamount?.errors?.required && (lineoriamount.dirty || lineoriamount.touched || adjustmentForm.submitted)">
+                                    This field is required.</p>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" name="lineamount-{{i}}" #lineamount="ngModel"
+                                    required [(ngModel)]="ol.amount" [disabled]="requestAdjustment.isApproved"
+                                    (change)="calculateInsTotals()">
+                                <br>({{ol.prev_amount | currency:'INR'}})
+                                <p class="text-danger mt-1"
+                                    *ngIf="lineamount?.errors?.required && (lineamount.dirty || lineamount.touched || adjustmentForm.submitted)">
+                                    This field is required.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12 mt-3">
+                <h5>Order Installments</h5><br>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" [cellSpacing]="0">
+                        <tr>
+                            <td>Ins Number</td>
+                            <td>Ins Amount*</td>
+                            <td>Additional Charges</td>
+                            <td>GST<br>(CGST+SGST+IGST)</td>
+                            <td>Status</td>
+                        </tr>
+                        <tr *ngFor="let oi of requestAdjustment.orderInstallments; let i=index">
+                            <td>{{oi.installment_number}}</td>
+                            <td>
+                                <input type="number" [disabled]="requestAdjustment.isApproved" class="form-control"
+                                    name="insamount-{{i}}" #insamount="ngModel" [(ngModel)]="oi.installment_amount"
+                                    (change)="calculateInsTotals()" required>
+                                <br>({{oi.prev_installment_amount | currency:'INR'}})
+                                <p class="text-danger mt-1"
+                                    *ngIf="insamount?.errors?.required && (insamount.dirty || insamount.touched || adjustmentForm.submitted)">
+                                    This field is required.</p>
+                            </td>
+                            <td>
+                                <input type="number" [disabled]="requestAdjustment.isApproved" class="form-control"
+                                    name="inscharge-{{i}}" #inscharge="ngModel" [(ngModel)]="oi.additional_charges">
+                                <br>({{oi.prev_additional_charges | currency:'INR'}})
+                            </td>
+                            <td>{{getGST(oi) | currency:'INR'}} <br>
+                                ({{oi.sgst}} + {{oi.cgst}} + {{oi.igst}})
+                            </td>
+                            <td>
+                                <span class="badge badge-success" *ngIf="oi?.is_Paid">Paid</span>
+                                <span class="badge badge-danger" *ngIf="!oi?.is_Paid">Due</span>
+                                <br>
+                                <span class="badge badge-success" *ngIf="oi?.is_Paid && oi?.is_verified">Verified</span>
+                                <span class="badge badge-danger" *ngIf="oi?.is_Paid && !oi?.is_verified">Verification
+                                    Pending</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div *ngIf="requestAdjustment.isApproved" class="col-md-12">
+                Remarks/Comments:<br>
+                {{requestAdjustment.comments}}<br>
+                Approved By:
+                {{requestAdjustment?.approvedBy_invid}} - {{requestAdjustment?.approvedBy_name}} <br>
+                {{requestAdjustment?.approveDate | date:'medium'}} 
+            </div>
+        </div>
+    </form>
+    <div *ngIf="errMsg" class="alert alert-danger">{{errMsg}}</div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+    <button type="button" *ngIf="!requestAdjustment.isApproved" [disabled]="adjustmentForm.invalid || errMsg" class="btn btn-primary"
+        (click)="submit()">Submit</button>
+    <button type="button" *ngIf="!requestAdjustment.isApproved && requestAdjustment._id" [disabled]="adjustmentForm.invalid || errMsg"
+        class="btn btn-success" (click)="approveRequest()">Approve</button>
+</div>

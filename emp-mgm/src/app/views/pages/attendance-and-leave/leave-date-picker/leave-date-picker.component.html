@@ -1,0 +1,124 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Apply Leave</li>
+  </ol>
+</nav>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card mb-4">
+      <div class="card-body">
+
+        <h4 class="mb-3 mb-md-0">Apply for Leave</h4>
+        <form #LeaveForm="ngForm" (ngSubmit)="LeaveForm.valid && submitLeave()">
+
+          <div class="row mt-2">
+            <div class="col-md-6" *ngIf="selectedLeavePolicy.leave_type">
+              <ngb-datepicker #dp [minDate]="minDate" [markDisabled]="markDisabled"
+                (dateSelect)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden">
+              </ngb-datepicker>
+
+              <ng-template #t let-date="date" let-focused="focused" let-today="today" let-disabled="disabled" required>
+                <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)"
+                  [class.faded]="isHovered(date) || isInside(date)" [class.today]="today" [class.disabled]="disabled"
+                  (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
+                  {{ date.day }}
+                </span>
+              </ng-template>
+            </div>
+
+            <div class="col-6">
+              <div class="row">
+                <div class="col-md-12 mb-2">
+                  <h5><span *ngFor="let lb of leaveBalance" class="badge badge-pill badge-success mr-1">{{lb.type}} -
+                      {{lb.balance}}</span></h5>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>From Date</label>
+                    <input type="date" name="fromdate" class="form-control" readonly #fromdate="ngModel"
+                      [(ngModel)]="startDate">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>To Date</label>
+                    <input type="date" name="todate" class="form-control" readonly #todate="ngModel"
+                      [(ngModel)]="endDate">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Leave Type*</label>
+                    <ng-select [items]="myLeavePolicy" #leavetype="ngModel" [(ngModel)]="selectedLeavePolicy"
+                      name="leavetype" placeholder="Select leave type" (change)="onLeaveTypeChange()" required
+                      [clearable]="false">
+                      <ng-template ng-label-tmp let-item="item">
+                        <span class="ng-value-label">{{item.policy_name}}</span>
+                      </ng-template>
+
+                      <ng-template ng-option-tmp let-item="item">
+                        {{item.policy_name}}
+                      </ng-template>
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                      *ngIf="leavetype?.errors?.required && (LeaveForm.submitted || leavetype.dirty || leavetype.touched)">
+                      This field is required.</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mt-30px" *ngIf="selectedLeavePolicy?.is_half_day_allowed">
+                  <div class="form-group">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="checkbox" name="is_half_day" #is_half_day="ngModel" [(ngModel)]="leave.is_half_day"
+                          class="form-check-input" (change)="resetDates()">
+                        <i class="input-frame"></i>
+                        Half Day
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 mt-30px" *ngIf="leave.is_half_day">
+                  <div class="form-group">
+                    <label>First or Second Half*</label>
+                    <ng-select [items]="halfdayDrop" required #halfdaydrop="ngModel" [(ngModel)]="leave.leave_half"
+                      name="halfdaydrop" placeholder="Select leave Half type" [clearable]="false">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                      *ngIf="halfdaydrop?.errors?.required && (LeaveForm.submitted || halfdaydrop.dirty || halfdaydrop.touched)">
+                      This field is required.</p>
+                  </div>
+
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Reason*</label>
+                    <textarea class="form-control" name="comments" placeholder="Reason" #Reason="ngModel"
+                      [(ngModel)]="leave.reason" required cols="8" rows="5"></textarea>
+                    <p class="text-danger mt-1"
+                      *ngIf="Reason?.errors?.required && (LeaveForm.submitted || Reason.dirty || Reason.touched)">
+                      This field is required.</p>
+                  </div>
+                </div>
+                <div class="col-md-12" *ngIf="supportingDocReq">
+                  <div class="form-group">
+                    <label>Supporting Document*</label>
+                    <input type="file" class="form-control" (change)="handelLeaveFile($event)" name="image"
+                      placeholder="Supporting Document" accept=".zip">
+                    <p>Please zip all the required document and upload</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="text-danger mt-1"
+            *ngIf="(LeaveForm.submitted || LeaveForm.dirty || LeaveForm.touched) && LeaveForm.invalid">
+            You Missed Some Fields
+          </p>
+          <button [disabled]="!LeaveForm.valid" class="btn btn-primary">Submit</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

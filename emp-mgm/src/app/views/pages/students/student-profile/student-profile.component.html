@@ -1,0 +1,1086 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Students Profile</li>
+    </ol>
+</nav>
+
+<section style="background-color: #eee;">
+    <div class="container py-3">
+        <div class="row">
+            <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- (click)="fileDropRef.click()" -->
+                                <div class="profiledropzone" appDnd (fileDropped)="onFileDropped($event)">
+                                    <input type="file" accept="image/*" #fileDropRef id="fileDropRef"
+                                        (change)="fileBrowseHandler($event)" />
+                                    <h3 *ngIf="!profilePictureUrl">Drag and Drop profile Image Here</h3>
+                                    <h3 *ngIf="!profilePictureUrl">or</h3>
+                                    <label *ngIf="!profilePictureUrl" for="fileDropRef">Browse</label>
+                                    <h3 class="prodeshov">Drag and Drop profile Image Here</h3>
+                                    <h3 class="prodeshov">or</h3>
+                                    <label class="prodeshov" for="fileDropRef">Browse</label>
+                                    <img [src]="profilePictureUrl" class="dropimage proimghov"
+                                        *ngIf="profilePictureUrl">
+                                </div>
+                                <!-- <br>
+                                    <label class="browse" for="fileDropRef">Browse Image</label> -->
+
+                                <h5 class="my-2">{{ user.fullName }}</h5>
+                                <p class="text-muted mb-2">{{user.invid}}</p>
+                                <button type="button" class="btn btn-primary" (click)="changePassword(user)">Change
+                                    Password</button>
+                                <!-- <button type="button" class="btn btn-outline-primary ms-1" (click)="changePicture()">Change
+                            Picture</button> -->
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-8 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Full Name: </p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{user.fullName}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Email: </p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{user.email}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Phone: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{user.countryCode}}-{{user.telephone}}</p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="mb-0">Alternate Number: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{user.countryCode}}-{{user.secondarynum}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Telegram Number: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{user.countryCode}}-{{user.telegram}}</p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="wp">Whatsapp Number: </p>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="text-muted mb-0">{{user.countryCode}}-{{user.alternatenum}}</p>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Address: </p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0">{{Address}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-2">
+                            <div class="col-sm-2">
+                                <p>Date of birth: </p>
+                            </div>
+                            <div class="col-sm-2">
+                                <span class="text-muted"> {{user.dob}}</span>
+                            </div>
+                            <div class="col-sm-2">
+                                <p class="gender">Gender: </p>
+                            </div>
+                            <div class="col-sm-2">
+                                <span class="text-muted"> {{user.gender}}</span>
+                            </div>
+                            <div class="col-sm-2">
+                                <p class="gstin">GSTIN: </p>
+                            </div>
+                            <div class="col-sm-2">
+                                <p class="text-muted mb-0">{{user.gstin? user.gstin: 'Not available'}}</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary my-2 mx-2"
+                            (click)="edit(user,changeModal)">Edit
+                            Profile</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <ul ngbNav #StudentProfileNav="ngbNav" class="nav-tabs nav-fill">
+                            <li [ngbNavItem]="1">
+                                <a ngbNavLink>Recent Orders</a>
+                                <ng-template ngbNavContent>
+                                    <div *ngIf="isLoading" class="spinner-wrapper">
+                                        <div class="spinner">Loading...</div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-bordered" multiTemplateDataRows
+                                            cellspacing="0" mat-table [dataSource]="dataSourceorders" matSort>
+
+                                            <ng-container matColumnDef="status">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> status </th>
+                                                <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status =='Active'?'green':'red'
+                                }"> {{row.status}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="service_code">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.service_code}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="service_name">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.service_name}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="batch_date">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Batch Date </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.batch_date}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="orderID">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>orderID </th>
+                                                <td mat-cell *matCellDef="let row" ngbTooltip="Click here to View Order"
+                                                    (click)="gotoorder(row)" [ngStyle]="{
+                                'color':row.status =='Active'?'green':'red'
+                                }"> {{row.orderID }} <i class="small-icon" data-feather="external-link"
+                                                        appFeatherIcon></i></td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="order_date">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> order date </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.order_date | date:
+                                                    'mediumDate'}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="payment_mode">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> payment mode
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.payment_mode}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="payment_received">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> net payment
+                                                    received </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.payment_received|
+                                                    currency:'INR'}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="sales_rep">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> sales rep </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.sales_rep}} <br>
+                                                    {{row.sales_rep_name}}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="total_amount">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>total amount <br>
+                                                    (Incl. Gst) </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.total_amount| currency:'INR'}}
+                                                </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="total_due">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>total due <br>
+                                                    (Incl. Gst)</th>
+                                                <td mat-cell *matCellDef="let row"> {{row.total_due| currency:'INR'}}
+                                                </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="total_additional_charges">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>Additional Charges
+                                                    <br> (Incl. Gst)
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.total_additional_charges |
+                                                    currency:'INR'}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="total_gst">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>GST</th>
+                                                <td mat-cell *matCellDef="let row"> {{row.total_gst | currency:'INR'}}
+                                                </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="coupon_code">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> coupon code </th>
+                                                <td mat-cell *matCellDef="let row"> {{row.coupon_code}}</td>
+                                            </ng-container>
+
+                                            <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+                                            <ng-container matColumnDef="expandedDetail">
+                                                <td mat-cell *matCellDef="let row; let i = dataIndex"
+                                                    style="padding: 0px;" [attr.colspan]="displayedColumns.length">
+                                                    <div class="example-row-detail"
+                                                        [@detailExpand]="row == expandedElement ? 'expanded' : 'collapsed'">
+                                                        <div class="row example-row-description">
+                                                            <table class="table table-hover table-bordered"
+                                                                cellspacing="0" style="width: fit-content;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td>Ins. Number</td>
+                                                                        <td>Ins. Date</td>
+                                                                        <td>Ins. Amount <br> (Incl. Gst)</td>
+                                                                        <td>Additional Charges <br> (Incl. Gst)</td>
+                                                                        <td>Net Payment <br> Received</td>
+                                                                        <td>GST</td>
+                                                                        <td>Paid</td>
+                                                                        <td>Verified</td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr *ngFor="let b of row.installments">
+                                                                        <td>{{b.installment_number}}</td>
+                                                                        <td>{{b.installment_date | date: 'mediumDate'}}
+                                                                        </td>
+                                                                        <td>{{b.installment_amount| currency:'INR'}}
+                                                                        </td>
+                                                                        <td>{{b.additional_charges| currency:'INR'}}
+                                                                        </td>
+                                                                        <td>{{b.net_payment_received | currency:'INR'}}
+                                                                        </td>
+                                                                        <td>{{b.gst| currency:'INR'}}</td>
+                                                                        <td
+                                                                            [ngStyle]="{'color':b.is_Paid?'green':'red'}">
+                                                                            {{b.is_Paid?'Yes':'No'}}</td>
+                                                                        <td [ngStyle]="{
+                                                                                                    'color':b.is_verified?'green':'red'
+                                                                                                    }">
+                                                                            {{b.is_verified?'Yes':'No'}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumnsorders; sticky: true">
+                                            </tr>
+                                            <tr mat-row *matRowDef="let element; columns: displayedColumnsorders;"
+                                                class=" cursor-pointer example-element-row"
+                                                [class.example-expanded-row]="expandedElement === element"
+                                                [class.alert-danger]="isnotregistered(element)"
+                                                (click)="expandedElement = expandedElement === element ? null : element">
+                                            </tr>
+                                            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
+                                                class="example-detail-row">
+                                            </tr>
+                                        </table>
+                                        <div class="row mb-2">
+                                            <div class="col-sm-4"></div>
+                                            <div class="col-sm-4 mt-4">
+                                                <button type="button" class="btn btn-outline-success btn-block"
+                                                    ngbTooltip="View All Order Details" (click)="orderslist()"><i
+                                                        class="small-icon" data-feather="arrow-down"
+                                                        appFeatherIcon></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="2">
+                                <a ngbNavLink>Referral Details</a>
+                                <ng-template ngbNavContent>
+                                    <div *ngIf="isLoading2" class="spinner-wrapper">
+                                        <div class="spinner">Loading...</div>
+                                    </div>
+                                    <div *ngIf="!allData">
+                                        <p>{{Errmsg}}</p>
+                                    </div>
+                                    <div *ngIf="!isLoading2 && allData">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p>Referral Code: {{allData.referal_code}}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p>Referred By:
+                                                        {{allData.referred_by_name}}({{allData.referred_by_invid}})</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p>Join Date: {{allData.join_date | date:'medium'}}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p>Current Balance: <b>{{allData.current_balance}}</b></p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p>Invecash Earned: {{allData.invescash_earned}}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p>Invecash Redeemed: {{allData.invescash_redeemed}}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-8">
+                                                <div class="form-group">
+                                                    <a (click)="copied(allData.referal_link)" placement="top"
+                                                        ngbTooltip="Copy">Referral Link:
+                                                        {{allData.referal_link}}</a>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <p> isActive: <span [ngStyle]="{
+                                                        'color':allData.isActive?'green':'red'
+                                                        }">{{allData.isActive?'Active':'Inactive' }}</span></p>
+
+                                                    <label class="mb-0 toggle-switch">
+                                                        <input type="checkbox" name="isActive"
+                                                            [(ngModel)]="allData.isActive" (change)="ReferalActive()"
+                                                            class="form-control">
+                                                        <span class="toggle-slider round"></span> </label>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <button type="button" class="btn btn-success btn-block"
+                                                    (click)="addTransactionModal(exportModal)">Add
+                                                    Transaction</button>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <button type="button" class="t btn btn-primary btn-block"
+                                                    (click)="AllTransaction()">View All
+                                                    Transaction</button>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <!-- end of card -->
+                                    <div class="card mb-2" *ngIf="allData">
+                                        <div class="card-body">
+                                            <div *ngIf="isLoadingTrn" class="spinner-wrapper">
+                                                <div class="spinner">Loading...</div>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-bordered" cellspacing="0"
+                                                    mat-table [dataSource]="dataSourceTrn" matSort>
+
+                                                    <ng-container matColumnDef="txn_type">
+                                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> txn_type
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let row">
+                                                            {{row.txn_type}}
+                                                        </td>
+                                                    </ng-container>
+
+                                                    <ng-container matColumnDef="amount">
+                                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> amount
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let row">
+                                                            {{row.amount}}
+                                                        </td>
+                                                    </ng-container>
+
+                                                    <ng-container matColumnDef="type">
+                                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> type
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let row">
+                                                            {{row.type}}
+                                                        </td>
+                                                    </ng-container>
+
+                                                    <ng-container matColumnDef="details">
+                                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> details
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let row">
+                                                            {{row.details}}
+                                                        </td>
+                                                    </ng-container>
+
+                                                    <ng-container matColumnDef="date">
+                                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> date
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let row">
+                                                            {{row.date |date:'medium'}}
+                                                        </td>
+                                                    </ng-container>
+
+                                                    <tr mat-header-row *matHeaderRowDef="displayedColumnsTrn"></tr>
+                                                    <tr mat-row *matRowDef="let row; columns: displayedColumnsTrn;">
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="3">
+                                <a ngbNavLink>Mobile App Details</a>
+                                <ng-template ngbNavContent>
+                                    <div class="row">
+                                        <div class="col-lg-12 grid-margin stretch-card">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <ul ngbNav #MobileAppDetails="ngbNav" class="nav-tabs nav-fill">
+                                                        <li [ngbNavItem]="1">
+                                                            <a ngbNavLink>Device details</a>
+                                                            <div *ngIf="!devices">
+                                                                <p>{{Errmsg2}}</p>
+                                                            </div>
+                                                            <ng-template *ngIf="devices" ngbNavContent>
+                                                                <div *ngIf="isLoading3" class="spinner-wrapper">
+                                                                    <div class="spinner">Loading...</div>
+                                                                </div>
+
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-hover table-bordered"
+                                                                        cellspacing="0" mat-table
+                                                                        [dataSource]="dataSource2" matSort>
+
+                                                                        <ng-container
+                                                                            *ngFor="let col of displayedColumns2"
+                                                                            [matColumnDef]="col">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> {{col}} </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row[col]}} </td>
+                                                                        </ng-container>
+
+
+
+                                                                        <tr mat-header-row
+                                                                            *matHeaderRowDef="displayedColumns2"></tr>
+                                                                        <tr mat-row
+                                                                            *matRowDef="let row; columns: displayedColumns2;">
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                                <!-- <mat-paginator
+                                                                    [pageSize]="pageSizeOptions"></mat-paginator> -->
+                                                                <div class="row mb-2">
+                                                                    <div class="col-sm-4"></div>
+                                                                    <div class="col-sm-4 mt-4">
+                                                                        <button type="button"
+                                                                            class="btn btn-outline-success btn-block"
+                                                                            ngbTooltip="View All Device Details"
+                                                                            (click)="ViewallDeviceDetails()"><i
+                                                                                class="small-icon"
+                                                                                data-feather="arrow-down"
+                                                                                appFeatherIcon></i></button>
+                                                                    </div>
+                                                                    <div class="col-sm-4"></div>
+                                                                </div>
+                                                            </ng-template>
+                                                        </li>
+                                                        <li [ngbNavItem]="2">
+                                                            <a ngbNavLink>Login history</a>
+                                                            <ng-template ngbNavContent>
+                                                                <div *ngIf="isLoading" class="spinner-wrapper">
+                                                                    <div class="spinner">Loading...</div>
+                                                                </div>
+                                                                <div *ngIf="!loginghisttory">
+                                                                    <p>{{Errmsg3}}</p>
+                                                                </div>
+                                                                <div *ngIf="loginghisttory" class="table-responsive">
+                                                                    <table class="table table-hover table-bordered"
+                                                                        cellspacing="0" mat-table
+                                                                        [dataSource]="dataSource" matSort>
+                                                                        <ng-container matColumnDef="is_logged_in"
+                                                                            sticky>
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> is_logged_in
+                                                                            </th>
+                                                                            <td mat-cell *matCellDef="let row"
+                                                                                [ngStyle]="{
+                                                                            'color':row.is_logged_in?'green':'red'
+                                                                            }"> {{row.is_logged_in?'Yes':'No'}}
+                                                                            </td>
+                                                                        </ng-container>
+
+                                                                        <ng-container matColumnDef="logged_in_time">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> logged_in_time
+                                                                            </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row.logged_in_time| date:
+                                                                                'medium'}} </td>
+                                                                        </ng-container>
+
+                                                                        <ng-container matColumnDef="logged_out_time">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> logged_out_time
+                                                                            </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row.logged_out_time | date:
+                                                                                'medium'}} </td>
+                                                                        </ng-container>
+                                                                        <ng-container matColumnDef="device_id">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> device_id
+                                                                            </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row.device_id}} </td>
+                                                                        </ng-container>
+
+
+
+                                                                        <ng-container matColumnDef="device_name">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> device_name
+                                                                            </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row.device_name}} </td>
+                                                                        </ng-container>
+
+                                                                        <ng-container matColumnDef="device_type">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> device_type
+                                                                            </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row.device_type}} </td>
+                                                                        </ng-container>
+
+                                                                        <!--                                                                         
+                                                                        <ng-container
+                                                                            *ngFor="let col of displayedColumns"
+                                                                            [matColumnDef]="col">
+                                                                            <th mat-header-cell *matHeaderCellDef
+                                                                                mat-sort-header> {{col}} </th>
+                                                                            <td mat-cell *matCellDef="let row">
+                                                                                {{row[col]}} </td>
+                                                                        </ng-container> -->
+
+                                                                        <tr mat-header-row
+                                                                            *matHeaderRowDef="displayedColumns"></tr>
+                                                                        <tr mat-row
+                                                                            *matRowDef="let row; columns: displayedColumns;">
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                                <!-- <mat-paginator
+                                                                    [pageSize]="pageSizeOptions"></mat-paginator> -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-6 mt-4">
+                                                                        <button type="button"
+                                                                            class="btn btn-outline-success btn-block"
+                                                                            ngbTooltip="View All Login History"
+                                                                            (click)="ViewallLoginHistory()"><i
+                                                                                class="small-icon"
+                                                                                data-feather="arrow-down"
+                                                                                appFeatherIcon></i></button>
+                                                                    </div>
+                                                                    <div class="col-sm-6 mt-4">
+                                                                        <button type="button"
+                                                                            class="btn btn-outline-danger btn-block"
+                                                                            (click)="LogutUser(user._id)">Logout
+                                                                            this user</button>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-template>
+                                                        </li>
+                                                    </ul>
+                                                    <div [ngbNavOutlet]="MobileAppDetails"
+                                                        class="border border-top-0 p-3"></div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+
+
+                                        <!-- <div class="col-sm-10">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-primary btn-block"
+                                                (click)="export()">Export</button>
+                                        </div> -->
+                                    </div>
+
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="4">
+                                <a ngbNavLink>Others</a>
+                                <ng-template ngbNavContent>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            Active/Inactive
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="mb-0 toggle-switch">
+                                                    <input type="checkbox" name="activty" [(ngModel)]="user.isActive"
+                                                        (change)="isactive()" class="form-control">
+                                                    <span class="toggle-slider round"></span> </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Counsellor Tagging</label>
+                                            <ng-select name="Counsellor tagging" placeholder="Counsellor Tagging">
+
+                                            </ng-select>
+                                        </div>
+                                    </div>
+
+                                </ng-template>
+                            </li>
+                            <!-- <li [ngbNavItem]="5">
+                                <a ngbNavLink>Notification</a>
+                                <ng-template ngbNavContent>
+                                    <div class="row">
+                                        <div class="col-md-12 grid-margin stretch-card">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">New Notification</h6>
+                                                    <form #notificationForm="ngForm"
+                                                        (ngSubmit)="notificationForm.valid && postnotification(notificationForm)">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label>Title*</label>
+                                                                            <input type="text" class="form-control"
+                                                                                #title="ngModel"
+                                                                                [(ngModel)]="notification.title"
+                                                                                name="title" maxlength="65" required
+                                                                                placeholder="Title in Maximum 65 Letters">
+                                                                            <p class="text-danger mt-1"
+                                                                                *ngIf="title?.errors?.required && (title.dirty || title.touched || notificationForm.submitted)">
+                                                                                This field is required.</p>
+                                                                            <p class="text-danger mt-1"
+                                                                                *ngIf="title?.errors?.maxlength && (title.dirty || title.touched || notificationForm.submitted)">
+                                                                                Max Length is 65 characters</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label>Image</label>
+                                                                            <input type="file" class="form-control"
+                                                                                (change)="handelFileInput($event)"
+                                                                                name="image" placeholder="file">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <label>Details*</label>
+                                                                        <textarea rows="5" class="form-control"
+                                                                            style="height:100px;"
+                                                                            placeholder="Description in maximum 240 Letters"
+                                                                            #description="ngModel"
+                                                                            [(ngModel)]="notification.desc"
+                                                                            name="description" maxlength="240" required>
+                                                                            </textarea>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="description?.errors?.required && (description.dirty || description.touched || notificationForm.submitted)">
+                                                                            This field is required.</p>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="description?.errors?.maxlength && (description.dirty || description.touched || notificationForm.submitted)">
+                                                                            Maximum Length is 240 characters.</p>
+                                                                    </div>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label>Url</label>
+                                                                            <input type="text" class="form-control"
+                                                                                #url="ngModel"
+                                                                                [(ngModel)]="notification.url"
+                                                                                name="url" placeholder="Url">
+                                                                            <p class="text-danger mt-1"
+                                                                                *ngIf="url?.errors?.required && (url.dirty || url.touched || notificationForm.submitted)">
+                                                                                This field is required.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-primary">Submit</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </li> -->
+                        </ul>
+                        <div [ngbNavOutlet]="StudentProfileNav" class="border border-top-0 p-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<ng-template #changeModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Student Details</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #updateForm="ngForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Full Name*</label>
+                        <!--full name-->
+                        <input type="text" #name="ngModel" [(ngModel)]="loggedUser.fullName" name="fullName"
+                            pattern="^([a-zA-Z]+\s)*[a-zA-Z]+$" placeholder="Your Full Name" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="name?.errors?.required && (updateForm.submitted || name.dirty || name.touched)">This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="name?.errors?.pattern && (updateForm.submitted || name.dirty || name.touched)">Remove
+                            space from start and end . Numbers Not Allowed</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>ID</label>
+                        <!--full name-->
+                        <input type="text" #invid="ngModel" [(ngModel)]="loggedUser.invid" name="invid"
+                            placeholder="Your ID" disabled class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Country Code*</label>
+                        <ng-select [items]="countries" #country="ngModel" [(ngModel)]="loggedUser.countryCode"
+                            name="country" placeholder="Select Country code" bindValue="code" [searchFn]="SearchFncode"
+                            bindLabel="code" required>
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.name | uppercase}} ({{item.code}})</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.name | uppercase}} ({{item.code}})
+                            </ng-template>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="country?.errors?.required && (updateForm.submitted || country.dirty || country.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Mobile Number*</label>
+                        <!--telephone-->
+                        <input type="text" #phone="ngModel" [(ngModel)]="loggedUser.telephone" name="telephone"
+                            placeholder="Your Mobile number" required pattern="^[0-9]*$" minlength="10" maxlength="10"
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.required && (updateForm.submitted || phone.dirty || phone.touched)">
+                            This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.minlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                            Min
+                            length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.maxlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                            Max
+                            length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.pattern && (updateForm.submitted || phone.dirty || phone.touched)">Max
+                            length mustbe 10.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Alternate Number</label>
+                        <!--telesecondarynumber-->
+                        <input type="text" #secondarynumber="ngModel" [(ngModel)]="loggedUser.secondarynum"
+                            name="telesecondarynumber" placeholder="Your Mobile number" pattern="^[0-9]*$"
+                            minlength="10" maxlength="10" class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="secondarynumber?.errors?.required && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                            This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="secondarynumber?.errors?.minlength && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                            Min
+                            length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="secondarynumber?.errors?.maxlength && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                            Max
+                            length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="secondarynumber?.errors?.pattern && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                            Max
+                            length mustbe 10.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Whatsapp Number*</label>
+                        <!--telephone-->
+                        <input type="text" #alternativenumber="ngModel" [(ngModel)]="loggedUser.alternatenum"
+                            name="alternativenumber" placeholder="Your Whatsapp number" pattern="^[0-9]*$"
+                            minlength="10" maxlength="10" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.required && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.minlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.maxlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.pattern && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Please Enter
+                            Correct 10 digit Mobile Number</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Telegram Number*</label>
+                        <!--telephone-->
+                        <input type="text" #telegram="ngModel" [(ngModel)]="loggedUser.telegram" name="telegramnumber"
+                            placeholder="Your Telegram number" pattern="^[0-9]*$" minlength="10" maxlength="10" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.required && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.minlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.maxlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.pattern && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Please Enter
+                            Correct 10 digit Mobile Number</p>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label>Email*</label>
+                        <!--email-->
+                        <input type="text" #email="ngModel" [(ngModel)]="loggedUser.email" name="email"
+                            class="form-control" placeholder="Your Email" required [pattern]="emailRegex">
+                        <p class="text-danger mt-1"
+                            *ngIf="email?.errors?.required && (updateForm.submitted || email.dirty || email.touched)">
+                            This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="email?.errors?.pattern && (updateForm.submitted || email.dirty || email.touched)">
+                            Invalid
+                            email address.</p>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label>Address*</label>
+                        <input type="text" #address="ngModel" [(ngModel)]="loggedUser.address" name="address"
+                            class="form-control" placeholder="Your Addesss" required pattern=".*\S+.*">
+                        <p class="text-danger mt-1"
+                            *ngIf="address?.errors?.required && (updateForm.submitted || address.dirty || address.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>State*</label>
+                        <ng-select [items]="states" #state="ngModel" [(ngModel)]="loggedUser.state" name="state"
+                            placeholder="Select State" required (change)="onstateChange()">
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="state?.errors?.required && (updateForm.submitted || state.dirty || state.touched)">
+                            This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>District*</label>
+                        <ng-select [items]="districts" #city="ngModel" [(ngModel)]="loggedUser.city" name="city"
+                            placeholder="Select City" required>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="city?.errors?.required && (updateForm.submitted || city.dirty || city.touched)">This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Pincode*</label>
+                        <input type="text" #pincode="ngModel" [(ngModel)]="loggedUser.pincode" name="pincode"
+                            class="form-control" placeholder="Your Pincode" required maxlength="6" minlength="6"
+                            pattern="^[0-9]+$">
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.required && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.minlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            Min length mustbe 6.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.maxlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            Max length mustbe 6.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.pattern && (pincode.dirty || pincode.touched || updateForm.submitted)">
+                            Only Numbers are allowed.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" #dob="ngModel" [(ngModel)]="loggedUser.dob" name="dob" class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="dob?.errors?.required && (updateForm.submitted || dob.dirty || dob.touched)">This
+                            field
+                            is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select #gender="ngModel" [(ngModel)]="loggedUser.gender" name="gender" class="form-control">
+                            <option value='' selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="gender?.errors?.required && (updateForm.submitted || gender.dirty || gender.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>GSTIN</label>
+                        <input type="text" #gstin="ngModel" [(ngModel)]="loggedUser.gstin" name="gstin"
+                            (ngModelChange)="loggedUser.gstin = $event.toUpperCase()" class="form-control"
+                            placeholder="Your GSTIN" pattern=".*\S+.*">
+                        <p class="text-danger mt-1"
+                            *ngIf="gstin?.errors?.required && (updateForm.submitted || gstin.dirty || gstin.touched)">
+                            This
+                            field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="!updateForm.valid" class="btn btn-primary"
+            (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>
+
+<ng-template #exportModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Transaction</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #addTransactionForm="ngForm">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Details*</label>
+                        <input type="text" class="form-control" #Details="ngModel" [(ngModel)]="transaction.details"
+                            name="details" required autocomplete="off" placeholder="Details">
+                        <p class="text-danger mt-1"
+                            *ngIf="Details?.errors?.required && (addTransactionForm.submitted || Details.dirty || Details.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>txn type</label>
+                        <ng-select [items]="txnType" placeholder="Select Lead Status" #txntype="ngModel"
+                            [(ngModel)]="transaction.txn_type" name="txn type">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Amount*</label>
+                        <input type="text" class="form-control" #Amount="ngModel" [(ngModel)]="transaction.amount"
+                            name="amount" required autocomplete="off" placeholder="Amount">
+                        <p class="text-danger mt-1"
+                            *ngIf="Amount?.errors?.required && (addTransactionForm.submitted || Amount.dirty || Amount.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" #Date="ngModel" [(ngModel)]="transaction.date"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <ng-select [items]="Type" #tyype="ngModel" [(ngModel)]="transaction.type" name="type"
+                            placeholder="Type">
+                        </ng-select>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+        <button [disabled]="addTransactionForm.invalid" type="button" class="btn btn-primary"
+            (click)="modal.close('Submit')">Add Transaction</button>
+
+    </div>
+</ng-template>

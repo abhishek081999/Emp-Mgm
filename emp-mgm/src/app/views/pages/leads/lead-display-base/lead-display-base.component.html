@@ -1,0 +1,23 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Leads</li>
+    </ol>
+</nav>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<app-lead-display 
+    [currentLead]="currentLead" 
+    [currentOnboard]="currentOnboard" 
+    [currentTat]="currentTat"
+    (onboardChanged)="getonboard()"
+    (leadhist)="leadhistory()"
+    (leadSubmit)="tablefilter()"></app-lead-display>
+
+<hr>
+
+<button [disabled]="!prevLead" (click)="gotoprev()" class="btn btn-primary mt-3 mr-2">Previous Lead</button>
+<button [disabled]="!nextLead" (click)="gotonext()" class="btn btn-primary mt-3 mr-2">Next Lead</button>

@@ -1,0 +1,94 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">One to One Mentorships</li>
+    </ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+			<div class="card-body">
+                <h6 class="card-title">One to One Mentorships</h6>
+				<div class="row mb-3">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+					No One to One Mentorships Found.
+				</ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+              
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+
+                        <ng-container matColumnDef="student_name" sticky>
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Student </th>
+                            <td mat-cell  *matCellDef="let row">{{row?.student_invid}} <br> {{row?.student_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_name">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Product </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.product_code}} <br> {{row?.product_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="language">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Language </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.language}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="slotBooked">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Slot Booked </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.slotBooked}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="completedSessions">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Session Completed </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.completedSessions}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="upcomingSessions">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Upcoming Sessions </th>
+                            <td mat-cell   *matCellDef="let row"> {{row?.upcomingSessions}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="purchase_date">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Purchase Date </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.purchase_date | date:'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expiry_date">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Expiry Date </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.expiry_date | date:'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="videoUploaded">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> video Uploaded </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.videoUploaded}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="pendingVideoUpload">
+                            <th mat-header-cell  *matHeaderCellDef mat-sort-header> Pending Video Upload </th>
+                            <td mat-cell  *matCellDef="let row"> {{row?.pendingVideoUpload}} </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row  (click)="goto(row)" *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+			</div>
+		</div>
+	</div>
+</div>

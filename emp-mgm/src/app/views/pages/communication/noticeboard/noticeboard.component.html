@@ -1,0 +1,306 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Notice Board</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Notice</li>
+    </ol>
+</nav>
+
+<!-- ---------------------Notice Board Form Starts ----------------- -->
+
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Notice Board</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">New Notice</h6>
+                <form #noticeForm="ngForm" (ngSubmit)="noticeForm.valid && postNotice(noticeForm)">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Title*</label>
+                                        <input type="text" class="form-control" #title="ngModel"
+                                            [(ngModel)]="notice.title" name="title" required placeholder="Notice title">
+                                        <p class="text-danger mt-1"
+                                            *ngIf="title?.errors?.required && (title.dirty || title.touched || noticeForm.submitted)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Image</label>
+                                        <input type="file" class="form-control" (change)="handelFileInput($event)"
+                                            name="image" placeholder="file">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    Select any one of the below condition
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Department</label>
+                                        <ng-select [items]="departments" [multiple]="true" bindValue="_id"
+                                            bindLabel="name" class="wd-md-340 border-0 rounded-sm" name="department"
+                                            placeholder="Select Department" [(ngModel)]="notice.department">
+                                        </ng-select>
+                                    </div>
+                                    --OR--
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Teams</label>
+                                        <ng-select [items]="allTeams" #team="ngModel" [(ngModel)]="notice.team"
+                                            name="team" placeholder="Search By Team" bindValue="_id" [multiple]="true">
+                                            <ng-template ng-label-tmp let-item="item">
+                                                <span class="ng-value-label">{{item.name}} - {{item.team_lead}}</span>
+                                            </ng-template>
+
+                                            <ng-template ng-option-tmp let-item="item">
+                                                {{item.name}} - {{item.team_lead}}
+                                            </ng-template>
+                                        </ng-select>
+                                    </div>
+                                    --OR--
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Roles</label>
+                                        <ng-select [items]="roles" #role="ngModel" [(ngModel)]="notice.roles"
+                                            name="role" placeholder="Search By Roles" [multiple]="true">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Tags</label>
+                                        <ng-select [items]="Tags" [searchable]="true" #tags="ngModel"
+                                            [(ngModel)]="notice.tags" name="tags" placeholder="Select Notice To Tags"
+                                            [multiple]="true">
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="tags?.errors?.required && (tags.dirty || tags.touched || noticeForm.submitted)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 mt-5">
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" name="wp" #wp="ngModel"
+                                                    [(ngModel)]="notice.isWhatsappMsgSend" class="form-check-input">
+                                                <i class="input-frame"></i>
+                                                Whatsapp Template?*
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="!notice.isWhatsappMsgSend" class="col-md-6">
+                            <label>Details*</label>
+                            <quill-editor [(ngModel)]="notice.description" #description="ngModel" name="description"
+                                placeholder="Enter Description" [styles]="{height:'445px'}" [modules]="quillConfig"
+                                [required]="true" (onSelectionChanged)="onSelectionChanged($event)"
+                                (onContentChanged)="onContentChanged($event)">
+                            </quill-editor>
+                            <p class="text-danger mt-1"
+                                *ngIf="description?.errors?.required && (description.dirty || description.touched || noticeForm.submitted)">
+                                This field is required.</p>
+                        </div>
+
+                        <div *ngIf="notice.isWhatsappMsgSend" class="col-md-6">
+                            <div class="form-group">
+                                <label>Select Template*</label>
+                                <select class="form-control" id="template" name="template" [(ngModel)]="displayTemplate"
+                                    #WPtemplate="ngModel" (change)="changeDisplayTemplate()">
+                                    <option value="">Select an option</option>
+                                    <option *ngFor="let t of wpTemplate" [ngValue]="t">
+                                        {{t.campaign_name}}
+                                    </option>
+                                </select>
+                                <!-- <p class="text-danger mt-1"
+                                    *ngIf="reply?.errors?.required && (reply.dirty || reply.touched || noticeForm.submitted)">
+                                    This field is required.</p> -->
+                            </div>
+                            <hr>
+                            <div *ngIf="notice.isWhatsappMsgSend">
+                                <!-- <textarea name="" id="" cols="30" rows="10"></textarea> -->
+                                <div *ngIf="display">
+                                    <quill-view-html [content]="display" theme="snow">
+                                    </quill-view-html>
+                                </div>
+                            </div>
+                            <div *ngIf="notice.isWhatsappMsgSend && isTextarea">
+                                <textarea class="form-control"
+                                    placeholder="Type ';' separate words for change the above numeric elements" id=""
+                                    cols="50" rows="3" name="arr" [(ngModel)]="arr" (keyup)="templateEdit()"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button class="btn btn-primary">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------------------Notice Board Form ends ----------------- -->
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<!-- --------------------- Notice Board Data Starts ------------------ -->
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">All Notice</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" #startDates="ngModel" [(ngModel)]="startDate" name="startDate"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" #endDates="ngModel" [(ngModel)]="endDate" name="endDate"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Department</label>
+                            <ng-select [items]="departments" bindValue="_id" bindLabel="name" [multiple]="true"
+                                class="wd-md-340 border-0 rounded-sm" name="departmentF" #departmentF="ngModel"
+                                placeholder="Select Department" [(ngModel)]="departmentFilter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Teams</label>
+                            <ng-select [items]="allTeams" #teamF="ngModel" [(ngModel)]="teamFilter" name="teamF"
+                                placeholder="Search By Team" bindValue="_id" [multiple]="true">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.name}} - {{item.team_lead}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}} - {{item.team_lead}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Roles</label>
+                            <ng-select [items]="roles" #roleF="ngModel" [(ngModel)]="rolesFilter" name="roleF"
+                                placeholder="Search By Roles" [multiple]="true">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Tags</label>
+                            <ng-select [items]="Tags" #TagsF="ngModel" [(ngModel)]="tagsFilter" name="TagsF"
+                                placeholder="Search By Tags" [multiple]="true">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Notice Status</label>
+                            <ng-select [items]="status" [searchable]="true" placeholder="Filter Notice Status"
+                                #Status="ngModel" [(ngModel)]="StatusFilter" name="StatusFilter">
+
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="refreshList()">Search</button>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <input class="form-control" type="text" placeholder="Search..." [(ngModel)]="searchq"
+                                (keyup)="filter()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="container card-columns">
+            <div class="row">
+                <div class="col-md-12"
+                    *ngFor="let item of filteredData | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                    <div class="card mb-3">
+                        <img *ngIf="item.image" class="card-img-top p-2" [src]="item.image" [alt]="item.title">
+
+                        <div class="card-body follow-my-portfolio">
+                            <h5 *ngIf="item?.tags && item?.tags?.length>0">
+                                <span *ngFor="let i of item?.tags" class="badge badge-primary m-1">{{i}}</span>
+                            </h5>
+                            <h5>{{ item.title }}
+                                <!-- <span class="badge badge-pill badge-primary m-1">{{item.noticefor}}</span> -->
+                                <span *ngIf="item.isApprove" class="badge badge-pill badge-success m-1">Approved</span>
+                                <span *ngIf="!item.isApprove" class="badge badge-pill badge-warning m-1">Pending</span>
+                            </h5>
+
+                            <quill-view-html [content]="item.description" class="limit-text"
+                                theme="snow"></quill-view-html>
+                        </div>
+
+                        <div class="d-flex justify-content-between p-4">
+                            <span>{{ item.published_date | date:
+                                'medium'}}</span>
+
+                            <div ngbDropdown class="dropdown">
+                                <button type="button" id="jobdropdown" ngbDropdownToggle
+                                    class="btn p-0 no-dropdown-toggle-icon">
+                                    <i ngbTooltip="Settings"
+                                        class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                </button>
+                                <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                                    <button *ngIf="!item.isApprove" (click)="editNotice(item)" ngbDropdownItem><i
+                                            class="feather icon-edit-2 icon-xs mr-2"></i> Edit
+                                        Notice</button>
+
+                                    <button *ngIf="!item.isApprove" (click)="onApprove(item)" ngbDropdownItem><i
+                                            class="feather icon-book icon-xs mr-2"></i>
+                                        Approve
+                                    </button>
+                                    <button (click)="onDelete(item._id)" ngbDropdownItem><i
+                                            class="feather icon-copy icon-xs mr-2"></i> Delete </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+            [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+            (pageChange)="pagechange()">
+        </ngb-pagination>
+    </div>
+</div>

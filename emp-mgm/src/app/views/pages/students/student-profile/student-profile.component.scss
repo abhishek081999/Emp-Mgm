@@ -1,0 +1,171 @@
+.profiledropzone {
+    width: 177px;
+    height: 177px;
+    padding: 2rem;
+    text-align: center;
+    border: dashed 1px #737df5;
+    position: relative;
+    margin: 0 auto;
+    cursor: pointer;
+    border-radius: 100px;
+
+    input {
+        opacity: 0;
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    label {
+        color: white;
+        width: 100px;
+        height: 27px;
+        border-radius: 21.5px;
+        background-color: #737df5;
+        padding: 3px 16px;
+    }
+
+    h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #38424c;
+    }
+
+    &:hover>.proimghov {
+        visibility: hidden;
+    }
+
+    &:hover>.prodeshov {
+        visibility: visible;
+    }
+}
+
+.dropimage {
+    top: 0px;
+    position: absolute;
+    left: 0px;
+    padding: 13px;
+    width: 177px;
+    height: 177px;
+    border-radius: 100px;
+}
+
+.browse {
+    color: white;
+    width: 100%;
+    height: 27px;
+    border-radius: 21.5px;
+    background-color: #737df5;
+    padding: 3px 16px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.prodeshov {
+    visibility: hidden;
+}
+
+@media only screen and (max-width: 570px) {
+
+    .gender {
+        margin-top: 4px;
+    }
+
+    .wp {
+        margin-top: 4px;
+    }
+
+    .gstin {
+        margin-top: 4px;
+    }
+}
+
+.b {
+    text-transform: uppercase;
+    // border-style: outset;
+    background-color: #d7d8f2;
+}
+
+.a {
+    border-style: ridge;
+
+}
+
+.d {
+    border-radius: 25px;
+    // border-style: ridge;
+}
+
+.a:hover {
+    background-color: #ffffff;
+}
+
+
+
+.scroll-down-button {
+    background-color: #737DF5;
+    /* button color */
+    color: #fff;
+    /* icon color */
+    border-radius: 50%;
+    /* circular button */
+    width: 50px;
+    /* button width */
+    height: 50px;
+    /* button height */
+    font-size: 2em;
+    /* icon size */
+    position: center;
+    /* position on the screen */
+    // bottom: 20px; /* distance from bottom of the screen */
+    // right: 20px; /* distance from right of the screen */
+    cursor: pointer;
+    /* change cursor on hover */
+    transition: all 0.2s ease-in-out;
+    /* smooth transition */
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    /* button shadow */
+}
+
+.t {
+    transform: scale(1.1);
+    /* scale up on hover */
+}
+
+.d {
+    width: auto;
+    align-content: center;
+    margin-bottom: 2px;
+}
+
+tr.example-detail-row {
+    height: 0;
+}
+
+tr.example-row-row:not(.example-expanded-row):hover {
+    background: whitesmoke;
+}
+
+tr.example-row-row:not(.example-expanded-row):active {
+    background: #efefef;
+}
+
+.example-row-row td {
+    border-bottom-width: 0;
+}
+
+.example-row-detail {
+    overflow: hidden;
+    // display: flex;
+}
+
+.example-row-description {
+    padding: 20px;
+}
+
+.example-row-description-attribution {
+    opacity: 0.5;
+}

@@ -1,0 +1,32 @@
+export class Payment {
+    _id?: string;
+    orderID?: number;
+    installment_number?: number;
+    installment_date?: Date;
+    installment_amount?: number;
+    is_Paid?: boolean;
+    sgst?: number;
+    igst?: number;
+    cgst?: number;
+    sales_rep?: string;
+    additional_charges?: number;
+    is_verified?: boolean;
+    payment_date?: Date;
+    payment_method?: string;
+    txnid?: string;
+    utr_no?: string;
+    invoice_date?: Date;
+    invoice_number?: string;
+    student_id?: string;
+    coupon_code?: string;
+    item_code?: string;
+    item_name?: string;
+    sales_rep_name?: string;
+    student_invid?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    gstin?: string;
+    net_received?: number;
+    total_gst?: number
+}

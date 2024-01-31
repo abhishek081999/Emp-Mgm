@@ -1,0 +1,339 @@
+<nav class="navbar">
+  <a href="" class="sidebar-toggler" (click)="toggleSidebar($event)">
+    <i class="feather icon-menu"></i>
+  </a>
+  <div class="navbar-content" style="align-items: center;">
+    <!--<form class="search-form">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <i class="feather icon-search"></i>
+            </div>
+          </div>
+          <input type="text" class="form-control" id="navbarForm" placeholder="Search here...">
+        </div>
+      </form>-->
+    <ul class="navbar-nav">
+      <div *ngIf="onlineMessage" class="alert alert-danger">
+        {{ onlineMessage }}
+      </div>
+      <!--<li class="nav-item" ngbDropdown>
+          <a class="nav-link" ngbDropdownToggle id="languageDropdown" role="button">
+            <i class="flag-icon flag-icon-us mt-1" title="us"></i> <span class="font-weight-medium ml-1 mr-1 d-none d-md-inline-block">English</span>
+          </a>
+          <div ngbDropdownMenu aria-labelledby="languageDropdown">
+            <a ngbDropdownItem class="py-2"><i class="flag-icon flag-icon-us" title="us" id="us"></i> <span class="ml-1"> English </span></a>
+            <a ngbDropdownItem class="py-2"><i class="flag-icon flag-icon-fr" title="fr" id="fr"></i> <span class="ml-1"> French </span></a>
+            <a ngbDropdownItem class="py-2"><i class="flag-icon flag-icon-de" title="de" id="de"></i> <span class="ml-1"> German </span></a>
+            <a ngbDropdownItem class="py-2"><i class="flag-icon flag-icon-pt" title="pt" id="pt"></i> <span class="ml-1"> Portuguese </span></a>
+            <a ngbDropdownItem class="py-2"><i class="flag-icon flag-icon-es" title="es" id="es"></i> <span class="ml-1"> Spanish </span></a>
+          </div>
+        </li>
+        <li class="nav-item nav-apps" ngbDropdown>
+          <a class="nav-link" ngbDropdownToggle id="appsDropdown">
+            <i class="link-icon feather icon-grid"></i>
+          </a>
+          <div ngbDropdownMenu aria-labelledby="appsDropdown">
+            <div class="dropdown-header d-flex align-items-center justify-content-between">
+              <p class="mb-0 font-weight-medium">Web Apps</p>
+              <a href="" (click)="false" class="text-muted">Edit</a>
+            </div>
+            <div class="dropdown-body">
+              <div class="d-flex align-items-center apps">
+                <a routerLink="/apps/chat"><i class="feather icon-message-square"></i><p>Chat</p></a>
+                <a routerLink="/apps/calendar"><i class="feather icon-calendar"></i><p>Calendar</p></a>
+                <a routerLink="/apps/email/inbox"><i class="feather icon-mail"></i><p>Email</p></a>
+                <a routerLink="/general/profile"><i class="feather icon-instagram"></i><p>Profile</p></a>
+              </div>
+            </div>
+            <div class="dropdown-footer d-flex align-items-center justify-content-center">
+              <a href="" (click)="false">View all</a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item nav-messages" ngbDropdown>
+          <a class="nav-link" ngbDropdownToggle id="messageDropdown">
+            <i class="link-icon feather icon-mail"></i>
+          </a>
+          <div ngbDropdownMenu aria-labelledby="messageDropdown">
+            <div class="dropdown-header d-flex align-items-center justify-content-between">
+              <p class="mb-0 font-weight-medium">9 New Messages</p>
+              <a href="" (click)="false" class="text-muted">Clear all</a>
+            </div>
+            <div class="dropdown-body">
+              <a href="" (click)="false" class="dropdown-item">
+                <div class="figure">
+                  <img src="https://via.placeholder.com/30x30" alt="userr">
+                </div>
+                <div class="content">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p>Leonardo Payne</p>
+                    <p class="sub-text text-muted">2 min ago</p>
+                  </div>	
+                  <p class="sub-text text-muted">Project status</p>
+                </div>
+              </a>
+              <a href="" (click)="false" class="dropdown-item">
+                <div class="figure">
+                  <img src="https://via.placeholder.com/30x30" alt="userr">
+                </div>
+                <div class="content">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p>Carl Henson</p>
+                    <p class="sub-text text-muted">30 min ago</p>
+                  </div>	
+                  <p class="sub-text text-muted">Client meeting</p>
+                </div>
+              </a>
+              <a href="" (click)="false" class="dropdown-item">
+                <div class="figure">
+                  <img src="https://via.placeholder.com/30x30" alt="userr">
+                </div>
+                <div class="content">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p>Jensen Combs</p>												
+                    <p class="sub-text text-muted">1 hrs ago</p>
+                  </div>	
+                  <p class="sub-text text-muted">Project updates</p>
+                </div>
+              </a>
+              <a href="" (click)="false" class="dropdown-item">
+                <div class="figure">
+                  <img src="https://via.placeholder.com/30x30" alt="userr">
+                </div>
+                <div class="content">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p>Amiah Burton</p>
+                    <p class="sub-text text-muted">2 hrs ago</p>
+                  </div>
+                  <p class="sub-text text-muted">Project deadline</p>
+                </div>
+              </a>
+              <a href="" (click)="false" class="dropdown-item">
+                <div class="figure">
+                  <img src="https://via.placeholder.com/30x30" alt="userr">
+                </div>
+                <div class="content">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p>Yaretzi Mayo</p>
+                    <p class="sub-text text-muted">5 hr ago</p>
+                  </div>
+                  <p class="sub-text text-muted">New record</p>
+                </div>
+              </a>
+            </div>
+            <div class="dropdown-footer d-flex align-items-center justify-content-center">
+              <a href="" (click)="false">View all</a>
+            </div>
+          </div>
+        </li>-->
+      <li class="nav-item" (click)="showRoaster(modal)">
+        <a class="nav-link">
+          <button class="btn btn-sm btn-primary">Today's Roster</button>
+        </a>
+      </li>
+      <li class="nav-item nav-notifications" ngbDropdown>
+        <a class="nav-link" ngbDropdownToggle id="notificationDropdown">
+          <i class="link-icon feather icon-bell"></i>
+          <div class="indicator" *ngIf="isindicate">
+            <div class="circle"></div>
+          </div>
+        </a>
+        <div ngbDropdownMenu aria-labelledby="notificationDropdown">
+          <div class="dropdown-header d-flex align-items-center justify-content-between">
+            <p class="mb-0 font-weight-medium">{{count>0?count:'No'}} Notifications</p>
+            <!--<a (click)="refresh()" class="text-muted">Refresh</a>-->
+          </div>
+          <div class="dropdown-body">
+            <a routerLink='/admin/courses/course-list' *ngIf="checkpresent(allUnapproveCourseCount)"
+              class="dropdown-item">
+              <div class="icon">
+                <i class="feather icon-book"></i>
+              </div>
+              <div class="content">
+                <p>{{allUnapproveCourseCount}} Pending Courses</p>
+                <p class="sub-text text-muted">Next Refresh {{getRefreshTime()}}</p>
+              </div>
+            </a>
+            <a routerLink='/admin/communication/messages' *ngIf="checkpresent(allUnreadMsgCount)" class="dropdown-item">
+              <div class="icon">
+                <i class="feather icon-mail"></i>
+              </div>
+              <div class="content">
+                <p>{{allUnreadMsgCount}} Unread Messages</p>
+                <p class="sub-text text-muted">Next Refresh {{getRefreshTime()}}</p>
+              </div>
+            </a>
+            <a routerLink='/admin/communication/messages' *ngIf="checkpresent(allUnreadInsMsgCount)"
+              class="dropdown-item">
+              <div class="icon">
+                <i class="feather icon-mail"></i>
+              </div>
+              <div class="content">
+                <p>{{allUnreadInsMsgCount}} Instructor Unread Messages</p>
+                <p class="sub-text text-muted">Next Refresh {{getRefreshTime()}}</p>
+              </div>
+            </a>
+            <a routerLink='/admin/students/certificates' *ngIf="checkpresent(allCertReqCount)" class="dropdown-item">
+              <div class="icon">
+                <i class="feather icon-award"></i>
+              </div>
+              <div class="content">
+                <p>{{allCertReqCount}} Certificate Requests</p>
+                <p class="sub-text text-muted">Next Refresh {{getRefreshTime()}}</p>
+              </div>
+            </a>
+            <a routerLink='/admin/courses/reviews' *ngIf="checkpresent(allUnapprovedRatingsCount)"
+              class="dropdown-item">
+              <div class="icon">
+                <i class="feather icon-star"></i>
+              </div>
+              <div class="content">
+                <p>{{allUnapprovedRatingsCount}} Unapproved Reviews</p>
+                <p class="sub-text text-muted">Next Refresh {{getRefreshTime()}}</p>
+              </div>
+            </a>
+          </div>
+          <div class="dropdown-footer d-flex align-items-center justify-content-center">
+            <a (click)="refresh()">Refresh</a>
+          </div>
+        </div>
+      </li>
+      <li class="nav-item nav-profile" ngbDropdown>
+        <a class="nav-link" ngbDropdownToggle id="profileDropdown">
+          <img [src]="employee.profile_image" class="mx-wd-30" alt="profile">
+        </a>
+        <div ngbDropdownMenu aria-labelledby="profileDropdown">
+          <div class="dropdown-header d-flex flex-column align-items-center">
+            <div class="figure mb-3">
+              <img [src]="employee.profile_image" class="mx-wd-80" alt="Profile">
+            </div>
+            <div class="info text-center">
+              <p class="name font-weight-bold mb-0">{{ employee.fullName | titlecase }}</p>
+              <p class="email text-muted mb-0">{{ employee.invid }}</p>
+              <p class="email text-muted mb-3">{{ employee.designation | titlecase }}</p>
+              <p class="email text-muted mb-0">{{ employee.department | titlecase }}</p>
+              <p class="email text-muted mb-3">{{ employee.Manager | titlecase }}</p>
+            </div>
+          </div>
+          <div class="dropdown-body">
+            <ul class="profile-nav p-0 pt-3">
+              <li class="nav-item">
+                <a routerLink="/admin/profile/my-profile" class="nav-link">
+                  <i class="feather icon-user"></i>
+                  <span>Profile</span>
+                </a>
+              </li>
+              <!--<li class="nav-item">
+                  <a href="" (click)="false" class="nav-link">
+                    <i class="feather icon-edit"></i>
+                    <span>Edit Profile</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="" (click)="false" class="nav-link">
+                    <i class="feather icon-repeat"></i>
+                    <span>Switch User</span>
+                  </a>
+                </li>-->
+              <li class="nav-item">
+                <a href="" (click)="onLogout($event)" class="nav-link">
+                  <i class="feather icon-log-out"></i>
+                  <span>Log Out</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Today's Roster</h5>
+    <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row mt-3">
+      <!-- <div class="col-md-6">
+        <div class="form-group">
+          <label>
+            Select Department*</label>
+          <ng-select [items]="departments" [searchable]="true" bindValue="_id" bindLabel="name" #departmentid="ngModel"
+            [(ngModel)]="DepartmentFilter" (change)="filter()" class="wd-md-340 border-0 rounded-sm"
+            name="department_id" placeholder="Select departments">
+          </ng-select>
+        </div>
+      </div> -->
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>
+            Select Team*</label>
+          <ng-select [items]="TeamsDrop" [searchable]="true" bindValue="_id" bindLabel="_id" #Teamid="ngModel"
+            [(ngModel)]="teamFilter" (change)="filterTeam()" class="wd-md-340 border-0 rounded-sm" name="team"
+            placeholder="Select Team">
+            <ng-template ng-label-tmp let-item="item">
+              <span class="ng-value-label">{{item.name}}</span>
+            </ng-template>
+
+            <ng-template ng-option-tmp let-item="item">
+              {{item.name}}
+            </ng-template>
+          </ng-select>
+
+        </div>
+      </div>
+      <div class="col-4 col-md-3">
+        <ul ngbNav #verticalNav2="ngbNav" class="nav-tabs nav-tabs-vertical" orientation="vertical">
+          <li *ngFor="let element of roster; let i = index" [ngbNavItem]="i">
+            <a ngbNavLink (click)="onDeptSelect(element)"> {{element.department}}</a>
+            <ng-template ngbNavContent>
+              <h6 class="mb-2">{{element.department}}</h6>
+
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                  [dataSource]="dataSourceRoster" matSort>
+
+                  <ng-container matColumnDef="employee_invid">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Employee
+                    </th>
+                    <td mat-cell *matCellDef="let row"> {{row?.employee_invid}} <br>{{row?.employee_name}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="shift">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Shift
+                    </th>
+                    <td mat-cell *matCellDef="let row"> {{row?.shift}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="manager_invid">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Manager
+                    </th>
+                    <td mat-cell *matCellDef="let row"> {{row?.manager_invid}} <br>{{row?.manager_name}} </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="working_location">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Working Location
+                    </th>
+                    <td mat-cell *matCellDef="let row"> {{row?.working_location}}</td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumnsRoaster; sticky:true;"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumnsRoaster;"></tr>
+
+                </table>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+      </div>
+      <div class="col-8 col-md-9">
+        <div [ngbNavOutlet]="verticalNav2" class="tab-content-vertical border p-3"></div>
+      </div>
+    </div>
+  </div>
+</ng-template>

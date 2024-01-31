@@ -1,0 +1,22 @@
+.img-container,
+.img-preview {
+  background-color: #f7f7f7;
+  text-align: center;
+  width: 100%;
+}
+
+.img-container {
+  max-height: 414px;
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .img-container {
+    min-height: 414px;
+  }
+}
+
+.img-container > img {
+  max-width: 100%;
+}
+

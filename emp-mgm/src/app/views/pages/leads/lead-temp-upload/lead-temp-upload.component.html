@@ -1,0 +1,436 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Leads</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Leads</h6>
+                    <div class="d-flex">
+                        <div ngbDropdown>
+                            <button class="btn btn-primary" placement="left-top" id="dropdownBasic1"
+                                ngbDropdownToggle>Add Lead</button>
+                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                <button ngbDropdownItem (click)="openfileuploadModal()">Import Excel</button>
+                            </div>
+                        </div>
+                        <button type="button" class="ml-2 btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Leads Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" #searchfield="ngModel" [(ngModel)]="searchLead"
+                                    placeholder="Search by Phone or email, only for single lead search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="ml-2 btn btn-primary btn-block" (click)="search()">Search</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Language</label>
+                            <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                #languagelead="ngModel" [(ngModel)]="leadLang" (change)="tablefilter()"
+                                name="languagelead">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Level</label>
+                            <ng-select [items]="LeadLevelDrop" bindValue="_id" [searchable]="true"
+                                placeholder="Select Level" #leadLvl="ngModel" [(ngModel)]="LeadLevel"
+                                (change)="tablefilter()" name="Levellead">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">
+                                        {{item.name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Stage</label>
+                            <ng-select [items]="LeadStage" #stagefilter="ngModel" [(ngModel)]="stageFilter"
+                                class="wd-md-340 border-0 rounded-sm" name="stagefilter" placeholder="Filter By Stage"
+                                bindLabel="name" bindValue="name" (change)="tablefilter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter By Status</label>
+                            <ng-select [items]="LeadStatus" #statusfilter="ngModel" [(ngModel)]="statusFilter"
+                                class="wd-md-340 border-0 rounded-sm" name="statusfilter" placeholder="Filter By Status"
+                                (change)="tablefilter()" [multiple]="true">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                    <!-- <span class="badge badge-primary">{{getstatuscount(item)}}</span> - {{item}} -->
+
+                                    <input id="item-{{index}}" type="checkbox" name="item-{{index}}"
+                                        [ngModel]="item$.selected" /> {{item}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-7">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select (change)="tablefilter()" #filter="ngModel" [(ngModel)]="filterQuery">
+                                        <option value="">All</option>
+                                        <option value="not found">Not Found</option>
+                                        <option value="existing">Existing Leads</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" #pag="ngModel" (keyup)="changePage()"
+                            [(ngModel)]="pageSizeOptions" placeholder="Search">
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="selection.hasValue()">
+                    <div class="align-items-center align-items-start d-flex justify-content-between">
+                        <p>{{selection?.selected?.length}} Leads Selected</p>
+                        <div class="d-flex">
+                            <div ngbDropdown>
+                                <button class="btn btn-primary" placement="left-top" id="dropdownBasic2"
+                                    ngbDropdownToggle>Options</button>
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic2">
+                                    <button ngbDropdownItem (click)="openassignstaffmodal(staffAssignModal)">Lead
+                                        Assign</button>
+                                    <button ngbDropdownItem (click)="openPromoteModal(changeLangModal)">Lead
+                                        Promote</button>
+                                    <!-- <button ngbDropdownItem (click)="openchangelangmodal(changeLangModal)">Change
+                                        Language</button> -->
+                                    <button ngbDropdownItem (click)="delete()">Lead Delete</button>
+                                    <button ngbDropdownItem (click)="leadupload()">Lead Upload</button>
+                                    <button ngbDropdownItem (click)="openassignstaffmodal(statusAssignModal)">Change
+                                        Status</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </ngb-alert>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event)">
+
+                        <ng-container matColumnDef="select" sticky>
+                            <th mat-header-cell cdkDrag *matHeaderCellDef>
+                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    [checked]="selection.hasValue() && isEntirePageSelected()"
+                                    [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row,i)">
+                                </mat-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadowner" sticky>
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>
+                                <p>Lead Owner</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.leadowner}} <br>
+                                {{row.leadownername}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leaddate">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Lead Date </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                <p>{{row.leaddate | date: 'mediumDate'}}<br>{{row.leaddate | date: 'shortTime'}}</p>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadassigndate">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>
+                                <p>Assign Date / <br>Reassign Date</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                <p>{{row.leadassigndate | date: 'mediumDate'}}<br>{{row.leadassigndate | date:
+                                    'shortTime'}}</p>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="leadstatus">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Lead Status </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                {{row.leadstatus}} <br>
+                                <b>{{row.stage_name}}</b> <br>
+                                <span class="text-uppercase badge" [ngClass]="{
+                                    'badge-success': row.color === 'green', 
+                                    'badge-warning' : row.color === 'yellow',
+                                    'badge-danger' : row.color === 'red' 
+                                }">{{ timeElapsed(row)}}</span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadlevel">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Lead Level </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                {{row.language}} <br>
+                                <span class="text-uppercase badge badge-success">{{row?.level_name}}</span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="updatedate">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Last Edited </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                <p>{{row.updatedate | date: 'mediumDate'}}<br>{{row.updatedate | date: 'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="attempt">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>
+                                <p>Attempted / <br>Unattempted</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                {{row.leadassigndate &&
+                                row.leadassigndate!==row.updatedate?'Attempted':'Unattempted'}}<br>
+                                <span *ngIf="row.retarget" class="text-uppercase badge badge-success">Retargeted</span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="callbackdate">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Callback/<br>Followup Date
+                            </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                <p>{{row.callbackdate | date: 'mediumDate'}}<br>{{row.callbackdate | date: 'shortTime'}}
+                                </p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadname">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Lead Name </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.name}} <br>
+                                {{row.phone}} <br> {{row.alternatenumber}} <br> {{row.email}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadsource">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Lead Source </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.leadsource}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="campaign_name">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Campaign Name </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.campaign_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="whatsappnum">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Whatsapp Num. </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.whatsappnum}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="city">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> City </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.city}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="state">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> State </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.state}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="dob">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Dob </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.dob}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gender">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Gender </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.gender}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="occupation">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Occupation </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.occupation}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="experience">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>
+                                <p>Experience In<br>Stock Market</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.experience}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicetype">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Service Type </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.servicetype}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicecode">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Service Code </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.servicecode}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicename">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Service Name </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.servicename}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="comment">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Comment </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.comment}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="creditcard">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Credit Card </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)">
+                                {{row.creditcard?'Yes':'No'}}<br>{{row.ccbank}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="itrfill">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> ITR File? </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.itrfill?'Yes':'No'}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="monthlyincome">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> Monthly Income </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"> {{row.monthlyincome}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col">
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header> {{col}} </th>
+                            <td mat-cell *matCellDef="let row" (click)="leaddisplay(row)"
+                                [class.text-danger]="getTimeDiff(row[col+'_Start_Time'],row[col+'_End_Time'],row[col+'_MAX'])[1]">
+                                {{getTimeDiff(row[col+'_Start_Time'],row[col+'_End_Time'],row[col+'_MAX'])[0]}}<br>
+                                {{row[col+'_End_Time'] | date:'medium'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="logs" stickyEnd>
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header></th>
+                            <td style="padding: 0px 0px 0px 11px;" mat-cell *matCellDef="let row"
+                                (click)="changehistory(row._id)">
+                                <a placement="top" ngbTooltip="Activity Logs" class="mr-2">
+                                    <i data-feather="file-text" appFeatherIcon></i>
+                                </a>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSize]="pageSizeOptions"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #staffAssignModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Assign Staff</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <ng-select [items]="LeadAssignEmp" bindLabel="invid" #employeeid="ngModel" [(ngModel)]="employee"
+            class="wd-md-340 border-0 rounded-sm" name="employeeid" [searchFn]="StaffSearchFn"
+            placeholder="Search By ID or Name" (change)="onassignstaff()">
+            <ng-template ng-label-tmp let-item="item">
+                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+            </ng-template>
+
+            <ng-template ng-option-tmp let-item="item">
+                {{item.invid}} - {{item.fullName}}
+            </ng-template>
+        </ng-select>
+    </div>
+</ng-template>
+
+<ng-template #statusAssignModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change Status</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <ng-select [items]="currentLevelStatus" bindLabel="status" #employeeid="ngModel" [(ngModel)]="changeStatus"
+            class="wd-md-340 border-0 rounded-sm" name="employeeid" placeholder="Search Status"
+            (change)="onchangeStatus(staffAssignModal)">
+        </ng-select>
+    </div>
+</ng-template>
+
+<ng-template #changeLangModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Promote Lead</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Language*</label>
+                    <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language" #CamLang="ngModel"
+                        [(ngModel)]="promoteLang" (change)="onLangSelect()" name="language">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label>Level*</label>
+                <ng-select [items]="promoteLevels" [searchable]="true" placeholder="Select Level" #leadLvl="ngModel"
+                    [(ngModel)]="LeadLevelPromote" (change)="onLangChange()" name="Levellead">
+                    <ng-template ng-label-tmp let-item="item">
+                        <span class="ng-value-label">
+                            {{item.name}}</span>
+                    </ng-template>
+
+                    <ng-template ng-option-tmp let-item="item">
+                        {{item.name}}
+                    </ng-template>
+                </ng-select>
+            </div>
+        </div>
+    </div>
+</ng-template>

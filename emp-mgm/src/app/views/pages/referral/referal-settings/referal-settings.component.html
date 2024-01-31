@@ -1,0 +1,208 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Referral</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Referral Settings</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <form #RefferalSetting="ngForm"
+                (ngSubmit)="RefferalSetting.valid && postReferralSettings($event)">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span>Name :
+                                <br> Referral Settings</span>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Referee Joining Bonus</label>
+                                <input type="text" class="form-control" #referee_joiningBonus="ngModel"
+                                    [(ngModel)]="referralSettings.referee_joining_bonus" name="referee_joining_bonus"
+                                    required placeholder="Referee Joining Bonus">
+                                <!-- <p class="text-danger mt-1"
+                                    *ngIf="currentVersion?.errors?.required && (currentVersion.dirty || currentVersion.touched || RefferalSetting.submitted)">
+                                    This field is required.</p> -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Referrer Joining Bonus</label>
+                                <input type="text" class="form-control" #referrerJoining_bonus="ngModel"
+                                    [(ngModel)]="referralSettings.referrer_joining_bonus" name="referrer_joining_bonus"
+                                    required placeholder="Referrer Joining Bonus">
+                                <!-- <p class="text-danger mt-1"
+                                    *ngIf="currentVersion?.errors?.required && (currentVersion.dirty || currentVersion.touched || RefferalSetting.submitted)">
+                                    This field is required.</p> -->
+                            </div>
+                        </div>
+
+
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="wd-100p">
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <label>
+                                                            Min Amount
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label>
+                                                            Max Amount
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label>
+                                                            Max Invescash Redeem
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label>
+                                                            Referee Invescash
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label>
+                                                            Referee Eligible
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label>
+                                                            Referrer Invescash
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label>
+                                                            Referrer Eligible
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr *ngFor="let p of Purchases; let in=index">
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control"
+                                                                 #minamount="ngModel"
+                                                                [(ngModel)]="p.min_amount" name="min_amount{{in}}"
+                                                                id="min_amount" autocomplete="off"
+                                                                placeholder="min amount" [pattern]="numPattern"
+                                                                required>
+                                                                <p class="text-danger mt-1"
+                                                                *ngIf="minamount?.errors?.pattern && (RefferalSetting.submitted || minamount.dirty || minamount.touched)">
+                                                                Only numbers are supported.</p>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" 
+                                                                 #maxamount="ngModel"
+                                                                [(ngModel)]="p.max_amount" name="max_amount{{in}}"
+                                                                id="max_amount" autocomplete="off"
+                                                                placeholder="max amount" [pattern]="numPattern"
+                                                                required>
+                                                                <p class="text-danger mt-1"
+                                                                *ngIf="maxamount?.errors?.pattern && (RefferalSetting.submitted || maxamount.dirty || maxamount.touched)">
+                                                                Only numbers are supported.</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control"
+                                                                 #maxinvesamount="ngModel"
+                                                                [(ngModel)]="p.max_invescash" name="maxinvesamount{{in}}"
+                                                                id="maxinvesamount" autocomplete="off"
+                                                                placeholder="max amount" [pattern]="numPattern"
+                                                                required>
+                                                                <p class="text-danger mt-1"
+                                                                *ngIf="maxinvesamount?.errors?.pattern && (RefferalSetting.submitted || maxinvesamount.dirty || maxinvesamount.touched)">
+                                                                Only numbers are supported.</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" #refereeinvescash="ngModel"
+                                                                [(ngModel)]="p.referee_invescash" name="referee_invescash{{in}}"
+                                                                id="referee_invescash" autocomplete="off"
+                                                                placeholder="referee invescash" [pattern]="numPattern"
+                                                                required>
+                                                                <p class="text-danger mt-1"
+                                                                *ngIf="refereeinvescash?.errors?.pattern && (RefferalSetting.submitted || refereeinvescash.dirty || refereeinvescash.touched)">
+                                                                Only numbers are supported.</p>
+                                                        </div>
+                                                    </div>
+                                                   
+
+                                                    <div class="col-md-1">
+                                                        <div>
+                                                            <!-- Rounded switch -->
+                                                            <label class="mb-0 toggle-switch">
+                                                                <input type="checkbox" name="referee_eligible{{in}}" #refereeEligible="ngModel"
+                                                                    [(ngModel)]="p.referee_eligible" class="form-control">
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" #referrerinvescash="ngModel"
+                                                                [(ngModel)]="p.referrer_invescash" name="referrer_invescash{{in}}"
+                                                                id="referrer_invescash" autocomplete="off"
+                                                                placeholder="referrer invescash" [pattern]="numPattern"
+                                                                required>
+                                                                <p class="text-danger mt-1"
+                                                                *ngIf="referrerinvescash?.errors?.pattern && (RefferalSetting.submitted || referrerinvescash.dirty || referrerinvescash.touched)">
+                                                                Only numbers are supported.</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <div>
+                                                            <!-- Rounded switch -->
+                                                            <label class="mb-0 toggle-switch">
+                                                                <input type="checkbox" name="referrer_eligible{{in}}" #referrerEligible="ngModel"
+                                                                    [(ngModel)]="p.referrer_eligible" class="form-control">
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-1">
+                                                        <div class="form-group">
+                                                            <a (click)="removeForm(in)"><i class="small-icon"
+                                                                    data-feather="minus-circle" appFeatherIcon></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <a (click)="addForm()" class="btn btn-primary"><i class="small-icon"
+                                            data-feather="plus-circle" appFeatherIcon></i>Add</a>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <button class="btn btn-primary mt-2">Submit</button>
+
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

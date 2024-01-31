@@ -1,0 +1,181 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Instructors</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Instructor List</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+      <h4 class="mb-3 mb-md-0">Instructor List</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-400 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input 
+                type="text" 
+                class="form-control border-0 rounded-sm" 
+                id="searchForm" 
+                name="searchby" 
+                placeholder="Search Here...." 
+                #searchfilter="ngModel" 
+                [(ngModel)]="pagefilter"
+                (keyup)="filter()">
+        </div>
+       
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-200 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select 
+                name="orderby" 
+                #statusfilter="ngModel" 
+                [(ngModel)]="pagefilter1" 
+                class="form-control border-0 rounded-sm"
+                (change)="filter()">
+                <option value="">Any status</option>
+                <option value="approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="rejected">Cancelled</option>
+                <option value="profilecomplete">Profile Completed</option>
+                <option value="deactivate">Deactivated</option>
+            </select>	
+        </div>
+        <button type="button" class="btn btn-primary btn-icon-text mb-2 mb-md-0" (click)="print()">Export</button>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 grid-margin stretch-card" *ngFor="let ins of allInstructor | slice: (currentPage-1) * pageSize : currentPage * pageSize; let i=index">
+		<div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <div>
+                        <span *ngIf="ins.approved && !ins.deactivate" class="badge badge-success mr-2">Approved</span>
+                        <span *ngIf="ins.rejected && !ins.approved" class="badge badge-danger mr-2">Rejected</span>
+                        <span *ngIf="ins.approved && ins.deactivate" class="badge badge-danger mr-2">Deactivated</span>
+                        <span *ngIf="!ins.approved && !ins.rejected" class="badge badge-warning mr-2">Pending</span>
+                        <span *ngIf="ins.profilecomplete" class="badge badge-success mr-2">Profile Completed</span>
+                        <span *ngIf="!ins.profilecomplete" class="badge badge-info mr-2">Profile Not Completed</span>
+                        <span *ngIf="deareq(ins._id)" class="badge badge-danger mr-2">Deactivation Request</span>
+                    </div>
+                    <div ngbDropdown class="dropdown">
+                        <button type="button" id="insdropdown" ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon">
+                            <i ngbTooltip="More Options" class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                        </button>
+                        <div ngbDropdownMenu aria-labelledby="insdropdown">
+                            <button [routerLink]="['/admin/instructor/instructor-list', ins._id]" ngbDropdownItem><i class="feather icon-eye icon-xs mr-2"></i> View Profile</button>
+                            <a href="{{imageurl}}{{ins.cv}}" target="blank" ngbDropdownItem><i class="feather icon-download icon-xs mr-2"></i> Download CV</a>
+                            <button *ngIf="!ins.approved" (click)="onApproved(ins)" ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i> Approve</button>
+                            <button *ngIf="!ins.approved && !ins.rejected" (click)="onRejected(ins)" ngbDropdownItem><i class="feather icon-x-circle icon-xs mr-2"></i>Reject</button>
+                            <button *ngIf="ins.approved  && ins.deactivate" (click)="onReactivate(ins)" ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i> Activate</button>
+                            <button *ngIf="ins.approved && !ins.deactivate" (click)="onDeactivate(ins)" ngbDropdownItem><i class="feather icon-x-circle icon-xs mr-2"></i> Deactivate</button>
+                            <button *ngIf="deareq(ins._id)" (click)="viewreq(ins._id,reqModal)" ngbDropdownItem><i class="feather icon-eye icon-xs mr-2"></i> Deactivation Request</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <div class="figure mb-3">
+                        <img width="150px" height="150px" [src]="ins.image" alt="{{ins.fullName | titlecase}}">
+                    </div>
+                    <div class="info text-center">
+                        <h4 class="name font-weight-bold mb-0">{{ins.fullName | titlecase}}</h4>
+                        <p class="email text-muted mb-3">{{ins.invid}}</p>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{ins.numberofstudents}}</h4>
+                        <p>Students</p>
+                    </div>
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{ins.numberofonlinecourses}}</h4>
+                        <p>Courses</p>
+                    </div>
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{ins.rating | number:'1.1-1'}}</h4>
+                        <p>Ratings</p>
+                    </div>
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{getavgrating(ins._id) | number:'1.1-1'}}</h4>
+                        <p>Feedback</p>
+                    </div>
+                </div>
+                <ul class="list-unstyled p-0 pt-3">
+                    <li>
+                        <i class="feather icon-mail mr-2"></i>
+                        <span> {{ins.email}}</span>
+                    </li>
+                    <li>
+                        <i class="feather icon-phone-call mr-2"></i>
+                        <span> {{ins.telephone}}</span>
+                    </li>
+                    <li>
+                        <i class="feather icon-map-pin mr-2"></i>
+                        <span> {{ins.city}}</span>
+                    </li>
+                    <li>
+                        <i class="feather icon-globe mr-2"></i>
+                        <span> {{ins.language}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ngb-pagination 
+    class="d-flex justify-content-end pagination-rounded" 
+    [collectionSize]="totalSize" 
+    [(page)]="currentPage"
+    [pageSize]="pageSize"
+    [maxSize]="5"
+    [rotate]="true" 
+    [boundaryLinks]="true"
+    (pageChange)="pagechange()"
+    >
+</ngb-pagination>
+
+<ngb-alert [dismissible]="false" [type]="'info'" class="cursor-pointer" placement="top" ngbTooltip="Click to Copy Link" (click)="copied()" ngxClipboard [cbContent]="'https://invesmate.com/instructor/deactivateaccount'">
+    Deactivation link: https://invesmate.com/instructor/deactivateaccount
+</ngb-alert>
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+<ng-template #reqModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Deactivation Requests</h5>
+        <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    <div class="modal-body">
+        <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!msgpresent">
+            No Request Found.
+        </ngb-alert>
+        <ul class="list-unstyled">
+            <li *ngFor="let req of reqmsg; let i=index">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <span>{{ req.date | date: 'medium' }}</span>
+                    <span><i (click)="delete(i,req._id)"class="cursor-pointer feather icon-trash icon-md"></i></span>
+
+                </div>                
+                <p>{{ req.details }}</p>
+            </li>
+        </ul>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Exit</button>
+    </div>
+</ng-template>

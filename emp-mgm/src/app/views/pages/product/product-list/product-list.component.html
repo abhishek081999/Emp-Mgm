@@ -1,0 +1,134 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Products</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Products</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input class="form-control wd-md-200 border-0 rounded-sm" name="search" #search="ngModel"
+                [(ngModel)]="searchq" type="text" placeholder="Search..." (keyup)="filter()">
+        </div>
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <ng-select style="width: 84%;" [items]="languages" [searchable]="true"
+                placeholder="Select Language Filter...." #courselanguage="ngModel" [(ngModel)]="languagefilter"
+                name="courselanguage" (change)="filter()">
+            </ng-select>
+        </div>
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select name="orderby" #statusfilter="ngModel" [(ngModel)]="pagefilter"
+                class="form-control wd-md-200 border-0 rounded-sm" (change)="filter()">
+                <option value="">Any status</option>
+                <option value="approved">Approved</option>
+                <option value="Pending">Pending</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2"
+                        *ngFor="let product of alllistfinal  | slice: (currentPage-1) * pageSize : currentPage * pageSize;">
+                        <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="{{imageurl}}{{product.image}}" class="wd-100p" alt="{{product.name}}">
+                                </div>
+                                <div class="col-md-9">
+                                    <h5>{{product.name | titlecase}}
+                                        <span *ngIf="product?.approve"
+                                            class="badge badge-pill badge-success mr-1">Approved</span>
+                                        <span *ngIf="!product?.approve"
+                                            class="badge badge-pill badge-warning mr-1">Pending</span>
+                                        <span *ngIf="product?.disable"
+                                            class="badge badge-pill badge-danger mr-1">Hidden</span>
+                                    </h5>
+                                    <ul class="list-unstyled">
+                                        <li
+                                            *ngIf="product?.type==='Live Market Practice' || product?.type==='One to One Mentorship'">
+                                            <strong>Duration :</strong> {{product.duration}}
+                                        </li>
+                                        <li><strong>Product Code :</strong> {{product.productid}}</li>
+                                        <li><strong>Ratings :</strong> {{product.rating | number:'1.1-1'}}/5</li>
+                                        <li *ngIf="product?.type==='Portfolio Checkup'"><strong>Number of Stocks
+                                                :</strong> {{product.no_of_stocks}}</li>
+                                        <li
+                                            *ngIf="product?.type==='Live Market Practice' || product?.type==='One to One Mentorship'">
+                                            <strong>Sessions :</strong> {{product.no_of_sessions}}
+                                        </li>
+                                        <li *ngIf="product?.type==='Live Technical Support Chat'"><strong>Conversations
+                                                :</strong> {{product.no_of_sessions}}</li>
+                                        <li><strong>Language :</strong> {{product.language}}</li>
+                                        <li><strong>Product Type :</strong> {{product.type}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div ngbDropdown class="dropdown">
+                                <button type="button" id="jobdropdown" ngbDropdownToggle
+                                    class="btn p-0 no-dropdown-toggle-icon">
+                                    <i ngbTooltip="Settings"
+                                        class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                </button>
+                                <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                                    <button (click)="editproduct(product)" ngbDropdownItem><i
+                                            class="feather icon-edit-2 icon-xs mr-2"></i> Edit Product</button>
+                                    <button (click)="duplicateproduct(product)" ngbDropdownItem><i
+                                            class="feather icon-copy icon-xs mr-2"></i> Duplicate Product</button>
+                                    <button *ngIf="product?.approve" (click)="duplicateproduct1(product)"
+                                        ngbDropdownItem><i class="feather icon-book icon-xs mr-2"></i> New
+                                        Batch</button>
+                                    <button *ngIf="!product?.approve" (click)="onApprove(product)" ngbDropdownItem><i
+                                            class="feather icon-check-circle icon-xs mr-2"></i> Approve Product</button>
+                                    <button *ngIf="!product?.approve" (click)="onDelete(product)" ngbDropdownItem><i
+                                            class="feather icon-trash-2 icon-xs mr-2"></i> Delete Product</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6>Product Description</h6>
+                                <p>{{product?.description}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                    </li>
+                </ul>
+                <ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+                    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+                    (pageChange)="pagechange()">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,239 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Settings</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Zoom Accounts</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Add Zoom Account</h6>
+                <form #zoomForm="ngForm" (ngSubmit)="zoomForm.valid && submitForm(zoomForm)" class="forms-sample">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>User For*</label>
+                                <select class="form-control" #usedFor="ngModel" [(ngModel)]="zoomacc.usedFor"
+                                    name="usedFor" required>
+                                    <option value="Free Live Class">Free Live Class</option>
+                                    <option value="Paid Live Class">Paid Live Class</option>
+                                    <option value="One to One Mentorship">One to One Mentorship</option>
+                                    <option value="Live Market Practice">Live Market Practice</option>
+                                    <option value="Demo Class">Demo Class</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="usedFor?.errors?.required && (zoomForm.submitted || usedFor.dirty || usedFor.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Name*</label>
+                                <input type="text" class="form-control" #title="ngModel" [(ngModel)]="zoomacc.name"
+                                    name="title" autocomplete="off" required placeholder="Name">
+                                <p class="text-danger mt-1"
+                                    *ngIf="title?.errors?.required && (zoomForm.submitted || title.dirty || title.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Email*</label>
+                                <input type="text" class="form-control" #email="ngModel" [(ngModel)]="zoomacc.email"
+                                    name="email" autocomplete="off" required placeholder="Zoom Email ID">
+                                <p class="text-danger mt-1"
+                                    *ngIf="email?.errors?.required && (zoomForm.submitted || email.dirty || email.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Host ID*</label>
+                                <input type="text" class="form-control" #hostID="ngModel" [(ngModel)]="zoomacc.hostID"
+                                    name="hostID" autocomplete="off" required placeholder="Zoom Host ID">
+                                <p class="text-danger mt-1"
+                                    *ngIf="hostID?.errors?.required && (zoomForm.submitted || hostID.dirty || hostID.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>is Parent Account?*</label>
+                                <select class="form-control" #isParent="ngModel" [(ngModel)]="zoomacc.isParent"
+                                    name="isParent" required>
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="isParent?.errors?.required && (zoomForm.submitted || isParent.dirty || isParent.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="!zoomacc.isParent">
+                            <div class="form-group">
+                                <label>Parent Account*</label>
+                                <ng-select [items]="allParentData" bindLabel="email" bindValue="_id" #parentID="ngModel"
+                                    [(ngModel)]="zoomacc.parentID" name="parentID" placeholder="Parent Account"
+                                    required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="parentID?.errors?.required && (zoomForm.submitted || parentID.dirty || parentID.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="zoomacc.isParent">
+                            <div class="form-group">
+                                <label>Account ID*</label>
+                                <input type="text" class="form-control" #AccountID="ngModel" [(ngModel)]="zoomacc.AccountID"
+                                    name="AccountID" autocomplete="off" required placeholder="Zoom Account ID">
+                                <p class="text-danger mt-1"
+                                    *ngIf="AccountID?.errors?.required && (zoomForm.submitted || AccountID.dirty || AccountID.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="zoomacc.isParent">
+                            <div class="form-group">
+                                <label>Client ID*</label>
+                                <input type="text" class="form-control" #ClientID="ngModel"
+                                    [(ngModel)]="zoomacc.ClientID" name="ClientID" autocomplete="off" required
+                                    placeholder="Zoom Client ID">
+                                <p class="text-danger mt-1"
+                                    *ngIf="ClientID?.errors?.required && (zoomForm.submitted || ClientID.dirty || ClientID.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="zoomacc.isParent">
+                            <div class="form-group">
+                                <label>Client Secret*</label>
+                                <input type="text" class="form-control" #ClientSecret="ngModel" [(ngModel)]="zoomacc.ClientSecret"
+                                    name="ClientSecret" autocomplete="off" required placeholder="Zoom Client Secret">
+                                <p class="text-danger mt-1"
+                                    *ngIf="ClientSecret?.errors?.required && (zoomForm.submitted || ClientSecret.dirty || ClientSecret.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="zoomacc.isParent">
+                            <div class="form-group">
+                                <label>Verification Token*</label>
+                                <input type="text" class="form-control" #VerificationToken="ngModel"
+                                    [(ngModel)]="zoomacc.VerificationToken" name="VerificationToken" autocomplete="off" required
+                                    placeholder="Zoom Verification Token">
+                                <p class="text-danger mt-1"
+                                    *ngIf="VerificationToken?.errors?.required && (zoomForm.submitted || VerificationToken.dirty || VerificationToken.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Zoom Accounts</h6>
+                <div class="row mb-3">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Zoom Accounts Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="usedFor">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Used For </th>
+                            <td mat-cell *matCellDef="let row"> {{row.usedFor}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="email">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                            <td mat-cell *matCellDef="let row"> {{row.email}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="hostID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Host ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.hostID}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="isParent">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Is Parent? </th>
+                            <td mat-cell *matCellDef="let row"> {{row.isParent?'Yes':'No'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="parentID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Parent ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.parentID}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="active">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                            <td mat-cell *matCellDef="let row"> {{row.active?'Active':'Inactive'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="createdBy">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Created By </th>
+                            <td mat-cell *matCellDef="let row"> {{row.createdBy}} <br> {{row.createdAt | date:
+                                'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="modifiedBy">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Modified By </th>
+                            <td mat-cell *matCellDef="let row"> {{row.modifiedBy}} <br> {{row.modifiedAt | date:
+                                'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="options">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Options </th>
+                            <td mat-cell *matCellDef="let row">
+                                <div ngbDropdown class="dropdown" container="body">
+                                    <button type="button" id="insdropdown" ngbDropdownToggle
+                                        class="btn p-0 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="More Options"
+                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                        <button (click)="editZoomDetails(row)" ngbDropdownItem><i
+                                                class="feather icon-edit icon-xs mr-2"></i> Edit Details</button>
+                                        <button (click)="toggleZoomStatus(row)" ngbDropdownItem>
+                                            <i class="feather icon-x icon-xs mr-2" *ngIf="row.active"></i>
+                                            <i class="feather icon-check icon-xs mr-2" *ngIf="!row.active"></i> Activate/Deactivate Account
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,702 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Onboarding List</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Onboarding List</h6>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <input type="text" class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Service Type</label>
+                            <select (change)="onChange()" #filter="ngModel" [(ngModel)]="filterQuery1">
+                                <option value="all">All</option>
+                                <option value="course">Course</option>
+                                <option value="product">Product</option>
+                                <option value="insignia">Insignia</option>
+                                <option value="invesmentor">Invesmentor</option>
+                                <option value="subscription">Subscription</option>
+                                <option value="insignia_subscription">Insignia Subscription</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select (change)="filter1()" #filter="ngModel" [(ngModel)]="filterQuery">
+                                <option value="all">All</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Min. Selling Approval</label>
+                            <select (change)="onChange()" #filter="ngModel" [(ngModel)]="filterQuery2">
+                                <option value="all">All</option>
+                                <option value="minsellingpend">Pending</option>
+                                <option value="minsellingcomp">Complete</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block mt-30px"
+                            (click)="export()">Export</button>
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Onboarding Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="leadowner" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Staff</th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadowner}} <br> {{row.leadownername}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentid" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.studentid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="name" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student </th>
+                            <td mat-cell *matCellDef="let row"> {{row.name}} <br> {{row.phone}} <br> {{row.email}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="whatsappnum">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Whatsapp Num. </th>
+                            <td mat-cell *matCellDef="let row"> {{row.whatsappnum}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telegram">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Telegram </th>
+                            <td mat-cell *matCellDef="let row"> {{row.telegram}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="mode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Mode </th>
+                            <td mat-cell *matCellDef="let row"> {{row.mode}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="totalfees">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Fees </th>
+                            <td mat-cell *matCellDef="let row"> {{row.totalfees | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paidamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Paid Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.paidamount | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="couponcode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Coupon Code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.couponcode}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicetype">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Type </th>
+                            <td mat-cell *matCellDef="let row"> {{row.servicetype}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicecode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.servicecode}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicename">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.servicename}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paymentdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>First Ins <br> Payment Date </th>
+                            <td mat-cell *matCellDef="let row">{{row.paymentdate | date: 'mediumDate'}} <br>
+                                <a class="mt-2" *ngIf="row.paymentimage" href="{{imageurl}}{{row.paymentimage}}"
+                                    target="blank"><i class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View
+                                    Receipt</a>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="txnid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>First ins <br> Transaction Id </th>
+                            <td mat-cell *matCellDef="let row"> {{row.txnid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paymentmethod">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>First Ins <br> Method </th>
+                            <td mat-cell *matCellDef="let row"> {{row.paymentmethod}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paymentamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> First Ins <br> Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.paymentamount | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="secpaymentdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Second Ins <br> Payment Date </th>
+                            <td mat-cell *matCellDef="let row">{{row.secpaymentdate | date: 'mediumDate'}} <br>
+                                <a class="mt-2" *ngIf="row.secpaymentimage" href="{{imageurl}}{{row.secpaymentimage}}"
+                                    target="blank"><i class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View
+                                    Receipt</a>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="sectxnid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Second ins <br> Transaction Id </th>
+                            <td mat-cell *matCellDef="let row"> {{row.sectxnid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="secpaymentmethod">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Second Ins <br> Method </th>
+                            <td mat-cell *matCellDef="let row"> {{row.secpaymentmethod}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="secpaymentamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Second Ins <br> Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.secpaymentamount | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdpaymentdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Third Ins <br> Payment Date </th>
+                            <td mat-cell *matCellDef="let row">{{row.thirdpaymentdate | date: 'mediumDate'}} <br>
+                                <a class="mt-2" *ngIf="row.thirdpaymentimage"
+                                    href="{{imageurl}}{{row.thirdpaymentimage}}" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View
+                                    Receipt</a>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdtxnid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Third ins <br> Transaction Id </th>
+                            <td mat-cell *matCellDef="let row"> {{row.thirdtxnid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdpaymentmethod">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Third Ins <br> Method </th>
+                            <td mat-cell *matCellDef="let row"> {{row.thirdpaymentmethod}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdpaymentamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Third Ins <br> Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.thirdpaymentamount | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthpaymentdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Forth Ins <br> Payment Date </th>
+                            <td mat-cell *matCellDef="let row">{{row.forthpaymentdate | date: 'mediumDate'}} <br>
+                                <a class="mt-2" *ngIf="row.forthpaymentimage"
+                                    href="{{imageurl}}{{row.forthpaymentimage}}" target="blank"><i
+                                        class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View
+                                    Receipt</a>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthtxnid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Forth ins <br> Transaction Id </th>
+                            <td mat-cell *matCellDef="let row"> {{row.forthtxnid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthpaymentmethod">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Forth Ins <br> Method </th>
+                            <td mat-cell *matCellDef="let row"> {{row.forthpaymentmethod}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthpaymentamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Forth Ins <br> Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.forthpaymentamount | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="comment_lead">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Lead Comment </th>
+                            <td mat-cell *matCellDef="let row"> {{row.comment_lead}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="comment">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Support Comment </th>
+                            <td mat-cell *matCellDef="let row"> {{row.comment}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentidgencomplete">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Student<br>Registration</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.studentidgencomplete?'green':'red'">
+                                {{row.studentidgencomplete?'Complete':'Pending'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentidgentime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Student<br>Registration TAT</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{getTimeDiff(row.createdAt,row.studentidgentime)}}<br>
+                                {{row.studentidgentime | date:'medium'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentregdonebyid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Student Reg<br> Done By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.studentregdonebyid}}
+                                <br>{{row.studentregdonebyname}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telegramcomplete">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Telegram<br>Joining</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"
+                                [style.color]="row.telegramcomplete === 'Complete'?'green':row.telegramcomplete ==='Pending'?'red':'orange'">
+                                {{row.telegramcomplete}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telegramtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Telegram<br>Joining TAT</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{getTimeDiff(row.createdAt,row.telegramtime)}}<br>
+                                {{row.telegramtime | date:'medium'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telegramregdonebyid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Telegram <br> Done By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.telegramregdonebyid}}
+                                <br>{{row.telegramregdonebyname}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="manualregcomplete">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>First<br>Ins</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.manualregcomplete?'green':'red'">
+                                {{row.manualregcomplete?'Complete':'Pending'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="regcompletetime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>First<br>Ins TAT</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{getTimeDiff(row.createdAt,row.regcompletetime)}}<br>
+                                {{row.regcompletetime | date:'medium'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="manualregdonebyid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>First Ins <br> Done By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.manualregdonebyid}}
+                                <br>{{row.manualregdonebyname}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="secmanualregcomplete">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Second<br>Ins</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.secmanualregcomplete?'green':'red'">
+                                {{row.secmanualregcomplete?'Complete':(row.mode != 'mode1' &&
+                                row.secregstarttime)?'Pending':null}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="secregcompletetime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Second<br>Ins TAT</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getTimeDiff(row.secregstarttime,row.secregcompletetime)}}<br> {{row.secregcompletetime
+                                | date:'medium'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="secmanualregdonebyid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Second Ins <br> Done By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.secmanualregdonebyid}}
+                                <br>{{row.secmanualregdonebyname}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdmanualregcomplete">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Third<br>Ins</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.thirdmanualregcomplete?'green':'red'">
+                                {{row.thirdmanualregcomplete?'Complete':((row.mode === 'mode3' ||row.mode === 'mode4')
+                                &&
+                                row.thirdregstarttime)?'Pending':null}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdregcompletetime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Third<br>Ins TAT</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getTimeDiff(row.thirdregstarttime,row.thirdregcompletetime)}}<br>
+                                {{row.thirdregcompletetime | date:'medium'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="thirdmanualregdonebyid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Third Ins <br> Done By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.thirdmanualregdonebyid}}<br>{{row.thirdmanualregdonebyname}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthmanualregcomplete">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Forth<br>Ins</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.forthmanualregcomplete?'green':'red'">
+                                {{row.forthmanualregcomplete?'Complete':(row.mode === 'mode4' &&
+                                row.forthregstarttime)?'Pending':null}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthregcompletetime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Forth<br>Ins TAT</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getTimeDiff(row.forthregstarttime,row.forthregcompletetime)}}<br>
+                                {{row.forthregcompletetime | date:'medium'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="forthmanualregdonebyid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Forth Ins <br> Done By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.forthmanualregdonebyid}}<br>{{row.forthmanualregdonebyname}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="below_selling_price_reason">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Minimum Price Selling</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.below_selling_price?'Yes':'No'}}<br>{{row.below_selling_price_reason}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="below_selling_approval">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <p>Minimum Selling <br> Approved By</p>
+                            </th>
+                            <td mat-cell *matCellDef="let row"
+                                [style.color]="row.below_selling_approval?'green':row.below_selling_price ? 'red' :'black'">
+                                {{row.below_selling_approval? 'Approved': row.below_selling_price ? 'Pending':
+                                'NA'}}<br>{{row.below_selling_approval_by}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="_id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                            <td mat-cell *matCellDef="let row">
+                                <div ngbDropdown class="dropdown">
+                                    <button type="button" id="insdropdown" ngbDropdownToggle
+                                        class="btn p-0 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="More Options"
+                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                        <button *ngIf="!row.studentidgencomplete" (click)="studentreg(row)"
+                                            ngbDropdownItem>
+                                            <i class="feather icon-user icon-xs mr-2"></i> Student Registration
+                                        </button>
+                                        <button *ngIf="row.studentidgencomplete" (click)="edit(row,changeModal)"
+                                            ngbDropdownItem>
+                                            <i class="feather icon-user icon-xs mr-2"></i> Student Profile Update
+                                        </button>
+                                        <button *ngIf="row.telegramcomplete !== 'Complete'" (click)="telegramjoin(row)"
+                                            ngbDropdownItem>
+                                            <i class="feather icon-phone icon-xs mr-2"></i> Telegram Joining
+                                        </button>
+                                        <button *ngIf="row.telegramcomplete === 'Pending'"
+                                            (click)="telegramjoinpendinguser(row)" ngbDropdownItem>
+                                            <i class="feather icon-phone icon-xs mr-2"></i> Telegram Not Done By Client
+                                        </button>
+                                        <button *ngIf="chkReg(row)" (click)="manualreg(row)" ngbDropdownItem>
+                                            <i class="feather icon-check icon-xs mr-2"></i> Manual Registration Complete
+                                        </button>
+                                        <button *ngIf="chkReg1(row)" (click)="manualreginco(row)" ngbDropdownItem>
+                                            <i class="feather icon-x-circle icon-xs mr-2"></i> Manual Registration
+                                            Pending
+                                        </button>
+                                        <button *ngIf="chkReg(row)" (click)="goto(row)" ngbDropdownItem>
+                                            <i class="feather icon-external-link icon-xs mr-2"></i> Go to Manual
+                                            Registration
+                                        </button>
+                                        <button *ngIf="!row.below_selling_approval && row.below_selling_price"
+                                            (click)="sellingPriceApproval(row)" ngbDropdownItem>
+                                            <i class="feather icon-check icon-xs mr-2"></i> Approve Minimum Selling
+                                        </button>
+                                        <button (click)="onAddCmnt(commentModal,row)" ngbDropdownItem>
+                                            <i class="feather icon-edit icon-xs mr-2"></i> Add Comment
+                                        </button>
+                                        <button (click)="gotoleads(row)" ngbDropdownItem>
+                                            <i class="feather icon-edit icon-xs mr-2"></i> Go to Lead
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+<ng-template #commentModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Comment</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <textarea #comment1="ngModel" [(ngModel)]="comment" name="comment1" class="form-control" rows="7">
+            </textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>
+
+<ng-template #changeModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Student Details</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #updateForm="ngForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Full Name*</label>
+                        <!--full name-->
+                        <input type="text" #name="ngModel" [(ngModel)]="loggedUser.fullName" name="fullName"
+                            pattern="^([a-zA-Z]+\s)*[a-zA-Z]+$" placeholder="Your Full Name" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="name?.errors?.required && (updateForm.submitted || name.dirty || name.touched)">This
+                            field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="name?.errors?.pattern && (updateForm.submitted || name.dirty || name.touched)">Remove
+                            space from start and end . Numbers Not Allowed</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>ID</label>
+                        <!--full name-->
+                        <input type="text" #invid="ngModel" [(ngModel)]="loggedUser.invid" name="invid"
+                            placeholder="Your ID" disabled class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Mobile Number*</label>
+                        <!--telephone-->
+                        <input type="text" #phone="ngModel" [(ngModel)]="loggedUser.telephone" name="telephone"
+                            placeholder="Your Mobile number" required disabled pattern="^[0-9]*$" minlength="10"
+                            maxlength="10" class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.required && (updateForm.submitted || phone.dirty || phone.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.minlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.maxlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="phone?.errors?.pattern && (updateForm.submitted || phone.dirty || phone.touched)">Max
+                            length mustbe 10.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Whatsapp Number*</label>
+                        <!--telephone-->
+                        <input type="text" #alternativenumber="ngModel" [(ngModel)]="loggedUser.alternatenum"
+                            name="alternativenumber" placeholder="Your Whatsapp number" pattern="^[0-9]*$"
+                            minlength="10" maxlength="10" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.required && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.minlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.maxlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="alternativenumber?.errors?.pattern && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                            Please Enter
+                            Correct 10 digit Mobile Number</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Email*</label>
+                        <!--email-->
+                        <input type="text" #email="ngModel" [(ngModel)]="loggedUser.email" name="email"
+                            class="form-control" placeholder="Your Email" required [pattern]="emailRegex">
+                        <p class="text-danger mt-1"
+                            *ngIf="email?.errors?.required && (updateForm.submitted || email.dirty || email.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="email?.errors?.pattern && (updateForm.submitted || email.dirty || email.touched)">
+                            Invalid email address.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Telegram Number*</label>
+                        <!--telephone-->
+                        <input type="text" #telegram="ngModel" [(ngModel)]="loggedUser.telegram" name="telegramnumber"
+                            placeholder="Your Telegram number" pattern="^[0-9]*$" minlength="10" maxlength="10" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.required && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.minlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Min length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.maxlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Max length mustbe 10.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="telegram?.errors?.pattern && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                            Please Enter
+                            Correct 10 digit Mobile Number</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Address*</label>
+                        <input type="text" #address="ngModel" [(ngModel)]="loggedUser.address" name="address"
+                            class="form-control" placeholder="Your Addesss" required pattern=".*\S+.*">
+                        <p class="text-danger mt-1"
+                            *ngIf="address?.errors?.required && (updateForm.submitted || address.dirty || address.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>State*</label>
+                        <ng-select [items]="states" #state="ngModel" [(ngModel)]="loggedUser.state" name="state"
+                            placeholder="Select State" required (change)="onstateChange()">
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="state?.errors?.required && (updateForm.submitted || state.dirty || state.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>District*</label>
+                        <ng-select [items]="districts" #city="ngModel" [(ngModel)]="loggedUser.city" name="city"
+                            placeholder="Select City" required>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="city?.errors?.required && (updateForm.submitted || city.dirty || city.touched)">This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Pincode*</label>
+                        <input type="text" #pincode="ngModel" [(ngModel)]="loggedUser.pincode" name="pincode"
+                            class="form-control" placeholder="Your Pincode" required maxlength="6" minlength="6"
+                            pattern="^[0-9]+$">
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.required && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.minlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            Min length mustbe 6.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.maxlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                            Max length mustbe 6.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="pincode?.errors?.pattern && (pincode.dirty || pincode.touched || updateForm.submitted)">
+                            Only Numbers are allowed.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" #dob="ngModel" [(ngModel)]="loggedUser.dob" name="dob" class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="dob?.errors?.required && (updateForm.submitted || dob.dirty || dob.touched)">This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select #gender="ngModel" [(ngModel)]="loggedUser.gender" name="gender" class="form-control">
+                            <option value='' selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="gender?.errors?.required && (updateForm.submitted || gender.dirty || gender.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>GSTIN</label>
+                        <input type="text" #gstin="ngModel" [(ngModel)]="loggedUser.gstin" name="gstin"
+                            (ngModelChange)="loggedUser.gstin = $event.toUpperCase()" class="form-control"
+                            placeholder="Your GSTIN" pattern=".*\S+.*">
+                        <p class="text-danger mt-1"
+                            *ngIf="gstin?.errors?.required && (updateForm.submitted || gstin.dirty || gstin.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="!updateForm.valid" class="btn btn-primary"
+            (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>

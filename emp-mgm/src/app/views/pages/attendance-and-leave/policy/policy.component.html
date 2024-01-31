@@ -1,0 +1,292 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Policy</li>
+    </ol>
+</nav>
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card mb-4">
+        <div class="card-body">
+            <form #policyForm="ngForm" (ngSubmit)="policyForm.valid && submitForm(policyForm)">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="policy_name">Policy Name*: </label>
+                            <input type="text" class="form-control" [(ngModel)]="policy.policy_name" id="policy_name"
+                                name="policy_name" #policyName="ngModel" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="policyName?.errors?.required && (policyForm.submitted || policyName.dirty || policyName.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="Description">Description*:</label>
+                            <textarea class="form-control textarea-input" [(ngModel)]="policy.description"
+                                id="Description" #description="ngModel" name="Description" rows="1"
+                                (mouseenter)="expandTextarea()" (mouseleave)="shrinkTextarea()" required></textarea>
+                            <p class="text-danger mt-1"
+                                *ngIf="description?.errors?.required && (policyForm.submitted || description.dirty || description.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Leave Type*: </label>
+                            <ng-select [items]="leaveTypeDrp" [searchable]="true" placeholder="leave type"
+                                name="leave_type" #leaveType="ngModel" [(ngModel)]="policy.leave_type" required>
+                            </ng-select>
+                            <p class="text-danger mt-1"
+                                *ngIf="leaveType?.errors?.required && (policyForm.submitted || leaveType.dirty || leaveType.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <p>Encashable?:</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="isActive" [(ngModel)]="policy.is_encashable"
+                                    class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator" [ngClass]="{'active': policy.is_encashable}">{{
+                                policy.is_encashable ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="">Effective From*: </label>
+                            <input type="date" name="effective_from" #effectiveFrom="ngModel"
+                                [ngModel]="policy.effective_from | date:'yyyy-MM-dd'"
+                                (ngModelChange)="policy.effective_from = $event" [min]="getCurrentDate()"
+                                class="form-control" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="effectiveFrom?.errors?.required && (policyForm.submitted || effectiveFrom.dirty || effectiveFrom.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="total_per_year">Total per year*: </label>
+                            <input type="number" class="form-control" id="total_per_year" #totalPerYear="ngModel"
+                                [(ngModel)]="policy.total_per_year" name="total_per_year" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="totalPerYear?.errors?.required && (policyForm.submitted || totalPerYear.dirty || totalPerYear.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <p>Holiday Exclude?:</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="is_holiday_excluded"
+                                    [(ngModel)]="policy.is_holiday_excluded" class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator" [ngClass]="{'active': policy.is_holiday_excluded}">{{
+                                policy.is_holiday_excluded ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <p>Weekend Exclude?:</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="is_weekend_excluded"
+                                    [(ngModel)]="policy.is_weekend_excluded" class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator" [ngClass]="{'active': policy.is_weekend_excluded}">{{
+                                policy.is_weekend_excluded ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="max_consecutive">Max Consecutive Days*: </label>
+                            <input type="number" class="form-control" id="max_consecutive"
+                                [(ngModel)]="policy.max_consecutive" #maxConsecutive="ngModel" name="max_consecutive"
+                                required>
+                            <p class="text-danger mt-1"
+                                *ngIf="maxConsecutive?.errors?.required && (policyForm.submitted || maxConsecutive.dirty || maxConsecutive.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="apply_before_days">Apply Before Days*: </label>
+                            <input type="number" class="form-control" id="apply_before_days"
+                                [(ngModel)]="policy.apply_before_days" #applyBeforeDays="ngModel"
+                                name="apply_before_days" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="applyBeforeDays?.errors?.required && (policyForm.submitted || applyBeforeDays.dirty || applyBeforeDays.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Accrual Method*: </label>
+                            <ng-select [items]="accrualMethodDrp" [searchable]="true" placeholder="leave type"
+                                name="accrual_method" #accrualMethod="ngModel" [(ngModel)]="policy.accrual_method"
+                                required>
+                            </ng-select>
+                            <p class="text-danger mt-1"
+                                *ngIf="accrualMethod?.errors?.required && (policyForm.submitted || accrualMethod.dirty || accrualMethod.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="waiting_period_length">Waiting Period Length*: </label>
+                            <input type="number" class="form-control" id="waiting_period_length"
+                                #waitingPeriod_length="ngModel" [(ngModel)]="policy.waiting_period_length"
+                                name="waiting_period_length" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="waitingPeriod_length?.errors?.required && (policyForm.submitted || waitingPeriod_length.dirty || waitingPeriod_length.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="waiting_period_unit">Waiting Period Unit*: </label>
+                            <!-- <input type="text" class="form-control" id="waiting_period_unit"
+                                [(ngModel)]="policy.waiting_period_unit"  name="waiting_period_unit"> -->
+                            <ng-select [items]="waitingPeriodDrop" id="waiting_period_unit" [searchable]="true"
+                                placeholder="Select Waiting Period Unit" name="waiting_period_unit"
+                                #waitingPeriod_unit="ngModel" [(ngModel)]="policy.waiting_period_unit" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="waitingPeriod_unit?.errors?.required && (policyForm.submitted || waitingPeriod_unit.dirty || waitingPeriod_unit.touched)">
+                                    This field is required.</p>
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="max_carry_days">Max Carry Days*: </label>
+                            <input type="number" class="form-control" id="max_carry_days" #maxCarry_days="ngModel"
+                                [(ngModel)]="policy.max_carry_days" name="max_carry_days" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="maxCarry_days?.errors?.required && (policyForm.submitted || maxCarry_days.dirty || maxCarry_days.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="max_balance_days">Max Balance Days*: </label>
+                            <input type="number" class="form-control" id="max_balance_days" #maxBalance_days="ngModel"
+                                [(ngModel)]="policy.max_balance_days" name="max_balance_days" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="maxBalance_days?.errors?.required && (policyForm.submitted || maxBalance_days.dirty || maxBalance_days.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <p>Half Day Allowed?</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="is_half_day_allowed"
+                                    [(ngModel)]="policy.is_half_day_allowed" class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator" [ngClass]="{'active': policy.is_half_day_allowed}">{{
+                                policy.is_half_day_allowed ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-md-3">
+                        <div class="form-group">
+                            <p>is_active:</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="is_active" [(ngModel)]="policy.is_active"
+                                    class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator" [ngClass]="{'active': policy.is_active}">{{
+                                policy.is_active ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div> -->
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for=" leave_exclusion">Leave Exclusion: </label>
+
+                            <!-- <ng-select [items]="leaveExclusion" [searchable]="true" placeholder="Leave Exclusion"
+                                name="Leave Exclusion" [(ngModel)]="policy.leave_exclusion">
+                            </ng-select> -->
+                            <ng-select [items]="leaveExclusion" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" #Leave_Exclusion="ngModel" [(ngModel)]="policy.leave_exclusion"
+                                bindValue="_id" class="wd-md-340 border-0 rounded-sm" name="policy_Type"
+                                placeholder="Leave Exclusion">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.policy_name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.policy_name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <p>Pro rata Basis?</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="is_prorata_basis" [(ngModel)]="policy.is_prorata_basis"
+                                    class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator" [ngClass]="{'active': policy.is_prorata_basis}">{{
+                                policy.is_prorata_basis ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <p>Supporting Document Required?</p>
+                            <label class="mb-0 toggle-switch">
+                                <input type="checkbox" name="supporting_document_required"
+                                    [(ngModel)]="policy.supporting_document_required" class="form-control">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="status-indicator"
+                                [ngClass]="{'active': policy.supporting_document_required}">{{
+                                policy.supporting_document_required ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="min_days_for_supporting_doc">Minimum Days for Supporting Document*: </label>
+                            <input type="number" class="form-control" id="min_days_for_supporting_doc"
+                                #min_days_for_supporting_doc="ngModel" [(ngModel)]="policy.min_days_for_supporting_doc"
+                                name="min_days_for_supporting_doc" required>
+                            <p class="text-danger mt-1"
+                                *ngIf="min_days_for_supporting_doc?.errors?.required && (policyForm.submitted || min_days_for_supporting_doc.dirty || min_days_for_supporting_doc.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <!-- <button class="btn btn-primary mt-4 animated-button">Submit</button> -->
+                </div>
+                <ngb-alert class="mt-2" [dismissible]="false" [type]="'danger'"
+                    *ngIf="(policyForm.submitted || policyForm.dirty || policyForm.touched) && policyForm.invalid">
+                    You Missed Some Fields
+                </ngb-alert>
+                <button [disabled]="!policyForm.valid" class="btn btn-primary mt-4 animated-button">Submit</button>
+
+            </form>
+        </div>
+    </div>
+</div>

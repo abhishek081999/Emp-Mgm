@@ -1,0 +1,68 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Request Refund</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <h4>Order ID {{requestRefund.orderID}}</h4>
+    <form #adjustmentForm="ngForm">
+        <div class="row pt-4">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Refund Type</label>
+                            <select class="form-control" #refundtype="ngModel" [(ngModel)]="requestRefund.refundtype"
+                                name="refundtype" required [disabled]="requestRefund.isApproved">
+                                <option value="">Select Refund Type</option>
+                                <option value="Money Returned">Money Returned</option>
+                                <option value="Service Change">Service Change</option>
+                                <option value="Wrong Data Entry">Wrong Data Entry</option>
+                            </select>
+                            <p class="text-danger mt-1"
+                                *ngIf="refundtype?.errors?.required && (refundtype.dirty || refundtype.touched || adjustmentForm.submitted)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-12" *ngIf="requestRefund.refundtype === 'Money Returned'">
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" class="form-control" name="amount" #amount="ngModel"
+                                [disabled]="requestRefund.isApproved" [(ngModel)]="requestRefund.amount">
+                            <p class="text-danger mt-1"
+                                *ngIf="amount?.errors?.required && (amount.dirty || amount.touched || adjustmentForm.submitted)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Refund Reason*</label>
+                    <textarea name="reason" cols="30" class="form-control" #reason="ngModel" required
+                        [disabled]="requestRefund.isApproved" [(ngModel)]="requestRefund.remarks" placeholder="Reason"
+                        rows="10"></textarea>
+                    <p class="text-danger mt-1"
+                        *ngIf="reason?.errors?.required && (reason.dirty || reason.touched || adjustmentForm.submitted)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div *ngIf="requestRefund.isApproved" class="col-md-12">
+                Remarks/Comments:<br>
+                {{requestRefund.comments}}<br>
+                Approved By:
+                {{requestRefund?.approvedBy_invid}} - {{requestRefund?.approvedBy_name}} <br>
+                {{requestRefund?.approveDate | date:'medium'}}
+            </div>
+        </div>
+    </form>
+    <div *ngIf="errMsg" class="alert alert-danger">{{errMsg}}</div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+    <button type="button" *ngIf="!requestRefund.isApproved" [disabled]="adjustmentForm.invalid || errMsg"
+        class="btn btn-primary" (click)="submit()">Submit</button>
+    <button type="button" *ngIf="!requestRefund.isApproved && requestRefund._id"
+        [disabled]="adjustmentForm.invalid || errMsg" class="btn btn-success" (click)="submit()">Approve</button>
+</div>

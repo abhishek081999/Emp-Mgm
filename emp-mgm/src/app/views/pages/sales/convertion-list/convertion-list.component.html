@@ -1,0 +1,281 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Sales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Conversion List</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Conversion List</h6>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filter by Status</label>
+                            <ng-select [items]="filterSts" #status="ngModel" [(ngModel)]="stsfilter" name="status"
+                                placeholder="Search By Status">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filter by Date</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="date" name="srtrange1" #srtrange1="ngModel" [(ngModel)]="srtRange"
+                                        class="form-control">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" name="torange1" #torange1="ngModel" [(ngModel)]="toRange"
+                                        class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filter by Student</label>
+                            <ng-select [items]="allStudent" #servicefilter="ngModel" [(ngModel)]="studentfilter"
+                                name="servicefilter" [searchFn]="StaffSearchFn" placeholder="Filter By Student"
+                                bindValue="invid" bindLabel="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filter by Employee</label>
+                            <ng-select [items]="allEmployee" #EmployeeFil="ngModel" [(ngModel)]="empfilter"
+                                name="EmployeeFil" [searchFn]="StaffSearchFn" placeholder="Search By Employee"
+                                bindValue="invid" bindLabel="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filter by Service Code</label>
+                            <ng-select [items]="servicecodes" #srvcode="ngModel" [(ngModel)]="serCdfilter"
+                                name="srvcode" placeholder="Search By Service Code" bindValue="serviceCode"
+                                bindLabel="serviceCode">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.serviceCode}} - {{item.name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.serviceCode}} - {{item.name}}
+                                </ng-template>
+                            </ng-select>
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label></label>
+                        <button type="button" class="btn btn-primary btn-block mt-2" (click)="filter()">Search</button>
+                    </div>
+                    <div class="col-md-4">
+                        <label></label>
+                        <button type="button" class="btn btn-primary btn-block mt-2" (click)="print1()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" multiTemplateDataRows cellspacing="0" mat-table
+                        [dataSource]="dataSource" matSort>
+
+
+                        <ng-container matColumnDef="student_invid" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student invid </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status =='Active'?'green':'red'
+                                }"> {{row.student_invid}} <br> {{row.student_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="phone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Contact </th>
+                            <td mat-cell *matCellDef="let row"> P: {{row.phone}} <br>
+                                W: {{row.whatsapp}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> status </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status =='Active'?'green':'red'
+                                }"> {{row.status}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="service_code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.service_code}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="service_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.service_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="batch_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Batch Date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.batch_date}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="orderID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>orderID </th>
+                            <td mat-cell *matCellDef="let row" ngbTooltip="Click here to View Order"
+                                (click)="gotoorder(row)"> {{row.orderID }} <i class="small-icon"
+                                    data-feather="external-link" appFeatherIcon></i></td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="order_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> order date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.order_date | date: 'mediumDate'}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="payment_mode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> payment mode </th>
+                            <td mat-cell *matCellDef="let row"> {{row.payment_mode}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="payment_received">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> net payment received </th>
+                            <td mat-cell *matCellDef="let row"> {{row.payment_received| currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalpaymentreceived | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="sales_rep">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> sales rep </th>
+                            <td mat-cell *matCellDef="let row"> {{row.sales_rep}} <br> {{row.sales_rep_name}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_amount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>total amount <br> (Incl. Gst) </th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_amount| currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalbookedamount | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>total due <br> (Incl. Gst)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_due| currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totaldue| currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_additional_charges">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Additional Charges <br> (Incl. Gst)
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_additional_charges | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_additional_charges| currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_gst">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>GST</th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_gst | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalgst| currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="coupon_code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> coupon code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.coupon_code}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+                        <ng-container matColumnDef="expandedDetail">
+                            <td mat-cell *matCellDef="let row; let i = dataIndex" style="padding: 0px;"
+                                [attr.colspan]="displayedColumns.length">
+                                <div class="example-row-detail"
+                                    [@detailExpand]="row == expandedElement ? 'expanded' : 'collapsed'">
+                                    <div class="row example-row-description">
+                                        <table class="table table-hover table-bordered" cellspacing="0"
+                                            style="width: fit-content;">
+                                            <thead>
+                                                <tr>
+                                                    <td>Ins. Number</td>
+                                                    <td>Ins. Date</td>
+                                                    <td>Ins. Amount <br> (Incl. Gst)</td>
+                                                    <td>Additional Charges <br> (Incl. Gst)</td>
+                                                    <td>Net Payment <br> Received</td>
+                                                    <td>GST</td>
+                                                    <td>Payment Date</td>
+                                                    <td>Paid</td>
+                                                    <td>Verified</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let b of row.installments">
+                                                    <td>{{b.installment_number}}</td>
+                                                    <td>{{b.installment_date | date: 'mediumDate'}}</td>
+                                                    <td>{{b.installment_amount| currency:'INR'}}</td>
+                                                    <td>{{b.additional_charges| currency:'INR'}}</td>
+                                                    <td>{{b.net_payment_received | currency:'INR'}}</td>
+                                                    <td>{{b.gst| currency:'INR'}}</td>
+                                                    <td>{{b.payment_date | date: 'mediumDate'}}</td>
+                                                    <td [ngStyle]="{'color':b.is_Paid?'green':'red'}">
+                                                        {{b.is_Paid?'Yes':'No'}}</td>
+                                                    <td [ngStyle]="{
+                                                        'color':b.is_verified?'green':'red'
+                                                        }">{{b.is_verified?'Yes':'No'}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                            class=" cursor-pointer example-element-row"
+                            [class.example-expanded-row]="expandedElement === element"
+                            (click)="expandedElement = expandedElement === element ? null : element">
+                        </tr>
+                        <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row">
+                        </tr>
+                        <tr class="bg-grey" mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

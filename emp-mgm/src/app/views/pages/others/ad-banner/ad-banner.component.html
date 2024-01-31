@@ -1,0 +1,115 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Others</a></li>
+        <li class="breadcrumb-item active" aria-current="page">AD Banner</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Add AD Banner</h6>
+                <form #bannerForm="ngForm" (ngSubmit)="bannerForm.valid && submit(bannerForm)" class="forms-sample">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Place*</label>
+                                <select class="form-control" autocomplete="off" #place="ngModel"
+                                    [(ngModel)]="banner.place" name="place" required>
+                                    <option value="">Select Place</option>
+                                    <option value="Home Page">Home Page</option>
+                                    <option value="Student Dashboard">Student Dashboard</option>
+                                    <option value="App Banner">App Home Banner</option>
+                                    <option value="App Insignia">App Insignia Banner</option>
+                                    <option value="App Invesmentor">App Invesmentor Banner</option>
+                                    <option value="App Invesletter">App Invesletter Banner</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="place?.errors?.required && (bannerForm.submitted || place.dirty || place.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Upload Image*</label>
+                                <input id="backup" type="file" accept="image/*" name="backup"
+                                    (change)="handelFile($event)" class="file-upload-default" required
+                                    [disabled]="!banner.place">
+                                <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload Image">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Redirection(Only for App)</label>
+                                <select class="form-control" autocomplete="off" #redirection="ngModel"
+                                    [(ngModel)]="banner.redirection" name="redirection">
+                                    <option value="">Select Redirection</option>
+                                    <option *ngFor="let i of redirections" [ngValue]="i.redirection">{{i.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Language(Only for App)</label>
+                                <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                    #language="ngModel" [(ngModel)]="banner.language" name="language">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="language?.errors?.required && (bannerForm.submitted || language.dirty || language.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="url">Url</label>
+                                <input type="text" class="form-control" id="url" autocomplete="off" placeholder="URL"
+                                    #url="ngModel" [(ngModel)]="banner.url" name="url">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">All Banners</h6>
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isbanneravailable">
+                    No Banner Found. Add Some New Banners.
+                </ngb-alert>
+                <div class="row">
+                    <div class="col-md-4 mb-2"
+                        *ngFor="let a of allbanner | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                        <img [src]="a?.image" width="100%" style="margin-bottom: 10px;" alt="AD Banner">
+                        <h5>
+                            <span *ngIf="a?.approve" class="badge badge-success mr-1">Approved</span>
+                            <span *ngIf="!a?.approve" class="badge badge-warning mr-1">Pending</span>
+                            <span class="badge badge-info mr-1">{{a?.place}}</span>
+                            <span *ngIf="a?.redirection" class="badge badge-info">{{a?.redirection}}</span>
+                            <span *ngIf="a?.language" class="badge badge-info">{{a?.language}}</span>
+                        </h5>
+                        <br>
+                        <a *ngIf="a?.url" [href]="a?.url" target="_blank" class="btn btn-primary mr-2">Open Link</a>
+                        <button (click)="removebanner(a?._id)" class="btn btn-danger mr-2">Delete</button>
+                        <button *ngIf="!a?.approve" (click)="approvebanner(a)" class="btn btn-primary">Approve</button>
+                    </div>
+                </div>
+                <ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+                    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

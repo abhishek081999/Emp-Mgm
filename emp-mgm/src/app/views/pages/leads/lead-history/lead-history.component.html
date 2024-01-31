@@ -1,0 +1,231 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">History</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                </div>
+            </div>
+        </div>
+    </div>
+    <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+        No Lead History Found.
+    </ngb-alert>
+    <div *ngIf="isLoading" class="spinner-wrapper">
+        <div class="spinner">Loading...</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+
+            <ng-container matColumnDef="leadowner">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> <p>Lead <br> Owner</p>  </th>
+                <td mat-cell *matCellDef="let row"> {{row.leadowner}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="leadownername">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Owner Name</th>
+                <td mat-cell *matCellDef="let row"> {{row.leadownername}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="leaddate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Lead Date </th>
+                <td mat-cell *matCellDef="let row">
+                    <p>{{row.leaddate | date: 'mediumDate'}}<br>{{row.leaddate | date: 'shortTime'}}</p> 
+            </ng-container>
+
+            <ng-container matColumnDef="leadassigndate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header><p>Assign Date / <br>Reassign Date</p></th>
+                <td mat-cell *matCellDef="let row">
+                    <p>{{row.leadassigndate | date: 'mediumDate'}}<br>{{row.leadassigndate | date: 'shortTime'}}</p> 
+            </ng-container>
+
+
+            <ng-container matColumnDef="leadstatus">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Status </th>
+                <td mat-cell *matCellDef="let row"> {{row.leadstatus}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="updatedate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Edited </th>
+                <td mat-cell *matCellDef="let row" > 
+                    <p>{{row.updatedate | date: 'mediumDate'}}<br>{{row.updatedate | date: 'shortTime'}}</p> 
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="attempt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header><p>Attempted / <br>Unattempted</p></th>
+                <td mat-cell *matCellDef="let row" > 
+                    {{row.leadassigndate && row.leadassigndate!==row.updatedate?'Attempted':'Unattempted'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="callbackdate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Callback Date </th>
+                <td mat-cell *matCellDef="let row"> 
+                    <p>{{row.callbackdate | date: 'mediumDate'}}<br>{{row.callbackdate | date: 'shortTime'}}</p> 
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="phone">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                <td mat-cell *matCellDef="let row"> {{row.phone}} </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                <td mat-cell *matCellDef="let row"> {{row.email}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="leadsource">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Source </th>
+                <td mat-cell *matCellDef="let row"> {{row.leadsource}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="campaign_name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Campaign Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.campaign_name}} </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="whatsappnum">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Whatsapp Num. </th>
+                <td mat-cell *matCellDef="let row"> {{row.whatsappnum}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="city">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> City </th>
+                <td mat-cell *matCellDef="let row"> {{row.city}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> State </th>
+                <td mat-cell *matCellDef="let row" > {{row.state}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="dob">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Dob </th>
+                <td mat-cell *matCellDef="let row"> {{row.dob}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="gender">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th>
+                <td mat-cell *matCellDef="let row" > {{row.gender}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="occupation">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Occupation </th>
+                <td mat-cell *matCellDef="let row"> {{row.occupation}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="experience">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> <p>Experience In<br>Stock Market</p>  </th>
+                <td mat-cell *matCellDef="let row" > {{row.experience}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="servicetype">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Type </th>
+                <td mat-cell *matCellDef="let row"> {{row.servicetype}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="servicecode">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                <td mat-cell *matCellDef="let row"> {{row.servicecode}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="servicename">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.servicename}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="comment">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Comment </th>
+                <td mat-cell *matCellDef="let row"> {{row.comment}} </td>
+            </ng-container>
+
+            <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+            <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let element" style="padding: 0px;" [attr.colspan]="displayedColumns.length">
+                <div class="example-element-detail"
+                    [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <h6>Student Basic Details</h6>
+                            <hr>
+                            <p>Name: {{element.name}}</p>
+                            <p>Phone: {{element.name}}</p>
+                            <p>Email: {{element.name}}</p>
+                            <p>Whatsapp: {{element.whatsappnum}}</p>
+                            <p>Telegram: {{element.telegram}}</p>
+                            <p>DOB: {{element.dob | date:'mediumDate'}}</p>
+                            <p>Gender: {{element.gender}}</p>
+                            <p>City: {{element.city}}</p>
+                            <p>State: {{element.state}}</p>
+                            <p>Occupation: {{element.occupation}}</p>
+                            <p>Experience in Stock Market: {{element.experience}}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Service Details</h6>
+                            <hr>
+                            <p>Service Type: {{element.servicetype}}</p>
+                            <p>Service Code: {{element.servicecode}}</p>
+                            <p>Service Name: {{element.servicename}}</p>
+                            <p>Demo Given: {{element.demogiven?'YES':'NO'}}</p>
+                            <p>Demo Date: {{element.demodate | date:'mediumDate'}}</p>
+                            <p>Demo Link: {{element.demolink}}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Lead Details</h6>
+                            <hr>
+                            <p>Lead Status: {{element.leadstatus}}</p>
+                            <p>Last Update Date: {{element.updatedate | date:'medium'}}</p>
+                            <p>Callback Date: {{element.callbackdate | date:'medium'}}</p>
+                            <p>Comment: {{element.comment}}</p>
+                            <p>Lead Owner: {{element.leadowner}}</p>
+                            <p>Lead Owner Name: {{element.leadownername}}</p>
+                            <p>Lead Assign/Reassign Date: {{element.leadassigndate | date:'medium'}}</p>
+                            <p>Lead Source: {{element.leadsource}}</p>
+                            <p>Lead Campaign Name: {{element.campaign_name}}</p>
+                            <p>Lead Date: {{element.leaddate  | date:'medium'}}</p>
+                        </div>
+                        <div class="col-md-2" *ngIf="Onbelement">
+                            <h6>Onboarding Details</h6>
+                            <hr>
+                            <p>Txn ID: {{Onbelement?.txnid}}</p>
+                            <p>Payment Method: {{Onbelement?.paymentmethod}}</p>
+                            <p>Total Fees: {{Onbelement?.totalfees | currency:'INR'}}</p>
+                            <p>Paid Amount: {{Onbelement?.paidamount | currency:'INR'}}</p>
+                            <p>Payment Date: {{Onbelement?.paymentdate | date:'mediumDate'}}</p>
+                            <p>Coupon Code: {{Onbelement?.couponcode}}</p>
+                            <p>Mode: {{Onbelement?.mode}}</p>
+                            <p>Student ID gen: {{Onbelement?.studentidgencomplete?'YES':'Pending'}}</p>
+                            <p>Manual Reg Complete: {{Onbelement?.manualregcomplete?'YES':'Pending'}}</p>
+                        </div>
+                    </div>
+                </div>
+                </td>
+            </ng-container>
+        
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                class="example-element-row cursor-pointer"
+                [class.example-expanded-row]="expandedElement === element"
+                (click)="selectelement(element)">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+        </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+</div>

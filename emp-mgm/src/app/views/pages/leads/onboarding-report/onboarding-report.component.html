@@ -1,0 +1,375 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Onboarding Report</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Onboarding TAT Report</h6>
+                </div>
+                <!-- <form #onboardingform="ngForm"(ngSubmit)="submit()"> -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Filter By Staff ID</label>
+                            <ng-select [items]="allStaff" bindLabel="invid" bindValue="invid"
+                                #employeeidfilter="ngModel" [(ngModel)]="staff" class="wd-md-340 border-0 rounded-sm"
+                                name="employeeidfilter" [searchFn]="StaffSearchFn" placeholder="Search By ID or Name"
+                                (change)="refreshlist()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" name="fromdate1" (change)="refreshlist()" #fromdate1="ngModel"
+                                [(ngModel)]="startDate" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" name="todate1" (change)="refreshlist()" #todate1="ngModel"
+                                [(ngModel)]="endDate" class="form-control">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row my-3">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Onboarding Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="Staff_ID" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Staff_ID</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Staff_ID}} <br> {{row.Staff_Name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Student_id_gen_TAT_Count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Student_id_gen_TAT_Count')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_Maxtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Maximum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Student_id_gen_TAT_Maxtime)}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Student_id_gen_TAT_Maxtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_Mintime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Student_id_gen_TAT_Mintime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Student_id_gen_TAT_Mintime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_Avgtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Student_id_gen_TAT_Avgtime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Student_id_gen_TAT_Avgtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_Ideal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ideal </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Student_id_gen_TAT_Ideal}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Student_id_gen_TAT_Ideal')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_Due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Student_id_gen_TAT_Due}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Student_id_gen_TAT_Due')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT_OverDue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Over Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Student_id_gen_TAT_OverDue}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Student_id_gen_TAT_OverDue')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Telegram_joining_TAT_Count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Telegram_joining_TAT_Count')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_Maxtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Maximum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Telegram_joining_TAT_Maxtime)}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Telegram_joining_TAT_Maxtime'))}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_Mintime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Telegram_joining_TAT_Mintime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Telegram_joining_TAT_Mintime'))}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_Avgtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Telegram_joining_TAT_Avgtime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Telegram_joining_TAT_Avgtime'))}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_Ideal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ideal </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Telegram_joining_TAT_Ideal}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Telegram_joining_TAT_Ideal')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_Due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Telegram_joining_TAT_Due}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Telegram_joining_TAT_Due')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT_OverDue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Over Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Telegram_joining_TAT_OverDue}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Telegram_joining_TAT_OverDue')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.First_ins_TAT_Count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('First_ins_TAT_Count')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_Maxtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Maximum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.First_ins_TAT_Maxtime)}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('First_ins_TAT_Maxtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_Mintime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.First_ins_TAT_Mintime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('First_ins_TAT_Mintime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_Avgtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.First_ins_TAT_Avgtime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('First_ins_TAT_Avgtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_Ideal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ideal </th>
+                            <td mat-cell *matCellDef="let row"> {{row.First_ins_TAT_Ideal}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('First_ins_TAT_Ideal')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_Due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.First_ins_TAT_Due}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('First_ins_TAT_Due')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT_OverDue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Over Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.First_ins_TAT_OverDue}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('First_ins_TAT_OverDue')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Sec_ins_TAT_Count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Sec_ins_TAT_Count')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_Maxtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Maximum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Sec_ins_TAT_Maxtime)}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Sec_ins_TAT_Maxtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_Mintime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Sec_ins_TAT_Mintime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Sec_ins_TAT_Mintime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_Avgtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Sec_ins_TAT_Avgtime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Sec_ins_TAT_Avgtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_Ideal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ideal </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Sec_ins_TAT_Ideal}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Sec_ins_TAT_Ideal')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_Due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Sec_ins_TAT_Due}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Sec_ins_TAT_Due')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT_OverDue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Over Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Sec_ins_TAT_OverDue}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Sec_ins_TAT_OverDue')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Third_ins_TAT_Count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Third_ins_TAT_Count')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_Maxtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Maximum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Third_ins_TAT_Maxtime)}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Third_ins_TAT_Maxtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_Mintime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Third_ins_TAT_Mintime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Third_ins_TAT_Mintime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_Avgtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Third_ins_TAT_Avgtime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Third_ins_TAT_Avgtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_Ideal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ideal </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Third_ins_TAT_Ideal}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Third_ins_TAT_Ideal')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_Due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Third_ins_TAT_Due}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Third_ins_TAT_Due')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT_OverDue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Over Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Third_ins_TAT_OverDue}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Third_ins_TAT_OverDue')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Forth_ins_TAT_Count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Forth_ins_TAT_Count')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_Maxtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Maximum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Forth_ins_TAT_Maxtime)}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Forth_ins_TAT_Maxtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_Mintime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Forth_ins_TAT_Mintime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Forth_ins_TAT_Mintime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_Avgtime">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average time </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row.Forth_ins_TAT_Avgtime)}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1('Forth_ins_TAT_Avgtime'))}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_Ideal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Ideal </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Forth_ins_TAT_Ideal}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Forth_ins_TAT_Ideal')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_Due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Forth_ins_TAT_Due}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Forth_ins_TAT_Due')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT_OverDue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Over Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Forth_ins_TAT_OverDue}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('Forth_ins_TAT_OverDue')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="staff-details" sticky>
+                            <th mat-header-cell *matHeaderCellDef colspan="1"> Staff Details </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Student_id_gen_TAT">
+                            <th mat-header-cell *matHeaderCellDef colspan="7"> Student ID Generation TAT </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Telegram_joining_TAT">
+                            <th mat-header-cell *matHeaderCellDef colspan="7"> Telegram Joining TAT </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="First_ins_TAT">
+                            <th mat-header-cell *matHeaderCellDef colspan="7"> First Installment TAT </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Sec_ins_TAT">
+                            <th mat-header-cell *matHeaderCellDef colspan="7"> Second Installment TAT </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Third_ins_TAT">
+                            <th mat-header-cell *matHeaderCellDef colspan="7"> Third Installment TAT </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Forth_ins_TAT">
+                            <th mat-header-cell *matHeaderCellDef colspan="7"> Forth Installment TAT </th>
+                        </ng-container>
+
+                        <tr mat-header-row
+                            *matHeaderRowDef="['staff-details','Student_id_gen_TAT','Telegram_joining_TAT','First_ins_TAT','Sec_ins_TAT','Third_ins_TAT','Forth_ins_TAT']; sticky: true"
+                            class="first-header-row"></tr>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

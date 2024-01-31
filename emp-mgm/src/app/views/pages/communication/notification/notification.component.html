@@ -1,0 +1,166 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Communications</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Notifications</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Notifications</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input class="form-control wd-md-200 border-0 rounded-sm" name="search" #search="ngModel"
+                [(ngModel)]="searchq" type="text" placeholder="Search..." (keyup)="filter()">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">New Notification</h6>
+                <form #notificationForm="ngForm"
+                    (ngSubmit)="notificationForm.valid && postnotification(notificationForm)">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Title*</label>
+                                        <input type="text" class="form-control" #title="ngModel"
+                                            [(ngModel)]="notification.title" name="title" maxlength="65" required
+                                            placeholder="Title in Maximum 65 Letters">
+                                        <p class="text-danger mt-1"
+                                            *ngIf="title?.errors?.required && (title.dirty || title.touched || notificationForm.submitted)">
+                                            This field is required.</p>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="title?.errors?.maxlength && (title.dirty || title.touched || notificationForm.submitted)">
+                                            Max Length is 65 characters</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Image</label>
+                                        <input type="file" class="form-control" (change)="handelFileInput($event)"
+                                            name="image" placeholder="file">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Notification For*</label>
+                                        <ng-select [items]="coursecodes" #notificationfor="ngModel"
+                                            [(ngModel)]="notification.for" name="notificationfor"
+                                            placeholder="notification For" bindValue="id" bindLabel="id">
+                                            <ng-template ng-label-tmp let-item="item">
+                                                <span class="ng-value-label">{{item.id | uppercase}} {{item.date |
+                                                    date:'mediumDate'}}</span>
+                                            </ng-template>
+
+                                            <ng-template ng-option-tmp let-item="item">
+                                                {{item.id | uppercase}} {{item.date | date:'mediumDate'}}
+                                            </ng-template>
+                                        </ng-select>
+                                        <p class="text-danger mt-1"
+                                            *ngIf="notificationfor?.errors?.required && (notificationfor.dirty || notificationfor.touched || notificationForm.submitted)">
+                                            This field is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Details*</label>
+                                    <textarea rows="5" class="form-control" style="height:100px;"
+                                        placeholder="Description in maximum 240 Letters" #description="ngModel"
+                                        [(ngModel)]="notification.desc" name="description" maxlength="240" required>
+                                        </textarea>
+                                    <p class="text-danger mt-1"
+                                        *ngIf="description?.errors?.required && (description.dirty || description.touched || notificationForm.submitted)">
+                                        This field is required.</p>
+                                    <p class="text-danger mt-1"
+                                        *ngIf="description?.errors?.maxlength && (description.dirty || description.touched || notificationForm.submitted)">
+                                        Maximum Length is 240 characters.</p>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Url</label>
+                                        <input type="text" class="form-control" #url="ngModel"
+                                            [(ngModel)]="notification.url" name="url" placeholder="Url">
+                                        <!-- <p class="text-danger mt-1"
+                                            *ngIf="url?.errors?.required && (url.dirty || url.touched || notificationForm.submitted)">
+                                            This field is required.</p> -->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">All Notifications</h6>
+                <ul class="list-unstyled">
+                    <li *ngFor="let item of filteredData | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <img *ngIf="item.img" [src]="item.img | urlsanitize" [alt]="item.title" width="100%"
+                                                    class="mb-3">
+                                                <button *ngIf="!item.approved" (click)="onApprove(item)"
+                                                    class="btn btn-success btn-block">Approve</button>
+                                                <button (click)="onDelete(item._id)"
+                                                    class="btn btn-danger btn-block">Delete</button>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <h5 class="mt-0 mb-1">{{ item.title }}
+                                                    <span class="badge badge-pill badge-success mr-1">{{item.for |
+                                                        uppercase}}</span>
+                                                    <span *ngIf="item.approved"
+                                                        class="badge badge-pill badge-success mr-1">Approved</span>
+                                                    <span *ngIf="!item.approved"
+                                                        class="badge badge-pill badge-warning mr-1">Pending</span>
+                                                </h5>
+                                                <p>{{item.desc}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span>{{ item.date | date: 'medium' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    </li>
+                </ul>
+                <ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+                    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+                    (pageChange)="pagechange()">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

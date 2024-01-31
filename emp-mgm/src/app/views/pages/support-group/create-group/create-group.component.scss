@@ -1,0 +1,59 @@
+@import "~@ng-select/ng-select/themes/default.theme.css";
+
+.ng {
+  width: 400px;
+  height: 40px;
+}
+
+.form-control {
+  width: 400px;
+  height: 40px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+thead {
+  background-color: #f2f2f2;
+}
+th {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #e0e0e0;
+}
+
+.button-container {
+  display: inline-block; 
+}
+
+.icon-button {
+  cursor: pointer;
+  color: #007bff; 
+}
+.header-cell {
+  font-weight: bold;
+}
+
+
+.bold-header {
+  font-weight: bold;
+}
+
+
+
+
+
+
+

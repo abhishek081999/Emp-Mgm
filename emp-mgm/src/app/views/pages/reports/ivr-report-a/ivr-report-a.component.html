@@ -1,0 +1,194 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">IVR-Report-1</li>
+    </ol>
+</nav>
+
+
+<!-- ----------------------  Filters   ---------------------- -->
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" #startDateAtten="ngModel" [(ngModel)]="startDate" name="startDateAtten"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" #endDateAtten="ngModel" [(ngModel)]="endDate" name="endDateAtten"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Department</label>
+                            <ng-select [items]="departments" [searchable]="true" bindValue="_id" bindLabel="name"
+                                #Department="ngModel" [(ngModel)]="department" class="wd-md-340 border-0 rounded-sm"
+                                name="department" placeholder="Select Departments">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Team</label>
+                        <ng-select [items]="allTeams" bindValue="_id" #teamid="ngModel" [(ngModel)]="team" name="teamid"
+                            placeholder="Search By Team Name">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.name}} - {{item.team_lead}} -
+                                    {{item.team_lead_name}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Staff Name</label>
+                            <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                #dept_head="ngModel" [(ngModel)]="employee" name="dept_head"
+                                placeholder="Filter by Staff Name" bindValue="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label"> {{item.invid}} - {{item.fullName}} </span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="filter()">Search</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="export()">Export</button>
+                    </div>
+
+                    <div class="col-md-12 mt-5">
+                        <input class="form-control" name="search" type="text" placeholder="Search..."
+                            (keyup)="filtersearch($event)">
+                    </div>
+
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <!-- ------------------   Table   ------------------- -->
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="dept_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> department
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.dept_name}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="team_lead_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> team lead name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.team_lead_id}} - {{row.team_lead_name}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="team_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> team name </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.team_name}}
+                            </td>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="staff_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> staff name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.staff_id}} - {{row.staff_name}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="agent_number">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> agent number
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.agent_number}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> date
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.date | date: 'mediumDate'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_duration">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> total duration
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getDuration(row.total_duration)}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="total_call">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>total call
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.total_call}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="outgoing_duration">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> outgoing duration
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getDuration(row.outgoing_duration)}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="incoming_duration">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> incoming duration
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getDuration(row.incoming_duration)}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="outgoing_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> outgoing count
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+
+                                {{row.outgoing_count}}
+
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="incoming_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> incoming count
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+
+                                {{row.incoming_count}}
+
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns;  sticky: true;"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                        </tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,238 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insignia</a></li>
+        <li class="breadcrumb-item active" aria-current="page">INSIGNIA RUNNING REPORT </li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">INSIGNIA RUNNING REPORT </h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" #sdate="ngModel" [(ngModel)]="startDate" name="sdate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" #edate="ngModel" [(ngModel)]="endDate" name="edate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="Lead_Owner">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Lead_Owner}} - {{row.Lead_Owner_Name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Promoted_BCMB">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Promoted <br> From BCMB</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Promoted_BCMB}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Promoted_BCMB}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Other_Source">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other <br> Source</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Other_Source}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Other_Source}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Total_Assigned">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total <br> Assigned</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Total_Assigned}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Total_Assigned}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="BCMB_Attempted_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> BCMB <br> Attempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.BCMB_Attempted_Count}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_BCMB_Attempted_Count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Other_Source_Attempted_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Source <br> Attempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Other_Source_Attempted_Count}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Other_Source_Attempted_Count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Attempted_Count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total <br> Attempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Attempted_Count}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Attempted_Count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Seat_Booked_Fresh">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Seat Booked <br> Fresh </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Seat_Booked_Fresh}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Seat_Booked_Fresh}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Seat_Booked_Existing">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Seat Booked <br>Carry Forward </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Seat_Booked_Existing}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Seat_Booked_Existing}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Seat_Booked_Total">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Seat Booked <br> Total </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Seat_Booked_Total}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Seat_Booked_Total}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Insignia_Conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Insignia <br> Converted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Insignia_Conv}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Insignia_Conv}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Course_Conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Course <br> Converted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Course_Conv}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Course_Conv}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Product_Conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Product <br> Converted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Product_Conv}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Product_Conv}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Total_Conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total <br> Converted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Total_Conv}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Total_Conv}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Pipeline_Fresh">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pipeline <br> Fresh </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Pipeline_Fresh}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Pipeline_Fresh}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Pipeline_Existing">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pipeline <br>Carry Forward </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Pipeline_Existing}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Pipeline_Existing}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Pipeline_Total">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Pipeline <br> Total </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Pipeline_Total}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Pipeline_Total}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Fresh">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fresh </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Fresh}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Fresh}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Not_Connected">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Not <br> Connected </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Not_Connected}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Not_Connected}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Not_Converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Not <br> Converted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Not_Converted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Not_Converted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Demo_Given">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Demo <br> Given </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Demo_Given}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Demo_Given}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="BCMB_Demo_Given">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> BCMB <br> Attempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.BCMB_Demo_Given}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_BCMB_Demo_Given}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Other_Source_Demo_Given">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Source <br> Attempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Other_Source_Demo_Given}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_Other_Source_Demo_Given}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="staff-details">
+                            <th mat-header-cell *matHeaderCellDef colspan="1"> Staff Details </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="lead-source">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Lead Source </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="lead-attempted">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Attempted </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="seat_booked">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Seat Booked </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="converted">
+                            <th mat-header-cell *matHeaderCellDef colspan="4"> Converted</th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="pipeline">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Pipeline</th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="others">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Other Stages </th>
+                        </ng-container>
+
+                        <ng-container matColumnDef="demo">
+                            <th mat-header-cell *matHeaderCellDef colspan="3"> Demo </th>
+                        </ng-container>
+
+                        <tr mat-header-row
+                            *matHeaderRowDef="['staff-details','lead-source','lead-attempted','seat_booked','converted','pipeline','others', 'demo']; sticky: true"
+                            class="first-header-row"></tr>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

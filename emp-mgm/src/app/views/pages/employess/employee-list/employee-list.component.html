@@ -1,0 +1,206 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Employees</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Employee List</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Employee List</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-400 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input type="text" class="form-control border-0 rounded-sm" id="searchForm" name="searchby"
+                placeholder="Search Here...." #searchfilter="ngModel" [(ngModel)]="pagefilter" (keyup)="filter()">
+
+            <button type="button" class="btn btn-primary btn-icon-text mb-2 ml-2 mb-md-0"
+                (click)="print()">Export</button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Search by Employee Type</label>
+            <ng-select [items]="EmpType" #emptype="ngModel" [(ngModel)]="EmpTypeFilter" name="emptype"
+                placeholder="Search By Employee Type" (change)="filter()">
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>
+                Select Role*</label>
+            <ng-select [items]="allRoles" [searchable]="true" bindValue="name" bindLabel="name" #role="ngModel"
+                [(ngModel)]="RoleFilter" class="wd-md-340 border-0 rounded-sm" name="role" placeholder="Select Role"
+                (change)="filter()">
+                <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{item.name | titlecase}}</span>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.name | titlecase}}
+                </ng-template>
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>
+                Select Department*</label>
+            <ng-select [items]="departments" [searchable]="true" bindValue="_id" bindLabel="name"
+                #departmentid="ngModel" [(ngModel)]="DepartmentFilter" (change)="filter()"
+                class="wd-md-340 border-0 rounded-sm" name="department_id" placeholder="Select departments">
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>
+                Select Team*</label>
+            <ng-select [items]="TeamsDrop" [searchable]="true" bindValue="_id" bindLabel="_id" #Teamid="ngModel"
+                [(ngModel)]="teamFilter" (change)="filter()" class="wd-md-340 border-0 rounded-sm" name="team"
+                placeholder="Select Team">
+                <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{item.name}}</span>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.name}}
+                </ng-template>
+            </ng-select>
+
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>
+                Select Designation*</label>
+            <ng-select [items]="DesignationDrop" [searchable]="true" bindValue="_id" bindLabel="_id"
+                #designationsid="ngModel" (change)="filter()" [(ngModel)]="DesignationFilter"
+                class="wd-md-340 border-0 rounded-sm" name="designations" placeholder="Select designations">
+                <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{item.name}}</span>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.name}}
+                </ng-template>
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>
+                Status*</label>
+            <select name="orderby" #statusFilter="ngModel" [(ngModel)]="statusfilter"
+                class="form-control rounded-sm" (change)="filter()">
+                <option value="">Any status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <!-- <option value="resigned">Resigned</option> -->
+            </select>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 grid-margin stretch-card"
+        *ngFor="let emp of employeeList | slice: (currentPage-1) * pageSize : currentPage * pageSize; let i=index">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <!-- <div>
+                        <span *ngIf="emp.approved && !emp.deactivate" class="badge badge-success mr-2">Approved</span>
+                        <span *ngIf="emp.rejected && !emp.approved" class="badge badge-danger mr-2">Rejected</span>
+                        <span *ngIf="emp.approved && emp.deactivate" class="badge badge-danger mr-2">Deactivated</span>
+                        <span *ngIf="!emp.approved && !emp.rejected" class="badge badge-warning mr-2">Pending</span>
+                        <span *ngIf="emp.profilecomplete" class="badge badge-success mr-2">Profile Completed</span>
+                        <span *ngIf="!emp.profilecomplete" class="badge badge-info mr-2">Profile Not Completed</span>
+                        <span *ngIf="deareq(emp._id)" class="badge badge-danger mr-2">Deactivation Request</span>
+                    </div> -->
+                    <div ngbDropdown class="dropgdown">
+                        <button type="button" id="empdropdown" ngbDropdownToggle
+                            class="btn p-0 no-dropdown-toggle-icon">
+                            <i ngbTooltip="More Options"
+                                class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                        </button>
+                        <div ngbDropdownMenu aria-labelledby="empdropdown">
+                            <button [routerLink]="['/admin/employees', emp.invid]" ngbDropdownItem><i
+                                    class="feather icon-eye icon-xs mr-2"></i> View Profile</button>
+                            <!-- <a [href]="emp.cv" target="blank" ngbDropdownItem><i class="feather icon-download icon-xs mr-2"></i> Download CV</a> -->
+                            <!-- <button *ngIf="!emp.approved" (click)="onApproved(emp)" ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i> Approve</button>
+                            <button *ngIf="!emp.approved && !emp.rejected" (click)="onRejected(emp)" ngbDropdownItem><i class="feather icon-x-circle icon-xs mr-2"></i>Reject</button>
+                            <button *ngIf="emp.approved  && emp.deactivate" (click)="onReactivate(emp)" ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i> Activate</button>
+                            <button *ngIf="emp.approved && !emp.deactivate" (click)="onDeactivate(emp)" ngbDropdownItem><i class="feather icon-x-circle icon-xs mr-2"></i> Deactivate</button>
+                            <button *ngIf="deareq(emp._id)" (click)="viewreq(emp._id,reqModal)" ngbDropdownItem><i class="feather icon-eye icon-xs mr-2"></i> Deactivation Request</button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <div class="figure mb-3">
+                        <img width="250px" height="250px" class="rounded-circle" [src]="emp.profile_image"
+                            alt="{{emp.fullName | titlecase}}">
+                    </div>
+                    <div class="info text-center">
+                        <h4 class="name font-weight-bold mb-0">{{emp.fullName | titlecase}}</h4>
+                        <p class="email text-muted mb-3">{{emp.invid}}</p>
+                        <p class="email text-muted mb-3">{{emp.designation}}</p>
+                    </div>
+                </div>
+                <!-- <div class="row text-center">
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{emp.numberofstudents}}</h4>
+                        <p>Students</p>
+                    </div>
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{emp.numberofonlinecourses}}</h4>
+                        <p>Courses</p>
+                    </div>
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{emp.rating | number:'1.1-1'}}</h4>
+                        <p>Ratings</p>
+                    </div>
+                    <div class="col-md-3 col-6 p-0">
+                        <h4>{{getavgrating(emp._id) | number:'1.1-1'}}</h4>
+                        <p>Feedback</p>
+                    </div>
+                </div> -->
+                <ul class="list-unstyled p-0 pt-3">
+                    <li>
+                        <i class="feather icon-briefcase mr-2"></i>
+                        <span> {{emp.department}}</span>
+                    </li>
+                    <li>
+                        <i class="feather icon-users mr-2"></i>
+                        <span> {{emp.team}}</span>
+                    </li>
+                    <li>
+                        <i class="feather icon-mail mr-2"></i>
+                        <span> {{emp.email}}</span>
+                    </li>
+                    <li>
+                        <i class="feather icon-phone-call mr-2"></i>
+                        <span> {{emp.telephone}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+    (pageChange)="pagechange()">
+</ngb-pagination>

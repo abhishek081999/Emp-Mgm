@@ -1,0 +1,627 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Schedule</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Calender</h6>
+                <full-calendar defaultView="dayGridMonth" [header]="{
+                        left: 'prev,today,next',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                    }" noEventsMessage="No Class Schedule For this Month" [plugins]="calendarPlugins"
+                    (eventClick)="handleEventClick($event)" [weekends]="true" [events]="events" [eventLimit]="false"
+                    [editable]="false"></full-calendar>
+                <br>
+                <h3>Add Holiday</h3>
+                <form #scheduleForm="ngForm" (ngSubmit)="scheduleForm.valid && submitForm()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Title*</label>
+                                <input type="text" class="form-control" #title="ngModel" [(ngModel)]="holiday.title"
+                                    name="title" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="title?.errors?.required && (title.dirty || title.touched || scheduleForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Date*</label>
+                                <input type="date" class="form-control" #dates="ngModel" [(ngModel)]="holiday.date"
+                                    required name="dates">
+                                <p class="text-danger mt-1"
+                                    *ngIf="dates?.errors?.required && (dates.dirty || dates.touched || scheduleForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Type*</label>
+                                <ng-select [items]="holidayType" #type="ngModel" [(ngModel)]="holiday.type"
+                                    name="holidaytype" placeholder="Select Holiday Type" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="type?.errors?.required && (type.dirty || type.touched || scheduleForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary mt-30px btn-block" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success mt-2" *ngIf="iscreatingwebinar">
+    <div class="spinner-border spinner-border-sm text-success mr-2" role="status">
+    </div>
+    Creating Webinar... Please Wait...
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <ul ngbNav #fillJustifyNav="ngbNav" class="nav-tabs nav-fill" (activeIdChange)="onTabChange()">
+                    <li [ngbNavItem]="1">
+                        <a ngbNavLink>Upcoming Schedule</a>
+                        <ng-template ngbNavContent>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Filter by Date range</label>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="date" [min]="minDate" name="srtrange" #srtrange="ngModel"
+                                                    (change)="filter()" [(ngModel)]="srtRange" class="form-control">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="date" [min]="minDate1" name="torange" #torange="ngModel"
+                                                    (change)="filter()" [(ngModel)]="toRange" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Search by Service Code</label>
+                                        <ng-select [items]="servicecodes" #servicefilter1="ngModel"
+                                            [(ngModel)]="servicefilter" name="servicefilter"
+                                            placeholder="Search By Service Code" (change)="filter()">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Search by Mentor</label>
+                                        <ng-select [items]="allMentor" [searchable]="true"
+                                            placeholder="Search Instructor" #mentoridf="ngModel"
+                                            [(ngModel)]="mentorFilter" name="mentoridf" bindValue="invid"
+                                            bindLabel="fullName" (change)="filter()" [searchFn]="StaffSearchFn">
+                                            <ng-template ng-label-tmp let-item="item">
+                                                <span class="ng-value-label">{{item?.invid}} - {{item?.fullName}}</span>
+                                            </ng-template>
+
+                                            <ng-template ng-option-tmp let-item="item">
+                                                {{item?.invid}} - {{item?.fullName}}
+                                            </ng-template>
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Language</label>
+                                        <ng-select [items]="languages" [searchable]="true"
+                                            placeholder="Select Language Filter...." #languagefilter1="ngModel"
+                                            [(ngModel)]="languageFilter" name="language" (change)="filter()" required>
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Class Number</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" #classNumberFilter1="ngModel"
+                                                [(ngModel)]="classNumberFilter" (change)="filter()"
+                                                placeholder="Class Number">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4" style="padding: 30px;">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2" style="padding: 30px;">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        (click)="export()">Export</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSource" matSort #sortUS="matSort">
+
+                                    <ng-container matColumnDef="service_code">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Service </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.service_code}} <br>
+                                            {{row.service_name}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="service_start_date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Start Date</th>
+                                        <td mat-cell *matCellDef="let row"> {{row.service_start_date | date:
+                                            'mediumDate'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="instructor_id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Trainer </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.instructor_id}} <br>
+                                            {{row.instructor_name}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="language">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Language </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.language}} <br>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="class_number">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Class Number </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.class_number}} <br>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="start_time">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date & Time</th>
+                                        <td mat-cell *matCellDef="let row"> {{row.start_time | date: 'mediumDate'}} <br>
+                                            {{row.start_time | date: 'shortTime'}} - {{row.end_time | date:
+                                            'shortTime'}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="webinar_id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Webinar </th>
+                                        <td mat-cell *matCellDef="let row"> ID: {{row.webinar_id}}<br>
+                                            PWD: {{row.webinar_password}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="account">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Account </th>
+                                        <td mat-cell *matCellDef="let row">{{row.account}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <div ngbDropdown placement="left-top" class="dropdown" container="body">
+                                                <button type="button" id="jobdropdown" ngbDropdownToggle
+                                                    class="btn p-0 no-dropdown-toggle-icon">
+                                                    <i ngbTooltip="Settings"
+                                                        class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                                </button>
+                                                <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                                                    <button *ngIf="row.service_type==='Live Market Practice'"
+                                                        (click)="onEdit(row,lmpscheduleModal)" ngbDropdownItem><i
+                                                            class="feather icon-calendar icon-xs mr-2"></i>Change
+                                                        Schedule</button>
+                                                    <button *ngIf="row.service_type!=='Live Market Practice'"
+                                                        (click)="onEdit(row,o2oscheduleModal)" ngbDropdownItem><i
+                                                            class="feather icon-calendar icon-xs mr-2"></i>Change
+                                                        Schedule</button>
+                                                    <button *ngIf="!row.webinar_id" (click)="createwebinar(row)"
+                                                        ngbDropdownItem><i
+                                                            class="feather icon-edit-2 icon-xs mr-2"></i>Create
+                                                        Webinar</button>
+                                                    <button *ngIf="row.type === 'COURSE'" (click)="onDelete(row)"
+                                                        ngbDropdownItem><i
+                                                            class="feather icon-trash-2 icon-xs mr-2"></i>Delete
+                                                        Schedule</button>
+                                                    <button (click)="gotoclass(row)" ngbDropdownItem><i
+                                                            class="feather icon-external-link icon-xs mr-2"></i>Go To
+                                                        Class</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                </table>
+                            </div>
+                            <mat-paginator #paginatorUS="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]">
+                            </mat-paginator>
+
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="2">
+                        <a ngbNavLink>Past Schedule</a>
+                        <ng-template ngbNavContent>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Filter by Date range</label>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <input type="date" name="pvsrtrange" [max]="maxDate"
+                                                    #pvsrtrange="ngModel" (change)="filter1()" [(ngModel)]="pvsrtRange"
+                                                    class="form-control">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="date" name="pvtorange" [max]="maxDate1"
+                                                    #pvtorange="ngModel" (change)="filter1()" [(ngModel)]="pvendRange"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Search by Service Code</label>
+                                        <ng-select [items]="servicecodes1" #servicefilter2="ngModel"
+                                            [(ngModel)]="servicefilter1" name="servicefilter"
+                                            placeholder="Search By Service Code" (change)="filter1()">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Search by Mentor</label>
+                                        <ng-select [items]="allMentor" [searchable]="true"
+                                            placeholder="Search Instructor" #mentoridf="ngModel"
+                                            [(ngModel)]="mentorFilter1" name="mentoridf" bindValue="invid"
+                                            bindLabel="fullName" (change)="filter1()">
+                                            <ng-template ng-label-tmp let-item="item">
+                                                <span class="ng-value-label">{{item?.invid}} - {{item?.fullName}}</span>
+                                            </ng-template>
+
+                                            <ng-template ng-option-tmp let-item="item">
+                                                {{item?.invid}} - {{item?.fullName}}
+                                            </ng-template>
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Language</label>
+                                        <ng-select [items]="languages" [searchable]="true"
+                                            placeholder="Select Language Filter...." #languagefilter2="ngModel"
+                                            [(ngModel)]="languageFilter1" name="language" (change)="filter1()" required>
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Class Number</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" #classNumberFilter2="ngModel"
+                                                [(ngModel)]="classNumberFilter1" (change)="filter1()"
+                                                placeholder="Class Number">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4" style="padding: 30px;">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" (keyup)="applyFilter1($event)"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2" style="padding: 30px;">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        (click)="export()">Export</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSource1" matSort #sortPS="matSort">
+
+                                    <ng-container matColumnDef="service_code">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Service </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.service_code}} <br>
+                                            {{row.service_name}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="service_start_date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Start Date</th>
+                                        <td mat-cell *matCellDef="let row"> {{row.service_start_date | date:
+                                            'mediumDate'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="instructor_id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Trainer </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.instructor_id}} <br>
+                                            {{row.instructor_name}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="language">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Language </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.language}} <br>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="class_number">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Class Number </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.class_number}} <br>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="start_time">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date & Time</th>
+                                        <td mat-cell *matCellDef="let row"> {{row.start_time | date: 'mediumDate'}} <br>
+                                            {{row.start_time | date: 'shortTime'}} - {{row.end_time | date:
+                                            'shortTime'}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="webinar_id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Webinar </th>
+                                        <td mat-cell *matCellDef="let row"> ID: {{row.webinar_id}}<br>
+                                            PWD: {{row.webinar_password}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="account">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Account </th>
+                                        <td mat-cell *matCellDef="let row">{{row.account}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                                        <td mat-cell *matCellDef="let row">
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                </table>
+                            </div>
+                            <mat-paginator #paginatorPS="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]">
+                            </mat-paginator>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="3">
+                        <a ngbNavLink>Upcoming Holiday</a>
+                        <ng-template ngbNavContent>
+                            <div class="row">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" (keyup)="applyFilter2($event)"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        (click)="export()">Export</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSource2" matSort #sortUH="matSort">
+
+                                    <ng-container matColumnDef="title">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.title}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.date | date: 'mediumDate'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="type">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.type}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <a (click)="onDelete1(row._id)"><i
+                                                    class="feather icon-trash-2 icon-xs mr-2"></i></a>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+                                </table>
+                                <mat-paginator #paginatorUH="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]">
+                                </mat-paginator>
+                            </div>
+                        </ng-template>
+                    </li>
+                    <li [ngbNavItem]="4">
+                        <a ngbNavLink>Past Holiday</a>
+                        <ng-template ngbNavContent>
+                            <div class="row">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" (keyup)="applyFilter3($event)"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        (click)="export()">Export</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSource3" matSort #sortPH="matSort">
+
+                                    <ng-container matColumnDef="title">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.title}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.date | date: 'mediumDate'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="type">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.type}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <a (click)="onDelete1(row._id)"><i
+                                                    class="feather icon-trash-2 icon-xs mr-2"></i></a>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+                                </table>
+                                <mat-paginator #paginatorPH="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]">
+                                </mat-paginator>
+                            </div>
+                        </ng-template>
+                    </li>
+                </ul>
+                <div [ngbNavOutlet]="fillJustifyNav" class="border border-top-0 p-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #lmpscheduleModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Change Schedule</h5>
+        <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="isSuccess" class="spinner-wrapper">
+            <div class="spinner">Loading...</div>
+        </div>
+        <form #scheduleForm="ngForm">
+            <p *ngIf="!isSuccess" style="color: red;padding: 0px;">All * Fields are Mandatory</p>
+            <div *ngIf="!isSuccess" class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Date*</label>
+                        <input type="date" class="form-control" #starttime="ngModel" [(ngModel)]="rescheduleSlot.date"
+                            required (change)="ontimechange()" name="starttime">
+                        <p class="text-danger mt-1"
+                            *ngIf="starttime?.errors?.required && (starttime.dirty || starttime.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Slot*</label>
+                        <ng-select [items]="availableSlots" [closeOnSelect]="true" #mentorslot="ngModel"
+                            name="mentorslot" bindValue="_id" placeholder="Search By Slot"
+                            [(ngModel)]="rescheduleSlot.nextbookingid" required>
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.slot}} - {{item.mentor_name}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.slot}} - {{item.mentor_name}}
+                            </ng-template>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="mentorslot?.errors?.required && (mentorslot.dirty || mentorslot.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button [disabled]="scheduleForm.invalid" (click)="reschedule()" class="btn btn-primary"> Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()"> Close</button>
+    </div>
+</ng-template>
+
+<ng-template #o2oscheduleModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Change Schedule</h5>
+        <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="isSuccess" class="spinner-wrapper">
+            <div class="spinner">Loading...</div>
+        </div>
+        <form #scheduleForm="ngForm">
+            <p *ngIf="!isSuccess" style="color: red;padding: 0px;">All * Fields are Mandatory</p>
+            <div *ngIf="!isSuccess" class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Mentor Name*</label>
+                        <ng-select [items]="allMentor" [searchable]="true" placeholder="Select Instructor"
+                            #mentorid="ngModel" [(ngModel)]="selectedSlot.mentor_id" name="mentorid" bindValue="_id"
+                            bindLabel="fullName" required>
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="mentorid?.errors?.required && (mentorid.dirty || mentorid.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Date*</label>
+                        <input type="date" class="form-control" #starttime="ngModel" [(ngModel)]="selectedSlot.date"
+                            required (change)="ono2otimechange()" name="starttime">
+                        <p class="text-danger mt-1"
+                            *ngIf="starttime?.errors?.required && (starttime.dirty || starttime.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Slot*</label>
+                        <ng-select [items]="availableo2oSlots" bindLabel="slot" [closeOnSelect]="true"
+                            #mentorslot="ngModel" name="mentorslot" placeholder="Search By Slot"
+                            [(ngModel)]="changedSlot" required>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="mentorslot?.errors?.required && (mentorslot.dirty || mentorslot.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button [disabled]="scheduleForm.invalid" (click)="submito2oForm()" class="btn btn-primary"> Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()"> Close</button>
+    </div>
+</ng-template>

@@ -1,0 +1,247 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Invesletter</li>
+    </ol>
+</nav>
+
+<form #lessonForm="ngForm" enctype="multipart/form-data" (ngSubmit)="lessonForm.valid && submitForm($event)">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Invesletter</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Title*<a placement="top" ngbTooltip="Title"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #title="ngModel" [(ngModel)]="invesletter.title"
+                                    name="name" required placeholder="Invesletter Title">
+                                <p class="text-danger mt-1"
+                                    *ngIf="title.errors?.required && (lessonForm.submitted || title.dirty || title.touched)">
+                                    This field is required.</p>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Invesletter code</label>
+                                <input type="text" class="form-control" #invesletterid="ngModel"
+                                    [(ngModel)]="invesletter.invesletterid" name="code" disabled
+                                    placeholder="Code Auto generated">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Published Date*</label>
+                                <input type="date" #published_date="ngModel"
+                                    [ngModel]="invesletter.published_date | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="invesletter.published_date = $event" name="date"
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="published_date?.errors?.required && (lessonForm.submitted || published_date.dirty || published_date.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Language*</label>
+                                <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                    #language="ngModel" [(ngModel)]="invesletter.language" name="language" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="language?.errors?.required && (lessonForm.submitted || language.dirty || language.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Upload Image*</label>
+                                <input id="img" type="file" accept="image/*" name="picture"
+                                    (change)="handelFileInput($event)" class="file-upload-default" required>
+                                <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload Image">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Free Link*</label>
+                                <input id="free" type="file" accept="application/pdf" name="free_link"
+                                    (change)="handelFreeFile($event)" class="file-upload-default" required>
+                                <div class="input-group col-xs-12" (click)="openFreeFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload PDF">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Premium Link*</label>
+                                <input id="premium" type="file" accept="application/pdf" name="premium_link"
+                                    (change)="handelPremiumFile($event)" class="file-upload-default" required>
+                                <div class="input-group col-xs-12" (click)="openPremiumFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload PDF">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'"
+                        *ngIf="(lessonForm.submitted || lessonForm.dirty || lessonForm.touched) && lessonForm.invalid">
+                        You Missed Some Fields
+                    </ngb-alert>
+                    <button class="btn btn-primary mt-2">Submit</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+<div class="row profile-body">
+    <!-- filters -->
+    <div class="container-fluid">
+        <div class="card rounded">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="card-title mb-0">Filter</h6>
+                </div>
+                <div class="row mt-4">
+                    <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none  d-xl-flex">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text border-0 rounded-sm">
+                                <i class="feather icon-search icon-sm cursor-pointer"></i>
+                            </div>
+                        </div>
+                        <input class="form-control border-0 rounded-sm" name="search" #search="ngModel"
+                            [(ngModel)]="searchq" type="text" placeholder="Search Title...." (keyup)="filter()">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <form class="search-form">
+                            <label>Start Date</label>
+                            <div class="input-group border rounded-sm mr-2 mb-2 mb-md-2 d-md-0 wd-md-auto d-xl-flex ">
+                                <div class="input-group border rounded-sm p-1">
+                                    <div class="input-group-prepend">
+                                        <!-- <div class="input-group-text border-0 rounded-sm">
+                                                <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                            </div> -->
+                                    </div>
+                                    <input type="date" #published_date="ngModel" [(ngModel)]="fromDateFilter"
+                                        name="date" class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-3 ">
+                        <form class="search-form">
+                            <label>End Date</label>
+                            <div class="input-group border rounded-sm mr-2 mb-2 mb-md-2 d-md-0 wd-md-auto d-xl-flex">
+                                <div class="input-group border rounded-sm p-1">
+                                    <div class="input-group-prepend">
+                                        <!-- <div class="input-group-text border-0 rounded-sm">
+                                                <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                            </div> -->
+                                    </div>
+                                    <input type="date" #published_date="ngModel" [(ngModel)]="toDateFilter" name="date"
+                                        class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <ng-select [items]="['All','Approved','Pending']" [searchable]="true"
+                                placeholder="Select Status" #statusf="ngModel" [(ngModel)]="statusFilter" name="statusf"
+                                (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Language</label>
+                            <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                #courselanguage="ngModel" [(ngModel)]="languageFilter" name="courselanguage"
+                                (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- cards -->
+
+        <div class="container-fluid" style="margin-top: 50px;">
+            <div class="row">
+                <div class="col-md-3 grid-margin"
+                    *ngFor="let item of filteredData | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+
+                    <div class="card cards">
+                        <img class="card-img-top" [src]="item.image" [alt]="item.title">
+                        <div class="card-body">
+                            <h5 class="titlelimit">{{item.title}}</h5>
+                            <p class="mt-2"> Published On : {{item.published_date | date: 'mediumDate'}}</p>
+                            <p>Language : {{item.language}}</p>
+                            <p>Code : {{item.invesletterid}}</p>
+
+                            <button *ngIf="!item.approve" (click)="Approve(item)"
+                                class="btn btn-success mr-2 mb-1">Approve
+                            </button>
+                            <button (click)="Delete(item._id)"
+                                class="btn btn-danger mr-2 mb-1">Delete
+                            </button>
+                            <button (click)="editinvesletter(item)" class="btn btn-primary btn-block my-3">Edit</button>
+
+                            <a [href]="item.free_link" target="_blank" class="card-link" style="font-size: 16px;">Free
+                                link</a>
+                            <a [href]="item.premium_link" target="_blank" class="card-link"
+                                style="font-size: 16px;">Premium
+                                link</a>
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin mt-2">
+                                <div>
+                                    <i class="feather icon-eye icon-sm"></i> {{item.view_count}}
+                                </div>
+                                <div>
+                                    <i class="feather icon-share-2 icon-sm"></i> {{item.share_count}}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- pages -->
+<ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+    (pageChange)="pagechange()">
+</ngb-pagination>

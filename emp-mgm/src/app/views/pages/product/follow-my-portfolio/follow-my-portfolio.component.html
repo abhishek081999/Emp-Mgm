@@ -1,0 +1,58 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin/products">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Follow My Portfolio</li>
+
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Follow My Portfolios List</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input class="form-control border-0 rounded-sm" name="search" #search="ngModel" [(ngModel)]="searchq"
+                type="text" placeholder="Search Portfolio Name...." (keyup)="filter()">
+        </div>
+
+        <button type="button" class="btn btn-primary m-1 mb-3" (click)="addedPortfolio()">Add Portfolio</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 grid-margin stretch-card"
+        *ngFor="let item of filteredData | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+        <div class="card cursor-pointer
+        " (click)="Showstocklist(item._id)">
+            <img class="card-img-top" [src]="item.image" [alt]="item.portfolio_name">
+            <div class="card-body">
+                <h4>{{item.portfolio_name | titlecase}}</h4>
+                <div class="about-text">
+                    <p class="card-text"><strong>Risk : </strong> {{item.risk}}</p>
+                    <p class="card-text"><strong>Category :</strong> {{item.category}}</p>
+                    <p class="card-text"><strong>Benchmark Index :</strong> {{item.benchmark| titlecase}}</p>
+                    <p class="card-text"><strong>Creation Date : </strong> 
+                        {{item.creation_date | date:'mediumDate'}}
+                    </p>
+                    <p class="card-text">
+                        <strong>Short Description : </strong>
+                        {{item.short_description}}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- pages -->
+<ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+    (pageChange)="pagechange()">
+</ngb-pagination>

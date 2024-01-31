@@ -1,0 +1,113 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insignia</a></li>
+        <li class="breadcrumb-item active" aria-current="page">DEMO TO CONVERSION REPORT</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">DEMO TO CONVERSION REPORT </h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" #sdate="ngModel" [(ngModel)]="startDate" name="sdate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" #edate="ngModel" [(ngModel)]="endDate" name="edate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="leadowner">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee </th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadowner}} - {{row.leadownername}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="demo_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Demo Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.demo_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_demo_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Insignia <br> Conversion</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_count_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Conv <br> for Insignia</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_count_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_count_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="course_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course <br> Conversion </th>
+                            <td mat-cell *matCellDef="let row"> {{row.course_count}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_course_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="course_count_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Conv <br>for Course </th>
+                            <td mat-cell *matCellDef="let row"> {{row.course_count_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_course_count_conv| percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Product <br> Conversion </th>
+                            <td mat-cell *matCellDef="let row"> {{row.product_count}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_product_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_count_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>% of count <br>for Product </th>
+                            <td mat-cell *matCellDef="let row"> {{row.product_count_conv}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_product_count_conv}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

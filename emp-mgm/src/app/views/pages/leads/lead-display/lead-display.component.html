@@ -1,0 +1,976 @@
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    Lead Details
+                    <span style="font-size: 14px;" *ngIf="currentLead.retarget"
+                        class="text-uppercase badge badge-success">Retargeted</span>
+                    <span style="font-size: 14px;" *ngIf="currentLead.tats" class="ml-2 text-uppercase badge" [ngClass]="{
+                            'badge-success': timeElapsed()[1] === 'success', 
+                            'badge-warning' : timeElapsed()[1] === 'warning',
+                            'badge-danger' : timeElapsed()[1] === 'danger' 
+                        }">{{timeElapsed()[0]}}</span>
+                </h6>
+                <p class="mb-3">Lead Owner: {{currentLead.leadownername }}({{currentLead.leadowner}}), Lead
+                    Assigned/Reassigned on {{currentLead.leadassigndate | date:'medium'}}, Last Updated on
+                    {{currentLead.updatedate | date:'medium'}},
+                    <br> Lead Date {{currentLead.leaddate | date:'medium'}} , Last Upload Date {{currentLead.uploaddate
+                    | date:'medium'}}
+                </p>
+                <form #updateForm="ngForm" (ngSubmit)="updateForm.valid && submit()">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Full Name*</label>
+                                <input type="text" class="form-control" #name="ngModel" [(ngModel)]="currentLead.name"
+                                    name="name" required autocomplete="off" placeholder="Name">
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.required && (updateForm.submitted || name.dirty || name.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Mobile Number*</label>
+                                <input type="text" #phone="ngModel" [(ngModel)]="currentLead.phone" name="phone"
+                                    placeholder="phone number" required minlength="10" maxlength="10"
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="phone?.errors?.required && (updateForm.submitted || phone.dirty || phone.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="phone?.errors?.minlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                                    Min length mustbe 10.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="phone?.errors?.maxlength && (updateForm.submitted || phone.dirty || phone.touched)">
+                                    Max length mustbe 10.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <!--email-->
+                                <input type="text" #email="ngModel" [(ngModel)]="currentLead.email" name="email"
+                                    class="form-control" placeholder="Email" [pattern]="emailRegex"
+                                    [required]="ismandatory">
+                                <p class="text-danger mt-1"
+                                    *ngIf="email?.errors?.required && (updateForm.submitted || email.dirty || email.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="email?.errors?.pattern && (updateForm.submitted || email.dirty || email.touched)">
+                                    Invalid email address.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Alternate Number</label>
+                                <input type="text" #secondarynumber="ngModel" [(ngModel)]="currentLead.alternatenumber"
+                                    name="secondarynumber" placeholder="Alternate number" minlength="10" maxlength="10"
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="secondarynumber?.errors?.required && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="secondarynumber?.errors?.minlength && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                                    Min length mustbe 10.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="secondarynumber?.errors?.maxlength && (updateForm.submitted || secondarynumber.dirty || secondarynumber.touched)">
+                                    Max length mustbe 10.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Whatsapp Number</label>
+                                <input type="text" #alternativenumber="ngModel" [(ngModel)]="currentLead.whatsappnum"
+                                    name="alternativenumber" placeholder="Whatsapp number" minlength="10" maxlength="10"
+                                    class="form-control" [required]="ismandatory">
+                                <p class="text-danger mt-1"
+                                    *ngIf="alternativenumber?.errors?.required && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="alternativenumber?.errors?.minlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                                    Min length mustbe 10.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="alternativenumber?.errors?.maxlength && (updateForm.submitted || alternativenumber.dirty || alternativenumber.touched)">
+                                    Max length mustbe 10.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Telegram Number</label>
+                                <input type="text" #telegram="ngModel" [(ngModel)]="currentLead.telegram"
+                                    name="telegram" placeholder="Telegram number" minlength="10" maxlength="10"
+                                    class="form-control" [required]="ismandatory">
+                                <p class="text-danger mt-1"
+                                    *ngIf="telegram?.errors?.required && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="telegram?.errors?.minlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                    Min length mustbe 10.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="telegram?.errors?.maxlength && (updateForm.submitted || telegram.dirty || telegram.touched)">
+                                    Max length mustbe 10.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" [ngModel]="currentLead.dob | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="currentLead.dob = $event" #dob="ngModel" name="dob"
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="dob?.errors?.required && (updateForm.submitted || dob.dirty || dob.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>State*</label>
+                                <ng-select [items]="states" #state="ngModel" [(ngModel)]="currentLead.state"
+                                    name="state" placeholder="Select State" required (change)="onstateChange()">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="state?.errors?.required && (updateForm.submitted || state.dirty || state.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>District</label>
+                                <ng-select [items]="districts" #city="ngModel" [(ngModel)]="currentLead.city"
+                                    name="city" placeholder="Select City" [required]="ismandatory">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="city?.errors?.required && (updateForm.submitted || city.dirty || city.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input type="text" #address="ngModel" [(ngModel)]="currentLead.address" name="address"
+                                    class="form-control" placeholder="address" [required]="ismandatory">
+                                <p class="text-danger mt-1"
+                                    *ngIf="address?.errors?.required && (updateForm.submitted || address.dirty || address.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Pincode</label>
+                                <input type="text" #pincode="ngModel" [(ngModel)]="currentLead.pincode" name="pincode"
+                                    class="form-control" placeholder="pincode" pattern="^[0-9]+$" maxlength="6"
+                                    minlength="6" [required]="ismandatory">
+                                <p class="text-danger mt-1"
+                                    *ngIf="pincode?.errors?.required && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="pincode?.errors?.minlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                                    Min length mustbe 6.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="pincode?.errors?.maxlength && (updateForm.submitted || pincode.dirty || pincode.touched)">
+                                    Max length mustbe 6.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="pincode?.errors?.pattern && (pincode.dirty || pincode.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>GSTIN</label>
+                                <input type="text" #gstin="ngModel" [(ngModel)]="currentLead.gstin" name="gstin"
+                                    class="form-control" placeholder="gstin"
+                                    (ngModelChange)="currentLead.gstin = $event.toUpperCase()">
+                                <p class="text-danger mt-1"
+                                    *ngIf="gstin?.errors?.required && (updateForm.submitted || gstin.dirty || gstin.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select #gender="ngModel" [(ngModel)]="currentLead.gender" name="gender"
+                                    class="form-control" [required]="ismandatory">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="gender?.errors?.required && (updateForm.submitted || gender.dirty || gender.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Occupation</label>
+                                <ng-select [items]="occupations.lists" #occupation="ngModel"
+                                    [(ngModel)]="currentLead.occupation" name="occupation"
+                                    placeholder="Select Occupation">
+                                </ng-select>
+
+                                <p class="text-danger mt-1"
+                                    *ngIf="occupation?.errors?.required && (updateForm.submitted || occupation.dirty || occupation.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Experience in Stock Market</label>
+                                <select #experience="ngModel" [(ngModel)]="currentLead.experience" name="experience"
+                                    class="form-control" [required]="ismandatory">
+                                    <option value="">Select Experience</option>
+                                    <option *ngFor="let p of explist" [value]="p">{{p}}</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="experience?.errors?.required && (updateForm.submitted || experience.dirty || experience.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Credit Card?</label>
+                                <select class="form-control" #creditcard="ngModel" [(ngModel)]="currentLead.creditcard"
+                                    name="creditcard">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="creditcard?.errors?.required && (updateForm.submitted || creditcard.dirty || creditcard.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentLead.creditcard">
+                            <div class="form-group">
+                                <label>Credit Card Bank</label>
+                                <ng-select [items]="allbanks" [multiple]=true placeholder="Select Bank"
+                                    #ccbank="ngModel" [hideSelected]="true" [closeOnSelect]="false"
+                                    [(ngModel)]="currentLead.ccbank" name="ccbank">
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="item-{{index}}" type="checkbox" name="item-{{index}}"
+                                            [ngModel]="item$.selected" /> {{item}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="ccbank?.errors?.required && (ccbank.dirty || ccbank.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>ITR File?</label>
+                                <select class="form-control" #itrfill="ngModel" [(ngModel)]="currentLead.itrfill"
+                                    name="itrfill">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="itrfill?.errors?.required && (updateForm.submitted || itrfill.dirty || itrfill.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Monthly Income</label>
+                                <select #monthlyincome="ngModel" [(ngModel)]="currentLead.monthlyincome"
+                                    name="monthlyincome" class="form-control">
+                                    <option value="">Select Monthly Income</option>
+                                    <option value="Upto 15K">Upto 15K</option>
+                                    <option value="15K - 30K">15K - 30K</option>
+                                    <option value="30K - 50K">30K - 50K</option>
+                                    <option value="above 50K">above 50K</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="monthlyincome?.errors?.required && (updateForm.submitted || monthlyincome.dirty || monthlyincome.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Service Type</label>
+                                <input #servicetype="ngModel" [(ngModel)]="currentLead.servicetype" name="servicetype"
+                                    class="form-control" [required]="ismandatory" readonly>
+                                <p class="text-danger mt-1"
+                                    *ngIf="servicetype?.errors?.required && (servicetype.dirty || servicetype.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Service Code</label>
+                                <input #servicecode="ngModel" [(ngModel)]="currentLead.servicecode" name="servicecode"
+                                    class="form-control" [required]="ismandatory" readonly>
+                                <p class="text-danger mt-1"
+                                    *ngIf="servicecode?.errors?.required && (servicecode.dirty || servicecode.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Service Name</label>
+                                <input #servicename="ngModel" [(ngModel)]="currentLead.servicename" name="servicename"
+                                    class="form-control" [required]="ismandatory" readonly>
+                                <p class="text-danger mt-1"
+                                    *ngIf="servicename?.errors?.required && (servicename.dirty || servicename.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <a (click)="selectservice()" class="btn btn-primary mt-30px btn-block">Select Service</a>
+                        </div>
+                        <div class="col-md-2">
+                            <a (click)="selectprice()" class="btn btn-primary mt-30px btn-block">View Price</a>
+                        </div>
+                        <div class="col-md-2" *ngIf="!currentLead.isdemoschedule">
+                            <a (click)="schedule(scheduleModal)" class="btn btn-primary mt-30px btn-block">Schedule
+                                Demo</a>
+                        </div>
+                        <div class="col-md-2" *ngIf="currentLead.isdemoschedule">
+                            <a (click)="schedule(scheduleModal)" class="btn btn-primary mt-30px btn-block">Demo
+                                Details</a>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Insignia Prospect?</label>
+                                <select class="form-control" #isInsigniaProspect="ngModel"
+                                    [(ngModel)]="currentLead.isInsigniaProspect" name="isInsigniaProspect"
+                                    [required]="ismandatory">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="isInsigniaProspect?.errors?.required && (updateForm.submitted || isInsigniaProspect.dirty || isInsigniaProspect.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Demat A/C Opened?</label>
+                                <select class="form-control" #isDematAccountOpened="ngModel"
+                                    [(ngModel)]="currentLead.isDematAccountOpened" name="isDematAccountOpened"
+                                    [required]="ismandatory">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="isDematAccountOpened?.errors?.required && (updateForm.submitted || isDematAccountOpened.dirty || isDematAccountOpened.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Demo Given?</label>
+                                <select class="form-control" #demogiven="ngModel" [(ngModel)]="currentLead.demogiven"
+                                    name="demogiven" (change)="ondemochange()" [required]="ismandatory">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="demogiven?.errors?.required && (updateForm.submitted || demogiven.dirty || demogiven.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentLead.demogiven">
+                            <div class="form-group">
+                                <label>Demo Date*</label>
+                                <input type="date" #demodate="ngModel"
+                                    [ngModel]="currentLead.demodate | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="currentLead.demodate = $event" name="demodate" required
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="demodate?.errors?.required && (updateForm.submitted || demodate.dirty || demodate.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6" *ngIf="currentLead.demogiven">
+                            <div class="form-group">
+                                <label>ZOOM Meeting Recording Link for Demo*</label>
+                                <input type="text" #demolink="ngModel" [(ngModel)]="currentLead.demolink"
+                                    name="demolink" class="form-control" placeholder="Demo Class Link" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="demolink?.errors?.required && (updateForm.submitted || demolink.dirty || demolink.touched)">
+                                    This field is required.</p>
+                            </div>
+                            <button class="btn btn-primary" (click)="playvideo()"
+                                *ngIf="currentLead.demogiven && currentLead.demolink">Play Video</button>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Lead Status*</label>
+                                <ng-select [items]="displayStatusList" required placeholder="Select Lead Status"
+                                    #leadstatus="ngModel" [(ngModel)]="currentLead.leadstatus"
+                                    (change)="onstatuschange()" name="leadstatus">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="leadstatus?.errors?.required && (leadstatus.dirty || leadstatus.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Device Held*</label>
+                                <ng-select [items]="deviceHeldDrop" [required]="ismandatory"
+                                    placeholder="Select Lead Status" #deviceheld="ngModel"
+                                    [(ngModel)]="currentLead.deviceHeld" name="deviceHeld">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="deviceheld?.errors?.required && (deviceheld.dirty || deviceheld.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="isfollowup(currentLead.leadstatus)">
+                            <div class="form-group">
+                                <label>Call Back/Follow up Date</label>
+                                <input type="datetime-local" #callbackdate="ngModel"
+                                    [ngModel]="currentLead.callbackdate | date:'yyyy-MM-ddTHH:mm'"
+                                    (ngModelChange)="currentLead.callbackdate = $event" name="callbackdate"
+                                    class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="callbackdate?.errors?.required && (updateForm.submitted || callbackdate.dirty || callbackdate.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label>Comments*</label>
+                            <textarea #comment="ngModel" [(ngModel)]="currentLead.comment" name="comment"
+                                class="form-control" rows="7" required>
+                            </textarea>
+                            <p class="text-danger mt-1"
+                                *ngIf="comment?.errors?.required && (updateForm.submitted || comment.dirty || comment.touched)">
+                                This field is required.</p>
+                        </div>
+                    </div>
+                    <h6 *ngIf="ismandatory" class="card-title">Student Onboarding Form</h6>
+                    <div class="row" *ngIf="ismandatory">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Mode*</label>
+                                <select #mode="ngModel" [(ngModel)]="currentOnboard.mode" name="mode"
+                                    class="form-control" required>
+                                    <option value="">Select Mode</option>
+                                    <option value="mode1">Mode 1</option>
+                                    <option value="mode2">Mode 2</option>
+                                    <option value="mode3">Mode 3</option>
+                                    <option *ngIf="currentLead.servicetype === 'insignia'" value="mode4">Mode 4</option>
+                                    <option *ngIf="currentLead.servicetype === 'course'" value="mode5">Mode 5</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="mode?.errors?.required && (mode.dirty || mode.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Coupon code</label>
+                                <!--email-->
+                                <input type="text" #couponcode="ngModel" [(ngModel)]="currentOnboard.couponcode"
+                                    name="couponcode" class="form-control" placeholder="Coupon Code">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Total Amount*</label>
+                                <!--email-->
+                                <input type="number" #totalfees="ngModel" [(ngModel)]="currentOnboard.totalfees"
+                                    name="totalfees" class="form-control" placeholder="Total Amount" pattern="^[0-9]+$"
+                                    required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="totalfees?.errors?.required && (totalfees.dirty || totalfees.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="totalfees?.errors?.pattern && (totalfees.dirty || totalfees.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Paid Amount*</label>
+                                <!--email-->
+                                <input type="number" #paidamount="ngModel" [(ngModel)]="currentOnboard.paidamount"
+                                    name="paidamount" class="form-control" placeholder="Paid Amount" pattern="^[0-9]+$"
+                                    disabled>
+                                <p class="text-danger mt-1"
+                                    *ngIf="paidamount?.errors?.required && (paidamount.dirty || paidamount.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="paidamount?.errors?.pattern && (paidamount.dirty || paidamount.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>First ins Txn ID<a placement="top" ngbTooltip="Unique Transaction ID"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <input type="text" #txnid="ngModel" [(ngModel)]="currentOnboard.txnid" name="txnid"
+                                    class="form-control" placeholder="Transaction ID" autocomplete="off">
+                                <p class="text-danger mt-1"
+                                    *ngIf="txnid?.errors?.required && (txnid.dirty || txnid.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>First ins Method*<a placement="top" ngbTooltip="Razorpay, Gpay,Paytm etc."><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <select #paymentmethod="ngModel" [(ngModel)]="currentOnboard.paymentmethod"
+                                    name="paymentmethod" class="form-control" placeholder="Payment Method" required>
+                                    <option value="Bank Transfer"> Bank Transfer</option>
+                                    <option value="Google Pay"> Google Pay</option>
+                                    <option value="Phone Pe"> Phone Pe</option>
+                                    <option value="UPI"> UPI</option>
+                                    <option value="Paytm"> Paytm</option>
+                                    <option value="Educational Loan"> Educational Loan</option>
+                                    <option value="Razor Pay Link"> Razor Pay Link</option>
+                                    <option value="Cash Payment"> Cash Payment</option>
+                                    <option value="Others"> Others</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="paymentmethod?.errors?.required && (paymentmethod.dirty || paymentmethod.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>First ins Amount*</label>
+                                <!--email-->
+                                <input type="number" #paymentamount="ngModel" [(ngModel)]="currentOnboard.paymentamount"
+                                    name="paymentamount" class="form-control" placeholder="Payment Amount"
+                                    pattern="^[0-9]+$" required (change)="onamountadded()">
+                                <p class="text-danger mt-1"
+                                    *ngIf="paymentamount?.errors?.required && (paymentamount.dirty || paymentamount.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="paymentamount?.errors?.required && (paymentamount.dirty || paymentamount.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>First ins Date of Purchase*</label>
+                                <!--email-->
+                                <input type="date" #date="ngModel"
+                                    [ngModel]="currentOnboard.paymentdate | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="currentOnboard.paymentdate = $event" name="date"
+                                    class="form-control" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="date?.errors?.required && (date.dirty || date.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>First ins Image</label>
+                                <input type="file" accept="image/*" name="paymentimage"
+                                    (change)="handelFileInput($event)" class="form-control" required>
+                                <a href="{{imageurl}}{{currentOnboard.paymentimage}}" target="_blank"><i
+                                        class=" icon-attach"></i>{{currentOnboard.paymentimage}}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="below_selling_price" #below_selling_price="ngModel"
+                                            [(ngModel)]="currentOnboard.below_selling_price" class="form-check-input">
+                                        <i class="input-frame"></i>
+                                        Are you selling this service below Minumum selling Price?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" *ngIf="currentOnboard.below_selling_price">
+                            <div class="form-group">
+                                <label>Reason*</label>
+                                <textarea #below_selling_price_reason="ngModel" required
+                                    [(ngModel)]="currentOnboard.below_selling_price_reason"
+                                    name="below_selling_price_reason" class="form-control" rows="7">
+                            </textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12"
+                            *ngIf="currentOnboard.mode === 'mode2' || currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4' || currentOnboard.mode === 'mode5'">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="sec_ins_start" #sec_ins_start="ngModel"
+                                            [(ngModel)]="secinsstart" class="form-check-input"
+                                            [disabled]="secinsstarted" (change)="onbstatuschange()">
+                                        <i class="input-frame"></i>
+                                        Start Second Installment Onboarding (Please Tick this after receiving the
+                                        installment)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode2' || currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4' || currentOnboard.mode === 'mode5'">
+                            <div class="form-group">
+                                <label>Second ins Txn ID<a placement="top" ngbTooltip="Unique Transaction ID"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <input type="text" #sectxnid="ngModel" [(ngModel)]="currentOnboard.sectxnid"
+                                    name="sectxnid" class="form-control" placeholder="Transaction ID" autocomplete="off"
+                                    [disabled]="!secinsstart">
+                                <p class="text-danger mt-1"
+                                    *ngIf="sectxnid?.errors?.required && (sectxnid.dirty || sectxnid.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode2' || currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4' || currentOnboard.mode === 'mode5'">
+                            <div class="form-group">
+                                <label>Second ins Method*<a placement="top" ngbTooltip="Razorpay, Gpay,Paytm etc."><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <select #secpaymentmethod="ngModel" [(ngModel)]="currentOnboard.secpaymentmethod"
+                                    name="secpaymentmethod" class="form-control" placeholder="Payment Method"
+                                    [required]="currentOnboard.manualregcomplete" [disabled]="!secinsstart">
+                                    <option value="Bank Transfer"> Bank Transfer</option>
+                                    <option value="Google Pay"> Google Pay</option>
+                                    <option value="Phone Pe"> Phone Pe</option>
+                                    <option value="UPI"> UPI</option>
+                                    <option value="Paytm"> Paytm</option>
+                                    <option value="Educational Loan"> Educational Loan</option>
+                                    <option value="Razor Pay Link"> Razor Pay Link</option>
+                                    <option value="Cash Payment"> Cash Payment</option>
+                                    <option value="Others"> Others</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="secpaymentmethod?.errors?.required && (secpaymentmethod.dirty || secpaymentmethod.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode2' || currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4' || currentOnboard.mode === 'mode5'">
+                            <div class="form-group">
+                                <label>Second ins Amount*</label>
+                                <!--email-->
+                                <input type="number" #secpaymentamount="ngModel"
+                                    [(ngModel)]="currentOnboard.secpaymentamount" name="secpaymentamount"
+                                    class="form-control" placeholder="Payment Amount" pattern="^[0-9]+$"
+                                    [required]="currentOnboard.manualregcomplete" [disabled]="!secinsstart"
+                                    (change)="onamountadded()">
+                                <p class="text-danger mt-1"
+                                    *ngIf="secpaymentamount?.errors?.required && (secpaymentamount.dirty || secpaymentamount.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="secpaymentamount?.errors?.required && (secpaymentamount.dirty || secpaymentamount.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode2' || currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4' || currentOnboard.mode === 'mode5'">
+                            <div class="form-group">
+                                <label>Second ins Date of Purchase*</label>
+                                <!--email-->
+                                <input type="date" #secpaymentdate="ngModel"
+                                    [ngModel]="currentOnboard.secpaymentdate | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="currentOnboard.secpaymentdate = $event" name="secpaymentdate"
+                                    class="form-control" [required]="currentOnboard.manualregcomplete"
+                                    [disabled]="!secinsstart">
+                                <p class="text-danger mt-1"
+                                    *ngIf="secpaymentdate?.errors?.required && (secpaymentdate.dirty || secpaymentdate.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode2' || currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4' || currentOnboard.mode === 'mode5'">
+                            <div class="form-group">
+                                <label>Second ins Image</label>
+                                <input type="file" accept="image/*" name="secpaymentimage"
+                                    (change)="handelFileInput1($event)" class="form-control" [disabled]="!secinsstart">
+                                <a href="{{imageurl}}{{currentOnboard.secpaymentimage}}" target="_blank"><i
+                                        class=" icon-attach"></i>{{currentOnboard.secpaymentimage}}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12"
+                            *ngIf="currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="third_ins_start" #third_ins_start="ngModel"
+                                            [(ngModel)]="thirdinsstart" class="form-check-input"
+                                            [disabled]="thirdinsstarted" (change)="onbstatuschange()">
+                                        <i class="input-frame"></i>
+                                        Start Third Installment Onboarding (Please Tick this after receiving the
+                                        installment)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Third ins Txn ID<a placement="top" ngbTooltip="Unique Transaction ID"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <input type="text" #thirdtxnid="ngModel" [(ngModel)]="currentOnboard.thirdtxnid"
+                                    name="thirdtxnid" class="form-control" placeholder="Transaction ID"
+                                    autocomplete="off" [disabled]="!thirdinsstart">
+                                <p class="text-danger mt-1"
+                                    *ngIf="thirdtxnid?.errors?.required && (thirdtxnid.dirty || thirdtxnid.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Third ins Method*<a placement="top" ngbTooltip="Razorpay, Gpay,Paytm etc."><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <select #thirdpaymentmethod="ngModel" [(ngModel)]="currentOnboard.thirdpaymentmethod"
+                                    name="thirdpaymentmethod" class="form-control" placeholder="Payment Method"
+                                    [required]="currentOnboard.secmanualregcomplete" [disabled]="!thirdinsstart">
+                                    <option value="Bank Transfer"> Bank Transfer</option>
+                                    <option value="Google Pay"> Google Pay</option>
+                                    <option value="Phone Pe"> Phone Pe</option>
+                                    <option value="UPI"> UPI</option>
+                                    <option value="Paytm"> Paytm</option>
+                                    <option value="Educational Loan"> Educational Loan</option>
+                                    <option value="Razor Pay Link"> Razor Pay Link</option>
+                                    <option value="Cash Payment"> Cash Payment</option>
+                                    <option value="Others"> Others</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="thirdpaymentmethod?.errors?.required && (thirdpaymentmethod.dirty || thirdpaymentmethod.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Third ins Amount*</label>
+                                <!--email-->
+                                <input type="number" #thirdpaymentamount="ngModel"
+                                    [(ngModel)]="currentOnboard.thirdpaymentamount" name="thirdpaymentamount"
+                                    class="form-control" placeholder="Payment Amount" pattern="^[0-9]+$"
+                                    [required]="currentOnboard.secmanualregcomplete" [disabled]="!thirdinsstart"
+                                    (change)="onamountadded()">
+                                <p class="text-danger mt-1"
+                                    *ngIf="thirdpaymentamount?.errors?.required && (thirdpaymentamount.dirty || thirdpaymentamount.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="thirdpaymentamount?.errors?.required && (thirdpaymentamount.dirty || thirdpaymentamount.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Third ins Date of Purchase*</label>
+                                <!--email-->
+                                <input type="date" #thirdpaymentdate="ngModel"
+                                    [ngModel]="currentOnboard.thirdpaymentdate | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="currentOnboard.thirdpaymentdate = $event" name="thirdpaymentdate"
+                                    class="form-control" [required]="currentOnboard.secmanualregcomplete"
+                                    [disabled]="!thirdinsstart">
+                                <p class="text-danger mt-1"
+                                    *ngIf="thirdpaymentdate?.errors?.required && (thirdpaymentdate.dirty || thirdpaymentdate.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="currentOnboard.mode === 'mode3' || currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Third ins Image</label>
+                                <input class="form-control" type="file" accept="image/*" name="thirdpaymentimage"
+                                    (change)="handelFileInput2($event)" [disabled]="!thirdinsstart">
+                                <a href="{{imageurl}}{{currentOnboard.thirdpaymentimage}}" target="_blank"><i
+                                        class=" icon-attach"></i>{{currentOnboard.thirdpaymentimage}}</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12" *ngIf="currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="forth_ins_start" #forth_ins_start="ngModel"
+                                            [(ngModel)]="forthinsstart" class="form-check-input"
+                                            [disabled]="forthinsstarted" (change)="onbstatuschange()">
+                                        <i class="input-frame"></i>
+                                        Start Forth Installment Onboarding (Please Tick this after receiving the
+                                        installment)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Forth ins Txn ID<a placement="top" ngbTooltip="Unique Transaction ID"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <input type="text" #forthtxnid="ngModel" [(ngModel)]="currentOnboard.forthtxnid"
+                                    name="forthtxnid" class="form-control" placeholder="Transaction ID"
+                                    autocomplete="off" [disabled]="!forthinsstart">
+                                <p class="text-danger mt-1"
+                                    *ngIf="forthtxnid?.errors?.required && (forthtxnid.dirty || forthtxnid.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Forth ins Method*<a placement="top" ngbTooltip="Razorpay, Gpay,Paytm etc."><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <!--email-->
+                                <select #forthpaymentmethod="ngModel" [(ngModel)]="currentOnboard.forthpaymentmethod"
+                                    name="forthpaymentmethod" class="form-control" placeholder="Payment Method"
+                                    [required]="currentOnboard.secmanualregcomplete" [disabled]="!forthinsstart">
+                                    <option value="Bank Transfer"> Bank Transfer</option>
+                                    <option value="Google Pay"> Google Pay</option>
+                                    <option value="Phone Pe"> Phone Pe</option>
+                                    <option value="UPI"> UPI</option>
+                                    <option value="Paytm"> Paytm</option>
+                                    <option value="Educational Loan"> Educational Loan</option>
+                                    <option value="Razor Pay Link"> Razor Pay Link</option>
+                                    <option value="Cash Payment"> Cash Payment</option>
+                                    <option value="Others"> Others</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="forthpaymentmethod?.errors?.required && (forthpaymentmethod.dirty || forthpaymentmethod.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Forth ins Amount*</label>
+                                <!--email-->
+                                <input type="number" #forthpaymentamount="ngModel"
+                                    [(ngModel)]="currentOnboard.forthpaymentamount" name="forthpaymentamount"
+                                    class="form-control" placeholder="Payment Amount" pattern="^[0-9]+$"
+                                    [required]="currentOnboard.secmanualregcomplete" [disabled]="!forthinsstart"
+                                    (change)="onamountadded()">
+                                <p class="text-danger mt-1"
+                                    *ngIf="forthpaymentamount?.errors?.required && (forthpaymentamount.dirty || forthpaymentamount.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="forthpaymentamount?.errors?.required && (forthpaymentamount.dirty || forthpaymentamount.touched || updateForm.submitted)">
+                                    Only Numbers are allowed.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Forth ins Date of Purchase*</label>
+                                <!--email-->
+                                <input type="date" #forthpaymentdate="ngModel"
+                                    [ngModel]="currentOnboard.forthpaymentdate | date:'yyyy-MM-dd'"
+                                    (ngModelChange)="currentOnboard.forthpaymentdate = $event" name="forthpaymentdate"
+                                    class="form-control" [required]="currentOnboard.secmanualregcomplete"
+                                    [disabled]="!forthinsstart">
+                                <p class="text-danger mt-1"
+                                    *ngIf="forthpaymentdate?.errors?.required && (forthpaymentdate.dirty || forthpaymentdate.touched || updateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="currentOnboard.mode === 'mode4'">
+                            <div class="form-group">
+                                <label>Forth ins Image</label>
+                                <input class="form-control" type="file" accept="image/*" name="forthpaymentimage"
+                                    (change)="handelFileInput3($event)" [disabled]="!forthinsstart">
+                                <a href="{{imageurl}}{{currentOnboard.forthpaymentimage}}" target="_blank"><i
+                                        class=" icon-attach"></i>{{currentOnboard.forthpaymentimage}}</a>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label>Support Comments</label>
+                            <textarea #comment1="ngModel" [(ngModel)]="currentOnboard.comment" name="comment1"
+                                class="form-control" readonly rows="7">
+                            </textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary submit mr-3 mt-3">Submit</button>
+                    <a (click)="leadhistory()" class="btn btn-primary mr-3 mt-3">Lead History</a>
+                    <a (click)="changehistory()" class="btn btn-primary mr-3 mt-3">Logs</a>
+                    <p class="text-danger mt-1"
+                        *ngIf="(updateForm.submitted || updateForm.dirty || updateForm.touched) && updateForm.invalid">
+                        You Missed Some Fields.</p>
+                    <!-- <a *ngIf="isNewStudent" (click)="studentreg()" class="btn btn-primary mr-3 mt-3" >Register Student</a> -->
+                    <!-- <button *ngIf="ismandatory && !isExistingOrder" (click)="isSubmitAndCreateOrder = true" class="btn btn-success mr-3 mt-3" >Submit & Create Order</button> -->
+                    <a *ngIf="ismandatory && isExistingOrder" (click)="goToOrder()" class="btn btn-success mr-3 mt-3">Go
+                        to Order</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #scheduleModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Demo Class Schedule</h5>
+        <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="submitf && !hide" class="spinner-wrapper">
+            <div class="spinner">Loading...</div>
+        </div>
+        <form #scheduleForm="ngForm" (ngSubmit)="scheduleForm.valid && submitForm()">
+            <p style="color: red;padding: 0px;" *ngIf="!submitf">All * Fields are Mandatory</p>
+            <div class="row" *ngIf="!submitf">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Topic*</label>
+                        <input type="text" class="form-control" #topic="ngModel" [(ngModel)]="leaddemo.topic"
+                            name="topic" required readonly maxlength="200">
+                        <p class="text-danger mt-1"
+                            *ngIf="topic?.errors?.required && (topic.dirty || topic.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                        <p class="text-danger mt-1"
+                            *ngIf="topic?.errors?.maxlength && (topic.dirty || topic.touched || scheduleForm.submitted)">
+                            Max Length 200 Charecters</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Start Time*</label>
+                        <input type="datetime-local" class="form-control" #starttime="ngModel"
+                            [ngModel]="leaddemo.start_time | date:'yyyy-MM-ddTHH:mm'"
+                            (ngModelChange)="leaddemo.start_time = $event" required (change)="ontimechange()"
+                            name="starttime">
+                        <p class="text-danger mt-1"
+                            *ngIf="starttime?.errors?.required && (starttime.dirty || starttime.touched || scheduleForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="my-3" *ngIf="hide">
+            <p><b>Demo Class ID:</b> {{webinarres?.id}}</p>
+            <p><b>Demo Class Password:</b> {{webinarres?.password}}</p>
+            <p><b>Demo Class Link:</b> <a [href]="webinarres?.join_url" target="blank">{{webinarres?.join_url}}</a></p>
+            <p><b>Time:</b> {{webinarres?.start_time | date:'medium'}}</p>
+            <p><b>Zoom Account:</b> {{webinarres?.account}}</p>
+        </div>
+
+        <div *ngIf="!submitf">
+            <full-calendar defaultView="timeGridWeek" [header]="{
+                        left: 'prev,today,next',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                    }" [plugins]="calendarPlugins" [weekends]="true" [events]="events" [eventLimit]="false"
+                [editable]="false"></full-calendar>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="hide" (click)="copied()" class="btn btn-primary">Copy Details</button>
+        <button *ngIf="submitf" (click)="submitf = !submitf" class="btn btn-primary"> Change Schedule</button>
+        <button *ngIf="hide" (click)="deleteschedule()" class="btn btn-danger"> Delete Schedule</button>
+        <button *ngIf="!submitf && isdateacceptable" [disabled]="scheduleForm.invalid" (click)="submitForm()"
+            class="btn btn-primary"> Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()"> Close</button>
+    </div>
+</ng-template>

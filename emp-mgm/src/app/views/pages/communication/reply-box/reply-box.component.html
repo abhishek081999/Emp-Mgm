@@ -1,0 +1,41 @@
+<div class="modal-header">
+    <h5 class="modal-title">{{ discussions.qtitle }}</h5>
+    <button type="button" class="close" (click)="activeModal.close('by: close icon')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div #scrollme>
+        <ul class="list-unstyled">
+            <li>
+                <quill-view-html [content]="discussions.qdetails | texttourl" theme="snow"></quill-view-html>
+                <img *ngIf="discussions.image" [src]="discussions.image" [alt]="discussions.qtitle"
+                    class="mx-wd-100p mb-3">
+                <p><b>Posted by {{ discussions.askby }} on {{ discussions.date | date: 'medium'}}</b></p>
+            </li>
+            <li *ngFor="let ans of answers; let i=index">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <div>
+                        <quill-view-html [content]="ans.details | texttourl" theme="snow"></quill-view-html>
+                        <img *ngIf="ans.image" [src]="ans.image" alt="image" class="mx-wd-100p mb-3">
+                        <p><b>Posted by {{ ans.submittedby }} on {{ ans.date | date: 'medium'}}</b></p>
+                    </div>
+                    <span><i (click)="deleteMessage(i)" ngbTooltip="Delete Message"
+                            class="feather icon-trash icon-sm cursor-pointer"></i></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <p>Upload image</p>
+    <input type="file" accept="image/*" (change)="handelFile($event)">
+    <p>Type Your Answer</p>
+    <quill-editor placeholder="Answer" #validation="ngModel" [(ngModel)]="postanswer.details" name="validation"
+        [styles]="{height:'146px'}" [modules]="quillConfig" [required]="true" [trimOnValidation]="true">
+    </quill-editor>
+    
+
+</div>
+<div class="modal-footer">
+    <button type="button" [disabled]="validation.invalid" (click)="onSubmit()" class="btn btn-primary"> Submit</button>
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()"> Close</button>
+</div>

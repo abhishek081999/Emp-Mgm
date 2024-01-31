@@ -1,0 +1,231 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Team Members Leads Report</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Team Members Leads Report</h6>
+                </div>
+
+                <form class="search-form" (ngSubmit)="submit()">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <ng-select [items]="allTeams" #teamid="ngModel"
+                                    [(ngModel)]="teamname" name="teamid" placeholder="Search By Team Name">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}</span>
+                                    </ng-template>
+        
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                    #lang="ngModel" [(ngModel)]="Lang" name="leadtatlang" (change)="onChange()">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <ng-select [items]="LeadLevelDrop" bindValue="_id" [searchable]="true"
+                                    placeholder="Select Level" #level="ngModel" [(ngModel)]="Level" name="tatlevel">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">
+                                            {{item.name}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.name}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="leadowner" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadowner}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadownername">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadownername}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="teamlead">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead ID</th>
+                            <td mat-cell *matCellDef="let row"> {{row.teamlead}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="teamleadname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead Name</th>
+                            <td mat-cell *matCellDef="let row"> {{row.teamleadname}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="month" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Month </th>
+                            <td mat-cell *matCellDef="let row"> {{row.month}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="assigned">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Assigned </th>
+                            <td mat-cell *matCellDef="let row"> {{row.assigned}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('assigned')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="unattempted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Unattempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.unattempted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('unattempted')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="attempted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Attempted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.attempted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('attempted')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="retarget">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Retarget </th>
+                            <td mat-cell *matCellDef="let row"> {{row.retarget}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('retarget')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="demo_given">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Demo Given </th>
+                            <td mat-cell *matCellDef="let row"> {{row.demo_given}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount('demo_given')}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of displayedColumns1" [matColumnDef]="col">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col}} </th>
+                            <td mat-cell *matCellDef="let row"> {{row[col]}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount(col)}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Seat_Booked_Rate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Seat Booked Rate(%)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Seat_Booked_Rate}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount1('Seat_Booked_Rate')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Partially_Converted_Rate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Partially Converted <br> Rate(%)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Partially_Converted_Rate}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount1('Partially_Converted_Rate')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Convertion_Rate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Convertion Rate(%) </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Convertion_Rate}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount1('Convertion_Rate')}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <ng-select [items]="monthslabels" #months="ngModel" [(ngModel)]="month" class="wd-md-400 border-0 rounded-sm"
+            name="months" placeholder="Search By Month" (change)="onchange1()">
+        </ng-select>
+    </div>
+    <div class="col-xl-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Attempted/Unattempted</h6>
+                <apx-chart [series]="pieChartOptions2.nonAxisSeries" [labels]="pieChartOptions2.labels"
+                    [chart]="pieChartOptions2.chart" [colors]="pieChartOptions2.colors"
+                    [stroke]="pieChartOptions2.stroke" [legend]="pieChartOptions2.legend"
+                    [dataLabels]="pieChartOptions2.dataLabels"></apx-chart>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Lead Category</h6>
+                <apx-chart [series]="pieChartOptions1.nonAxisSeries" [labels]="pieChartOptions1.labels"
+                    [chart]="pieChartOptions1.chart" [colors]="pieChartOptions1.colors"
+                    [stroke]="pieChartOptions1.stroke" [legend]="pieChartOptions1.legend"
+                    [dataLabels]="pieChartOptions1.dataLabels"></apx-chart>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 
+<div class="row">
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Convertion Rate</h6>
+                <apx-chart [series]="barChartOptions.series" [colors]="barChartOptions.colors"
+                    [grid]="barChartOptions.grid" [chart]="barChartOptions.chart" [xaxis]="barChartOptions.xaxis">
+                </apx-chart>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Seat Booked Rate</h6>
+                <apx-chart [series]="barChartOptions1.series" [colors]="barChartOptions1.colors"
+                    [grid]="barChartOptions1.grid" [chart]="barChartOptions1.chart" [xaxis]="barChartOptions1.xaxis">
+                </apx-chart>
+            </div>
+        </div>
+    </div>
+</div> -->

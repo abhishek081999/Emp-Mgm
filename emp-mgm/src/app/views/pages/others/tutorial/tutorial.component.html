@@ -1,0 +1,172 @@
+<nav class="page-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a routerLink=".">Others</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Tutorials</li>
+	</ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+			<div class="card-body">
+				<h6 class="card-title">Add Tutorial</h6>
+                <form #tutorialForm="ngForm" (ngSubmit)="tutorialForm.valid && postTutorial(tutorialForm)" class="forms-sample">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Tutorial for*</label>
+                                <select 
+                                    class="form-control" 
+                                    #type="ngModel" 
+                                    [(ngModel)]="tutorial.type" 
+                                    name="type" 
+                                    required>
+                                        <option value="" selected>Tutorial For</option>
+                                        <option value="student">Student</option>
+                                        <option value="instructor">Instructor</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="type?.errors?.required && (tutorialForm.submitted || type.dirty || type.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Device Type*</label>
+                                <select 
+                                    class="form-control" 
+                                    #device="ngModel" 
+                                    [(ngModel)]="tutorial.device" 
+                                    name="device" 
+                                    required>
+                                    <option value="" selected>Device Type</option>
+                                    <option value="mobile">Mobile</option>
+                                    <option value="pc">PC/Laptop</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="device?.errors?.required && (tutorialForm.submitted || device.dirty || device.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Course Language*</label>
+                                <select 
+                                    class="form-control" 
+                                    #language="ngModel" 
+                                    [(ngModel)]="tutorial.language" 
+                                    name="language"
+                                    required>
+                                    <option value="" selected>Select Language</option>
+                                    <option *ngFor="let l of languages" [value]="l">{{l}}</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="language?.errors?.required && (tutorialForm.submitted || language.dirty || language.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Title*</label>
+                                <input 
+                                type="text" 
+                                class="form-control"
+                                #title="ngModel" 
+                                [(ngModel)]="tutorial.title" 
+                                autocomplete="off"
+                                name="title"
+                                required
+                                placeholder="Title">
+                                <p class="text-danger mt-1" *ngIf="title?.errors?.required && (tutorialForm.submitted || title.dirty || title.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Url*</label>
+                                <input 
+                                type="text" 
+                                class="form-control"
+                                #url="ngModel" 
+                                autocomplete="off"
+                                [(ngModel)]="tutorial.url" 
+                                name="url"
+                                required
+                                placeholder="Url">
+                                <p class="text-danger mt-1" *ngIf="url?.errors?.required && (tutorialForm.submitted || url.dirty || url.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Tutorials</h6>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div class="table-responsive pt-3">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+                  
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tutorial For </th>
+                            <td mat-cell *matCellDef="let row" > {{row.type}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="language">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Language </th>
+                            <td mat-cell *matCellDef="let row" > {{row.language}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="device">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Device Type </th>
+                            <td mat-cell *matCellDef="let row" > {{row.device}} </td>
+                        </ng-container>
+                     
+                        <ng-container matColumnDef="title">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+                            <td mat-cell *matCellDef="let row" > {{row.title}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="url">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Url </th>
+                            <td mat-cell *matCellDef="let row"> <a [href]="row.url" target="_blank">{{row.url}} </a></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="approved">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.approved?'green':'red'"> {{row.approved?'Approve':'Pending'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                            <td mat-cell style="cursor: pointer;" *matCellDef="let row">
+                                <a *ngIf="!row.approved" placement="top" ngbTooltip="Approve Tutorial" class="mr-2" (click)="onApprove(row)"> 
+                                    <i class="small-icon" data-feather="check" appFeatherIcon></i>
+                                </a>
+                                <a placement="top" ngbTooltip="Edit Tutorial" class="mr-2" (click)="onEdit(row)"> 
+                                    <i class="small-icon" data-feather="edit" appFeatherIcon></i>
+                                </a>
+                                <a placement="top" ngbTooltip="Delete Tutorial" class="mr-2" (click)="onDelete(row._id)"> 
+                                    <i class="small-icon" data-feather="trash-2" appFeatherIcon></i>
+                                </a>
+                            </td>
+                        </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[5, 10, 15, 20]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

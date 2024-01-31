@@ -1,0 +1,56 @@
+.custom-day {
+    text-align: center;
+    padding: 0.185rem 0.25rem;
+    display: inline-block;
+    height: 2rem;
+    width: 2rem;
+}
+
+.custom-day.range,
+.custom-day:hover,
+.custom-day.today {
+    background-color: rgb(2, 117, 216);
+    color: white;
+}
+
+.custom-day.faded {
+    background-color: rgba(2, 117, 216, 0.5);
+}
+
+.custom-day.selected {
+    background-color: rgba(72, 192, 24, 0.8);
+
+}
+
+.custom-day.disabled {
+    background-color: rgba(5, 5, 5, .1);
+    ;
+
+}
+
+.highlight-holiday {
+    border: 2px solid #f3db21;
+}
+.date-picker-legend {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+  
+      .legend-icon {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3db21; /* Yellow border for the square */
+        margin-right: 5px;
+      }
+  
+      .legend-label {
+        font-weight: bold;
+      }
+    }
+  }
+  

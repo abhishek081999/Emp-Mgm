@@ -1,0 +1,121 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Employees</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Team</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Team</h6>
+                <form #crate_team="ngForm" (ngSubmit)="crate_team.valid && submit()">
+                    <div class="row mt-2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" name="team_name" placeholder="Team Name" #team_name="ngModel"
+                                    [(ngModel)]="team.name" required class="form-control">
+                                <p class="text-danger mt-1"
+                                    *ngIf="team_name?.errors?.required && (crate_team.submitted || team_name.dirty || team_name.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <ng-select [items]="departments" [searchable]="true" #department_id="ngModel"
+                                    [(ngModel)]="team.department_id" name="department_id" (change)="deptChange()"
+                                    placeholder="Select Department" bindValue="_id" bindLabel="name">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="department_id?.errors?.required && (crate_team.submitted || department_id.dirty || department_id.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <ng-select [items]="dept_emp" [searchFn]="StaffSearchFn" [searchable]="true" #team_lead="ngModel"
+                                    [(ngModel)]="team.team_lead" name="team_lead" placeholder="Select Team Lead"
+                                    bindValue="invid">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.fullName}} -
+                                            {{item.invid}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.fullName}} - {{item.invid}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="team_lead?.errors?.required && (crate_team.submitted || team_lead.dirty || team_lead.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" [disabled]="crate_team.invalid"
+                                class="btn btn-primary btn-block">Save</button>
+                            <a type="submit" *ngIf="isEdit"
+                                class="btn btn-outline-danger btn-block" (click)="cancelEdit()">Cancel</a>
+                        </div>
+
+                    </div>
+                </form>
+                <div class="row mt-3" *ngIf="isTeamAvailable">
+                    <div class="col-4 col-md-3">
+                        <ul ngbNav #verticalNav2="ngbNav" class="nav-tabs nav-tabs-vertical" orientation="vertical">
+                            <li *ngFor="let element of teams; let i = index" [ngbNavItem]="i">
+                                <a ngbNavLink (click)="onDeptSelect(element)">{{element._id}}</a>
+                                <ng-template ngbNavContent>
+                                    <h6 class="mb-2">{{element._id}}</h6>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                            [dataSource]="dataSource" matSort>
+
+                                            <ng-container matColumnDef="name" sticky>
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header>Team Name
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row?.name | titlecase}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="team_lead">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row?.team_lead}} <br>
+                                                    {{row?.team_lead_name | titlecase}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="no_of_member">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> No of Member
+                                                </th>
+                                                <td mat-cell *matCellDef="let row"> {{row?.active_emp}} </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="options">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                                                <td mat-cell *matCellDef="let row">
+                                                    <a placement="top" ngbTooltip="Edit" (click)="editTeam(row)">
+                                                        <i class="feather icon-edit icon-xs mr-2"></i></a>
+                                                    <a (click)="deleteTeam(row._id)" placement="top"
+                                                        ngbTooltip="Delete"> <i
+                                                            class="feather icon-trash-2 icon-xs mr-2"></i></a>
+                                                </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true;"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                                        </table>
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-8 col-md-9">
+                        <div [ngbNavOutlet]="verticalNav2" class="tab-content-vertical border p-3"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

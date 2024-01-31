@@ -1,0 +1,150 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Sales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Team Member Sales Report</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Team Member Sales Report</h6>
+                </div>
+                <form class="search-form" (ngSubmit)="onchange()">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Month</label>
+                                <ng-select [items]="monthList" #monthFilter="ngModel" [(ngModel)]="month" name="monthFilter"
+                                    placeholder="Search By Month" bindLabel="name" bindValue="num">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Year</label>
+                                <ng-select [items]="yearList" #yearFilter="ngModel" [(ngModel)]="year" name="yearFilter"
+                                    placeholder="Search By Year">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Team</label>
+                            <ng-select [items]="allTeams" #teamid="ngModel" [(ngModel)]="teamname" name="teamid"
+                                placeholder="Search By Team Name" bindValue="_id">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.name}} - {{item.team_lead}} -
+                                        {{item.team_lead_name}}</span>
+                                </ng-template>
+                
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="employeeid" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.employeeid}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="employeename">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.employeename}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="year">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>year</th>
+                            <td mat-cell *matCellDef="let row">{{ row.year }}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="month">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Month </th>
+                            <td mat-cell *matCellDef="let row"> {{row.month}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="teamname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>teamname</th>
+                            <td mat-cell *matCellDef="let row">{{ row.teamname }}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="teamlead">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>team lead</th>
+                            <td mat-cell *matCellDef="let row">{{ row.teamlead }}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="teamleadname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>team lead name</th>
+                            <td mat-cell *matCellDef="let row">{{ row.teamleadname }}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+
+                        <ng-container matColumnDef="bookedamount" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Booked Amount (Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bookedamount | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalbookedamount | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paymentreceived">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Net Payment Received </th>
+                            <td mat-cell *matCellDef="let row"> {{row.paymentreceived | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalpaymentreceived | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gst">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>GST </th>
+                            <td mat-cell *matCellDef="let row"> {{row.gst | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalgst | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due (Incl. GST) </th>
+                            <td mat-cell *matCellDef="let row"> {{row.due | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totaldue | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

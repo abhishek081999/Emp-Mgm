@@ -1,0 +1,132 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Mobile App</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Login History</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Login History</h6>
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Student ID*</label>
+                            <ng-select [items]="allstudents" required placeholder="Search by Student ID"
+                                #studentid="ngModel" [(ngModel)]="student" (change)="filter()" name="studentid"
+                                bindValue="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item?.invid}} - {{item?.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item?.invid}} - {{item?.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Device type</label>
+                            <ng-select [items]="deviceType" placeholder="Select Device type" #devicetype="ngModel"
+                                [(ngModel)]="DeviceTypes" (change)="filter()" name="Device Type">
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                    <div class="col-sm-2 m">
+                        <button type="button" class="btn btn-outline-danger btn-block" (click)="LogouAll()">
+                            Logout All User
+                        </button>
+
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Devices Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="is_logged_in" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Logged IN?
+                            </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.is_logged_in?'green':'red'
+                                }"> {{row.is_logged_in?'Yes':'No'}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="logged_in_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Log in Time
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.logged_in_time| date:
+                                'medium'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="logged_out_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Log Out Time
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.logged_out_time | date:
+                                'medium'}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="Total_login_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Time Spend
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{getLoginHours(row.logged_in_time,row.logged_out_time)}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="user_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.user_name}} - {{row.user_invid}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="device_id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Device ID
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.device_id}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="device_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Device Name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.device_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="device_type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Device Type
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.device_type}} </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,119 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insignia</a></li>
+        <li class="breadcrumb-item active" aria-current="page"> MONTH WISE SUMMARY REPORT BCMB TO INSIGNIA CONVERSION</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title"> MONTH WISE SUMMARY REPORT BCMB TO INSIGNIA CONVERSION </h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Year</label>
+                                <ng-select [items]="yearList" #yearFilter="ngModel" [(ngModel)]="year"
+                                    name="yearFilter" placeholder="Search By Year">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="month">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Month </th>
+                            <td mat-cell *matCellDef="let row"> {{row.month}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_active_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> BCMB Active Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_active_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_active_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_inactive_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> BCMB Inactive Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_inactive_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_inactive_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total BCMB Count</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Opted For <br> Insignia</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_opted}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_opted_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Opted <br> for Insignia</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_opted_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_opted_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="advance_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Opted for <br> Advance Course </th>
+                            <td mat-cell *matCellDef="let row"> {{row.advance_opted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_advance_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="advance_opted_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Opted for <br>Advance Course </th>
+                            <td mat-cell *matCellDef="let row"> {{row.advance_opted_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_advance_opted_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_opted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Opted for <br> Product </th>
+                            <td mat-cell *matCellDef="let row"> {{row.product_opted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_product_opted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_opted_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>% of Opted for <br> Product </th>
+                            <td mat-cell *matCellDef="let row"> {{row.product_opted_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_product_opted_conv | percent}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

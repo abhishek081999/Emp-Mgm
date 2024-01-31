@@ -1,0 +1,123 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Question Sets</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+      <h4 class="mb-3 mb-md-0">Question Sets</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input 
+                class="form-control wd-md-200 border-0 rounded-sm" 
+                name="search"  
+                #search="ngModel" 
+                [(ngModel)]="searchq" 
+                type="text" 
+                placeholder="Search..."
+                (keyup)="filter()">
+        </div>
+       
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select 
+                name="orderby" 
+                #statusfilter="ngModel" 
+                [(ngModel)]="pagefilter" 
+                class="form-control wd-md-200 border-0 rounded-sm" 
+                (change)="filter()">
+                    <option value="">Any status</option>
+                    <option value="approved">Approved</option>
+                    <option value="Pending">Pending</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li *ngFor="let q of alllistfinal  | slice: (currentPage-1) * pageSize : currentPage * pageSize;">
+						<div class="col-md-12">
+                            <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h5>{{q.quizname  | titlecase}} 
+                                                <span *ngIf="q.approved" class="badge badge-pill badge-success mr-1">Approved</span>
+                                                <span *ngIf="!q.approved" class="badge badge-pill badge-warning mr-1">Pending</span>
+                                                <span class="badge badge-pill badge-success mr-1">{{q.type==='evaluationtest'?'Evaluation Test':'Quiz Game'}}</span>
+                                            </h5>
+                                            <ul class="list-unstyled">
+                                                <li><strong>Duration: </strong> {{q.time}} Min</li>
+                                                <li><strong>Question Code: </strong> {{q.quizid}}</li>
+                                                <li [routerLink]="['/admin/instructor/instructor-list', q.teacherid]" ><strong>Submitted By: </strong><a>{{q.teachername}}</a></li>
+                                                <li><strong>Total Marks: </strong> {{q.totalmarks}}</li>
+                                                <li><strong>Passing Marks: </strong> {{q.passingmarks}}</li>
+                                                <li><strong>Number of Attempts: </strong> {{q.numberofattempt}}</li>
+                                                <li *ngIf="q.type==='evaluationtest'">
+                                                    <strong>Url: </strong>
+                                                    <span class="cursor-pointer" placement="top" ngbTooltip="Click to Copy Link" (click)="copied()" ngxClipboard [cbContent]="gettext('https://invesmate.com/examportal/instruction?q=',q._id)">
+                                                        https://invesmate.com/examportal/instruction?q={{q._id}}
+                                                    </span>
+                                                </li>
+                                                <li *ngIf="q.type!=='evaluationtest'">
+                                                    <strong>Url: </strong>
+                                                    <span class="cursor-pointer" placement="top" ngbTooltip="Click to Copy Link" (click)="copied()" ngxClipboard [cbContent]="gettext('https://invesmate.com/contest/instruction?q=',q._id)">
+                                                        https://invesmate.com/contest/instruction?q={{q._id}}
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ngbDropdown class="dropdown">
+                                    <button type="button" id="jobdropdown" ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="Settings" class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                                        <button (click)="editQuestion(q)" ngbDropdownItem><i class="feather icon-edit-2 icon-xs mr-2"></i> Edit Question</button>
+                                        <button (click)="duplicateQuestion(q)" ngbDropdownItem><i class="feather icon-copy icon-xs mr-2"></i> Duplicate Question</button>
+                                        <button *ngIf="!q.approved" (click)="onApprove(q)" ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i> Approve Question</button>
+                                        <button (click)="onDelete(q)"  ngbDropdownItem><i class="feather icon-trash-2 icon-xs mr-2"></i> Delete Question</button>
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+                        <hr>
+					</li>
+				</ul>
+                <ngb-pagination 
+                    class="d-flex justify-content-end pagination-rounded" 
+                    [collectionSize]="totalSize" 
+                    [(page)]="currentPage"
+                    [pageSize]="pageSize"
+                    [maxSize]="5"
+                    [rotate]="true" 
+                    [boundaryLinks]="true"
+                    (pageChange)="pagechange()"
+                    >
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

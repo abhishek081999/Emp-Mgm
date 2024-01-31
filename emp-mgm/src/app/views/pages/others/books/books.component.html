@@ -1,0 +1,70 @@
+<nav class="page-breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a routerLink=".">Others</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Books</li>
+	</ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+			<div class="card-body">
+				<h6 class="card-title">Add Books</h6>
+				<form #bookForm="ngForm" (ngSubmit)="bookForm.valid && submit(bookForm)" class="forms-sample">
+					<div class="form-group">
+						<label for="url">Url*</label>
+						<input 
+						type="text" 
+						class="form-control" 
+						id="url" 
+						autocomplete="off" 
+						placeholder="URL"
+						#url="ngModel" 
+						[(ngModel)]="books.url" 
+						name="url"
+						required>
+						<p class="text-danger mt-1" *ngIf="url?.errors?.required && (bookForm.dirty || bookForm.touched)">This field is required.</p>
+					</div>
+					<button type="submit" class="btn btn-primary mr-2">Submit</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+			<div class="card-body">
+				<h6 class="card-title">All Books</h6>
+				<ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isbookavailable">
+					No Books Found. Add Some New Books.
+				</ngb-alert>
+				<div class="row">
+					<div class="col-md-3" *ngFor="let b of allbooks | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+						<div [innerHTML]="b.url"></div>
+						<br>
+						<h4>
+							<span *ngIf="b?.approved" class="badge badge-success">Approved</span>
+							<span *ngIf="!b?.approved" class="badge badge-warning">Pending</span>  
+						</h4>
+						<br>
+						<button *ngIf="!b?.approved" (click)="onApprove(b._id)" style="cursor: pointer; margin-right: 10px;" class="btn btn-primary">Approve</button>
+						<button (click)="onDelete(b._id)" style="cursor: pointer;" class="btn btn-danger">Delete</button>
+					</div>
+				</div>
+				<ngb-pagination 
+                    class="d-flex justify-content-end pagination-rounded" 
+                    [collectionSize]="totalSize" 
+                    [(page)]="currentPage"
+                    [pageSize]="pageSize"
+                    [maxSize]="5"
+                    [rotate]="true" 
+                    [boundaryLinks]="true"
+                    >
+                </ngb-pagination>
+			</div>
+		</div>
+	</div>
+</div>
+

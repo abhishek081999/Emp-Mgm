@@ -1,0 +1,853 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin/products">Products</a></li>
+        <li class="breadcrumb-item"><a routerLink="/admin/products/follow-my-portfolio">Follow My Portfolio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{myPortfolio?.portfolio_name | titlecase}}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex">
+                    <h4>{{myPortfolio?.portfolio_name | titlecase}}</h4>
+                    <h5 class="ml-2">
+                        <span class="badge badge-outlineprimary badge-pill mr-2">{{myPortfolio?.category}}</span>
+                        <span class="badge badge-outlineprimary badge-pill mr-2">{{myPortfolio?.risk}}</span>
+                    </h5>
+                </div>
+                <div class="row mb-3 follow-my-portfolio">
+                    <div class="col-md-12">
+                        <quill-view-html class="tx-14" [content]="myPortfolio?.about" theme="snow">
+                        </quill-view-html>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-success m-2" (click)="Buynow(modal)">Buy</button>
+                            <button type="button" class="btn btn-danger m-2" (click)="Sellnow(modal)">Sell</button>
+                            <button type="button" class="btn btn-info m-2" (click)="editportfolio(myPortfolio)">
+                                Edit My Portfolio</button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap ">
+                            <div>
+                                <h3>{{myPortfolio?.portfolio_return}} <span class="text-small">Unrealised Return</span>
+                                </h3>
+                                <p class="ml-2">
+                                    <span *ngIf="myPortfolio?.is_day_change_profit"
+                                        class="text-success font-weight-bold">+{{myPortfolio?.day_change}}</span>
+                                    <span *ngIf="!myPortfolio?.is_day_change_profit"
+                                        class="text-danger font-weight-bold">{{myPortfolio?.day_change}}</span>
+                                    1D
+                                </p>
+                            </div>
+                            <div>
+                                <h3>{{myPortfolio?.realised_return}} <span class="text-small">Realised Return</span>
+                                </h3>
+                            </div>
+                            <div>
+                                <h3>{{myPortfolio?.total_return}} <span class="text-small">Total Return</span></h3>
+                            </div>
+                            <mat-button-toggle-group [(ngModel)]="graphDuration" (change)="refreshGraph()"
+                                aria-label="Duration">
+                                <mat-button-toggle value="1m">1M</mat-button-toggle>
+                                <mat-button-toggle value="6m">6M</mat-button-toggle>
+                                <mat-button-toggle value="1y">1Y</mat-button-toggle>
+                                <mat-button-toggle value="3y">3Y</mat-button-toggle>
+                                <mat-button-toggle value="5y">5Y</mat-button-toggle>
+                                <mat-button-toggle value="all">MAX</mat-button-toggle>
+                            </mat-button-toggle-group>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <apx-chart [series]="lineChartOptions.series" [colors]="lineChartOptions.colors"
+                            [grid]="lineChartOptions.grid" [chart]="lineChartOptions.chart"
+                            [xaxis]="lineChartOptions.xaxis" [markers]="lineChartOptions.markers"
+                            [stroke]="lineChartOptions.stroke" [legend]="lineChartOptions.legend"
+                            [tooltip]="lineChartOptions.tooltip" [yaxis]="lineChartOptions.yaxis"></apx-chart>
+                    </div>
+                </div>
+
+                <ul ngbNav #followmyportfolioNav="ngbNav" class="nav-tabs nav-fill" (activeIdChange)="onTabChange()">
+
+                    <!-- -------------- My Portfolio Stock List ------------- -->
+
+                    <li [ngbNavItem]="1">
+                        <a ngbNavLink>Portfolio Holdings </a>
+                        <ng-template ngbNavContent>
+                            <div class="row mb-3">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        (click)="export()">Export</button>
+                                </div>
+                            </div>
+                            <div *ngIf="isLoading" class="spinner-wrapper">
+                                <div class="spinner">Loading...</div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSource" matSort #sortUS="matSort">
+                                    <ng-container matColumnDef="sn" sticky>
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> SN. </th>
+                                        <td mat-cell *matCellDef="let row; let i = index;">{{i+1}}</td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="stock_name" sticky>
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Stock </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.stock_name}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="market_cap">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Market Cap </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.market_cap}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="sector">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Sector </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.sector}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="last_added_date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Added
+                                            Date </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.last_added_date |
+                                            date:'mediumDate'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="last_added_price">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Added
+                                            Price </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.last_added_price |
+                                            currency:'INR'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="average_price">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Average Price
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.average_price |
+                                            currency:'INR'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="quantity">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Qty.
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.quantity}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="cmp">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> CMP </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.cmp | currency:'INR'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="weight">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Weight(%)
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.weight}}%
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="stock_return">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Return(%)
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <span [style.color]="row.is_profit ? 'green' : 'red'">
+                                                {{row.stock_return}}%
+                                            </span>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="amount_invested">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount
+                                            Invested </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.amount_invested |
+                                            currency:'INR'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="invested_amount">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Value as <br> on Today </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.invested_amount |
+                                            currency:'INR'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="day_change">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Day Change
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <span
+                                                [style.color]="row.is_day_change_profit ? 'green' : 'red'">{{row.day_change}}%</span>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="amount_change">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount Change
+                                            Today
+                                        </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <span
+                                                [style.color]="row.is_day_change_profit ? 'green' : 'red'">{{row.amount_change
+                                                |
+                                                currency:'INR' }}</span>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true">
+                                    </tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer">
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <mat-paginator #paginatorUS="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+
+                        </ng-template>
+                    </li>
+
+                    <!-- -------------- My Portfolio Holding Buy and Sell ------------- -->
+
+                    <li [ngbNavItem]="2">
+                        <a ngbNavLink>Buy And Selling Stocks</a>
+                        <ng-template ngbNavContent>
+                            <div class="row mb-3">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" (keyup)="applyFilter2($event)"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-primary btn-block"
+                                        (click)="export2()">Export</button>
+                                </div>
+                            </div>
+                            <div *ngIf="isLoading" class="spinner-wrapper">
+                                <div class="spinner">Loading...</div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                    [dataSource]="dataSourceBS" matSort #sortPS="matSort">
+
+                                    <ng-container matColumnDef="sn" sticky>
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> SN. </th>
+                                        <td mat-cell *matCellDef="let row; let i = index;">{{i+1}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="stock" sticky>
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Stock </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.stock}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="market_cap">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Market Cap </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.market_cap}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="sector">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> sector </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.sector}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="exchange">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Exchange
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.exchange}}</td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="date">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Transaction Date </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.date | date:'mediumDate'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="price">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Transaction Price
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.price | currency:'INR'}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="quantity">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Quantity
+                                        </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.quantity}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="is_Buy">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Type </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <span
+                                                [style.color]="row.is_Buy ? 'green' : 'red'">{{row.is_Buy?'Buy':'Sell'}}</span>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="remarks">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Remarks </th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <span [style.color]="row.is_profit ? 'green' : 'red'">{{row.remarks}}</span>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="average_price">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Average Price </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.average_price | currency:'INR'}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="weight">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Weight </th>
+                                        <td mat-cell *matCellDef="let row"> {{row.weight}}% </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="allocation">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header> New Allocation
+                                            /<br>Allocation Reduced</th>
+                                        <td mat-cell *matCellDef="let row"> {{row.allocation}}% </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="id">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                                        <td mat-cell *matCellDef="let row">
+                                            <a (click)="onEdit(row, updateBuySellModal)"> <i
+                                                    class="feather icon-edit icon-xs mr-2"></i></a>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumnsbuysell; sticky: true">
+                                    </tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumnsbuysell;"
+                                        class="cursor-pointer"></tr>
+                                </table>
+                            </div>
+                            <mat-paginator #paginatorPS="matPaginator" [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+                        </ng-template>
+                    </li>
+
+                    <!-- -------------- My Portfolio Update ------------- -->
+
+                    <li [ngbNavItem]="3">
+                        <a ngbNavLink>Updates</a>
+
+                        <ng-template ngbNavContent>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary m-2"
+                                    (click)="updatemyportfolio(modalupdate)"> Post New Update</button>
+                            </div>
+
+                            <div *ngIf="isLoading" class="spinner-wrapper">
+                                <div class="spinner">Loading...</div>
+                            </div>
+                            <div class="row profile-body">
+                                <!-- left wrapper start -->
+                                <div class="d-none d-md-block col-md-4 col-xl-4 left-wrapper">
+                                    <div class="card rounded">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <h6 class="card-title mb-0">Filter</h6>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Status</label>
+                                                        <ng-select [items]="['All','Approved','Pending']"
+                                                            [searchable]="true" placeholder="Select Status"
+                                                            #statusf="ngModel" [(ngModel)]="statusFilter" name="statusf"
+                                                            (change)="filter3()">
+                                                        </ng-select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Type</label>
+                                                        <ng-select [items]="Type" #type="ngModel"
+                                                            [(ngModel)]="typeFilter" (change)="filter3()" name="type"
+                                                            placeholder="Type">
+                                                        </ng-select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Language</label>
+                                                        <ng-select [items]="languages" [searchable]="true"
+                                                            placeholder="Select Language" #language="ngModel"
+                                                            [(ngModel)]="languageFilter" name="language"
+                                                            (change)="filter3()">
+                                                        </ng-select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- left wrapper end -->
+                                <!-- middle wrapper start -->
+                                <div class="col-md-8 col-xl-8 middle-wrapper">
+                                    <div class="row">
+                                        <div class="col-md-12 grid-margin"
+                                            *ngFor="let item of filteredData3 | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                                            <div class="card rounded">
+                                                <div class="card-header">
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="ml-2">
+                                                                <p>
+                                                                    <span
+                                                                        class="badge badge-pill badge-success ml-2 mr-1">{{item.language}}</span>
+                                                                    <span
+                                                                        class="badge badge-pill badge-success ml-2 mr-1">{{item.created_date
+                                                                        | date:'mediumDate'}}</span>
+                                                                    <span *ngIf="item.isEdited"
+                                                                        class="badge badge-pill badge-secondary ml-2 mr-1">Edited</span>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <button *ngIf="!item.approved"
+                                                                (click)="Approveupdate(item._id)"
+                                                                class="btn btn-success mr-2">Approve</button>
+                                                            <button *ngIf="!item.approved"
+                                                                (click)="Deleteupdate(item._id)"
+                                                                class="btn btn-danger mr-2">Delete</button>
+                                                            <button (click)="editmyportfolioupdate(item, modalupdate)"
+                                                                class="btn btn-info">Edit</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <img *ngIf="item.image" class="img-fluid mb-3" [src]="item.image"
+                                                        style="padding: 12px;" [alt]="item.details">
+                                                    <iframe *ngIf="item.video" style="padding: 12px;"
+                                                        class="vooplayer wd-100p ivideo" allowtransparency="true"
+                                                        allowfullscreen="true" [src]="getUrl(item.video) | urlsanitize"
+                                                        frameborder="0" scrolling="no">
+                                                    </iframe>
+                                                    <quill-view-html class="tx-14" [content]="item.details"
+                                                        theme="snow">
+                                                    </quill-view-html>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- middle wrapper end -->
+                            </div>
+                            <ngb-pagination class="d-flex justify-content-end pagination-rounded"
+                                [collectionSize]="totalSize3" [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5"
+                                [rotate]="true" [boundaryLinks]="true" (pageChange)="pagechange3()">
+                            </ngb-pagination>
+                        </ng-template>
+                    </li>
+
+                </ul>
+                <div [ngbNavOutlet]="followmyportfolioNav" class="border border-top-0 p-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Model Buy Holding -->
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #buySellForm="ngForm" style="height: 300px;">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="exchange">Exchange*</label>
+                        <select class="form-control" name="exchange" #exchange="ngModel"
+                            [(ngModel)]="followMyPortfolioStocks.exchange" (change)="exchangeSelect()" required>
+                            <option value="">Select an option</option>
+                            <option value="NSE">NSE</option>
+                            <option value="BSE">BSE</option>
+                        </select>
+                        <p *ngIf="exchange?.errors?.required && (exchange.dirty || exchange.touched)"
+                            class="text-danger">
+                            This field is required
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="stock" class="form-label">Stock*</label>
+                        <ng-select [items]="allStockAvailable" [searchFn]="SearchFn" bindValue="ISIN" bindLabel="name"
+                            [searchable]="true" [minTermLength]="3" typeToSearchText="Please enter 3 or more characters"
+                            placeholder="Stock Name" required name="stock_name" #stock_name="ngModel"
+                            dropdownPosition="bottom" [(ngModel)]="followMyPortfolioStocks.ISIN">
+                            <!-- <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.exchange}} : {{item.exchange}}</span>
+                                    </ng-template> -->
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.exchange}} - {{item.name}} - {{item.tradingsymbol}}
+                            </ng-template>
+                        </ng-select>
+                        <p *ngIf="stock_name?.errors?.required && (stock_name.dirty || stock_name.touched )"
+                            class="text-danger">
+                            Stock Name is required
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" #date="ngModel" [(ngModel)]="followMyPortfolioStocks.date" name="date"
+                            class="form-control" required>
+
+                        <p class="text-danger mt-1" *ngIf="date?.errors?.required && (date.dirty || date.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Price</label>
+                        <input type="number" placeholder="Price" required name="price"
+                            [(ngModel)]="followMyPortfolioStocks.price" class="form-control" #price="ngModel">
+                        <p class="text-danger mt-1" *ngIf="price?.errors?.required && (price.dirty || price.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+
+                <!-- <div class="col-md-4">
+                            <div class="form-group">
+                                <label> Remarks</label>
+                                <input type="text" placeholder="Remarks" name="remarks"
+                                    [(ngModel)]="followMyPortfolioStocks.remarks" class="form-control">
+                            </div>
+                        </div> -->
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Quantity</label>
+                        <input type="number" placeholder="Quantity" name="quantity" #quantity="ngModel"
+                            [(ngModel)]="followMyPortfolioStocks.quantity" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="quantity?.errors?.required && (quantity.dirty || quantity.touched)">
+                            This field is required.</p>
+                    </div>
+
+                </div>
+                <div class="alert alert-info">
+                    Please Add/Edit Holdings Entry Between 7:20PM - 11:45PM to calculate the data automatically.
+                    As our Stock Market EOD Data Sync Between 7PM - 7:15PM and Graph value calculated at 11:59PM daily.
+                    Please do not add/modify any previous day holdings.
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+        <button type="button" class="btn btn-primary" [disabled]="!buySellForm.valid"
+            (click)="modal.close('Save')">Submit</button>
+    </div>
+</ng-template>
+
+<ng-template #updateBuySellModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #buySellForm="ngForm" style="height: 300px;">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="exchange">Exchange*</label>
+                        <select class="form-control" name="exchange" #exchange="ngModel"
+                            [(ngModel)]="updateFMPholding.exchange" (change)="exchangeSelect()" required>
+                            <option value="">Select an option</option>
+                            <option value="NSE">NSE</option>
+                            <option value="BSE">BSE</option>
+                        </select>
+                        <p *ngIf="exchange?.errors?.required && (exchange.dirty || exchange.touched)"
+                            class="text-danger">
+                            This field is required
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="stock" class="form-label">Stock*</label>
+                        <ng-select [items]="allStockAvailable1" [searchFn]="SearchFn" bindValue="ISIN" bindLabel="name"
+                            [searchable]="true" [minTermLength]="3" typeToSearchText="Please enter 3 or more characters"
+                            placeholder="Stock Name" required name="stock_name" #stock_name="ngModel"
+                            dropdownPosition="bottom" [(ngModel)]="updateFMPholding.ISIN">
+                            <!-- <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.exchange}} : {{item.exchange}}</span>
+                                    </ng-template> -->
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.exchange}} - {{item.name}} - {{item.tradingsymbol}}
+                            </ng-template>
+                        </ng-select>
+                        <p *ngIf="stock_name?.errors?.required && (stock_name.dirty || stock_name.touched )"
+                            class="text-danger">
+                            Stock Name is required
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date*</label>
+                        <input type="date" #date="ngModel" [(ngModel)]="updateFMPholding.date" name="date"
+                            class="form-control" required>
+
+                        <p class="text-danger mt-1" *ngIf="date?.errors?.required && (date.dirty || date.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Buy/Sell*</label>
+                        <select class="form-control" #is_Buy="ngModel" [(ngModel)]="updateFMPholding.is_Buy"
+                            name="is_Buy" required>
+                            <option [ngValue]="true">Buy</option>
+                            <option [ngValue]="false">Sell</option>
+                        </select>
+
+                        <p class="text-danger mt-1"
+                            *ngIf="is_Buy?.errors?.required && (is_Buy.dirty || is_Buy.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Price*</label>
+                        <input type="number" placeholder="Price" required name="price"
+                            [(ngModel)]="updateFMPholding.price" class="form-control" #price="ngModel">
+                        <p class="text-danger mt-1" *ngIf="price?.errors?.required && (price.dirty || price.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Remarks*</label>
+                        <input type="text" placeholder="Remarks" required name="remarks" #remarks="ngModel"
+                            [(ngModel)]="updateFMPholding.remarks" class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="remarks?.errors?.required && (remarks.dirty || remarks.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Quantity*</label>
+                        <input type="number" placeholder="Quantity" name="quantity" #quantity="ngModel"
+                            [(ngModel)]="updateFMPholding.quantity" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="quantity?.errors?.required && (quantity.dirty || quantity.touched)">
+                            This field is required.</p>
+                    </div>
+
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Allocation*</label>
+                        <input type="number" placeholder="Allocation" name="allocation" #allocation="ngModel"
+                            [(ngModel)]="updateFMPholding.allocation" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="allocation?.errors?.required && (allocation.dirty || allocation.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Average Price*</label>
+                        <input type="number" placeholder="Average Price" name="average_price" #average_price="ngModel"
+                            [(ngModel)]="updateFMPholding.average_price" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="average_price?.errors?.required && (average_price.dirty || average_price.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Weight*</label>
+                        <input type="number" placeholder="Weight" name="weight" #weight="ngModel"
+                            [(ngModel)]="updateFMPholding.weight" required class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="weight?.errors?.required && (weight.dirty || weight.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label> Invested Amount*</label>
+                        <input type="number" placeholder="Invested Amount" name="invested_amount"
+                            #invested_amount="ngModel" [(ngModel)]="updateFMPholding.invested_amount" required
+                            class="form-control">
+                        <p class="text-danger mt-1"
+                            *ngIf="invested_amount?.errors?.required && (invested_amount.dirty || invested_amount.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Profit/Loss/Buying*</label>
+                        <select class="form-control" #is_profit="ngModel" [(ngModel)]="updateFMPholding.is_profit"
+                            name="is_profit" required>
+                            <option [ngValue]="true">Profit/Buying Alert</option>
+                            <option [ngValue]="false">Loss</option>
+                        </select>
+
+                        <p class="text-danger mt-1"
+                            *ngIf="is_profit?.errors?.required && (is_profit.dirty || is_profit.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    Please Add/Edit Holdings Entry Between 7:20PM - 11:45PM to calculate the data automatically.
+                    As our Stock Market EOD Data Sync Between 7PM - 7:15PM and Graph value calculated at 11:59PM daily.
+                    Please do not add/modify any previous day holdings.
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+        <button type="button" class="btn btn-primary" [disabled]="!buySellForm.valid"
+            (click)="modal.close('Save')">Submit</button>
+    </div>
+</ng-template>
+
+<!--------  Model Updated ------ -->
+
+<ng-template #modalupdate let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Portfolio Updates</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #followmyportfolioupdateForm="ngForm"
+            (ngSubmit)="followmyportfolioupdateForm.valid && myportfolioupdate($event)">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div *ngIf=" followmyportfolioupdate.type == 'text'" class="col-md-12">
+                            <div class="form-group">
+                                <label>
+                                    Details*
+                                </label>
+                                <quill-editor [(ngModel)]="followmyportfolioupdate.details" #details="ngModel"
+                                    name="description" placeholder="Enter Description" [styles]="{height:'216px'}"
+                                    [modules]="quillConfig" [required]="true"
+                                    (onSelectionChanged)="onSelectionChanged($event)">
+                                </quill-editor>
+                                <p class="text-danger mt-1"
+                                    *ngIf="details?.errors?.required && (details.dirty || details.touched || followmyportfolioupdateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div *ngIf="followmyportfolioupdate.type == 'video' || followmyportfolioupdate.type == 'image' || followmyportfolioupdate.type == '' "
+                            class="col-md-12">
+                            <div class="form-group">
+                                <label>
+                                    Details
+                                </label>
+                                <quill-editor [(ngModel)]="followmyportfolioupdate.details" #details1="ngModel"
+                                    name="description1" placeholder="Enter Description" [styles]="{height:'216px'}"
+                                    [modules]="quillConfig" (onSelectionChanged)="onSelectionChanged($event)">
+                                </quill-editor>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Type*</label>
+                                <ng-select [items]="Type" #type="ngModel" [(ngModel)]="followmyportfolioupdate.type"
+                                    name="type" placeholder="Type">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="type?.errors?.required && (type.dirty || type.touched || followmyportfolioupdateForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Language*</label>
+                                <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                    #language="ngModel" [(ngModel)]="followmyportfolioupdate.language" name="language"
+                                    required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="language?.errors?.required && (followmyportfolioupdateForm.submitted || language.dirty || language.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div *ngIf="followmyportfolioupdate.type == 'image'" class="col-md-12">
+
+                            <div class="form-group">
+                                <label>Upload Image*</label>
+                                <input id="img" type="file" accept="picture/*" name="picture"
+                                    (change)="handelFileInput3($event)" class="file-upload-default" required>
+                                <div class="input-group col-xs-12" (click)="openFileBrowser3($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload Image">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+
+                            </div>
+                            <!-- <div class="form-group">
+                                                        <label>Image*</label>
+                                                        <input type="file" class="form-control" #image="ngModel" (ngModel)="filesToUpload1" accept="image/*" (change)="handelFileInput3($event)"name="image" placeholder="file">
+                                                        <p class="text-danger mt-1"
+                                                            *ngIf="followmyportfolioupdateForm.submitted && !followmyportfolioupdate.image">
+                                                            This field is required.</p>
+                                                    </div> -->
+                        </div>
+
+                        <div *ngIf="followmyportfolioupdate.type == 'video'" class="col-md-12">
+                            <div class="form-group">
+                                <label>Video link*<a placement="top" ngbTooltip="Embed url"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #video="ngModel"
+                                    [(ngModel)]="followmyportfolioupdate.video_link" name="video"
+                                    placeholder="Video link">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <span class="d-flex justify-content-end">
+                <button class="btn btn-primary mr-2">Submit</button>
+            </span>
+
+        </form>
+    </div>
+
+</ng-template>

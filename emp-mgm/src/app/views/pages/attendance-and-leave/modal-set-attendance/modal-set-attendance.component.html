@@ -1,0 +1,36 @@
+<div class="modal-header">
+    <h4 class="modal-title">Attendance</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.close()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" style="height: 300px;">
+
+    <form #attendanceForm="ngForm">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label>Set your Attendance*</label>
+                <ng-select [items]="attendanceType" #Attendance="ngModel" [(ngModel)]="attendance.attendance"
+                    name="state" placeholder="Set your Attendance" required>
+                    <p class="text-danger mt-1"
+                        *ngIf="Attendance?.errors?.required && ( Attendance.dirty || Attendance.touched)">
+                        This field is required.</p>
+                </ng-select>
+
+            </div>
+        </div>
+        <div class="col-md-12">
+            <p *ngIf="ClickedDate">Your Attendance Date set as {{ClickedDate | date: 'mediumDate'}}</p>
+        </div>
+    </form>
+</div>
+<ngb-alert class="mt-2" [dismissible]="false" [type]="'danger'"
+    *ngIf="(attendanceForm.submitted || attendanceForm.dirty || attendanceForm.touched) && attendanceForm.invalid">
+    You Missed Some Fields
+</ngb-alert>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+    <button type="button" [disabled]="attendanceForm.invalid" class="btn btn-primary" (click)="close()">Save
+        changes</button>
+
+</div>

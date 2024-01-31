@@ -1,0 +1,371 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Sales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Sales Projection</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Add Sales Projection</h6>
+                </div>
+                <form #projectionForm="ngForm" (ngSubmit)="projectionForm.valid && submitForm(projectionForm)">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Staff ID*</label>
+                                <ng-select [items]="allEmployee" bindValue="invid" #staffids="ngModel" name="staffids"
+                                    [(ngModel)]="Staff_ID" required [disabled]="isedit" [searchFn]="StaffSearchFn"
+                                    placeholder="Search By ID or Name">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="staffids?.errors?.required && (staffids.dirty || staffids.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Month*</label>
+                                <ng-select [items]="months" #monthf="ngModel" name="monthf" [(ngModel)]="Month" required
+                                    [disabled]="isedit" (change)="refreshCourse()">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="monthf?.errors?.required && (monthf.dirty || monthf.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Year*</label>
+                                <ng-select [items]="years" #yearf="ngModel" name="yearf" [(ngModel)]="Year" required
+                                    [disabled]="isedit" (change)="refreshCourse()">
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="yearf?.errors?.required && (yearf.dirty || yearf.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngFor="let p of newProjectionLists; let i=index"
+                        [ngClass]="{'slot-error':errorList[i]}">
+                        <div class="col-md-12 mb-2">
+                            <h5>
+                                <span class="text-uppercase badge badge-success mr-2">{{p.ServiceName}}</span>
+                                <span class="text-uppercase badge badge-success mr-2">{{p.ServiceCode}}</span>
+                                <span class="text-uppercase badge badge-success mr-2">{{p.Instructors}}</span>
+                                <span class="text-uppercase badge badge-success mr-2">{{p.Start_Day |
+                                    date:'mediumDate'}}</span>
+                            </h5>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Fees(Incl GST)*</label>
+                                <input type="number" class="form-control" #fees="ngModel" [(ngModel)]="p.Fees"
+                                    name="fees-{{i}}" required (change)="bookedAmountCalc(p)" placeholder="Base Fees">
+                                <p class="text-danger mt-1"
+                                    *ngIf="fees?.errors?.required && (fees.dirty || fees.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Count*</label>
+                                <input type="number" class="form-control" #count="ngModel" [(ngModel)]="p.Counts"
+                                    name="count-{{i}}" required (change)="bookedAmountCalc(p)" placeholder="Count">
+                                <p class="text-danger mt-1"
+                                    *ngIf="count?.errors?.required && (count.dirty || count.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Booked Amount(Incl GST)*</label>
+                                <input type="number" class="form-control" #booked="ngModel" [(ngModel)]="p.Booked_Rev"
+                                    readonly name="booked-{{i}}" required placeholder="Booked Amount (Incl GST)">
+                                <p class="text-danger mt-1"
+                                    *ngIf="booked?.errors?.required && (booked.dirty || booked.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Payment Received(Incl GST)*</label>
+                                <input type="number" class="form-control" #received="ngModel"
+                                    [(ngModel)]="p.Payment_Recv" name="received-{{i}}" required
+                                    placeholder="Payment Received (Incl GST)">
+                                <p *ngIf="p?.Payment_Recv">Net Amount: {{getNetAmount(p.Payment_Recv) | currency:'INR'}}
+                                </p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="received?.errors?.required && (received.dirty || received.touched || projectionForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-1 mt-4">
+                            <a *ngIf="!isedit" (click)="removeService(i)"><i class="small-icon"
+                                    data-feather="minus-circle" appFeatherIcon></i></a>
+                        </div>
+                    </div>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddBasicCourseLive && !isedit"
+                        (click)="addBasicCoursesLive()">+ Basic Live
+                        Courses</a>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddAdvanceCourseLive && !isedit"
+                        (click)="addAdvanceCoursesLive()">+ Advance Live
+                        Courses</a>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddCourseRecorded && !isedit"
+                        (click)="addCoursesRecorded()">+ Rec Courses</a>
+                    <!-- <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddMarketResearch && !isedit"
+                        (click)="addMarketResearch()">+
+                        Market Research</a>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddProduct && !isedit"
+                        (click)="addProduct()">+
+                        Other
+                        Products</a> -->
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddInvesmentor && !isedit"
+                        (click)="addInvesmentor()">+
+                        Invesmentor</a>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddInsignia && !isedit"
+                        (click)="addInsignia()">+
+                        Insignias</a>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddPendingPayment && !isedit"
+                        (click)="addPendingPayment()">+
+                        Pending Payment</a>
+                    <a class="btn btn-outline-primary mr-2 mt-2" *ngIf="!isAddOthers && !isedit" (click)="addOthers()">+
+                        Others</a>
+                    <br><br>
+                    <button class="btn btn-primary mr-2 mt-2">Submit</button>
+                    <a class="btn btn-danger mt-2" *ngIf="isedit" (click)="cancelEdit(projectionForm)">Cancel</a>
+                    <div class="alert alert-danger mt-2" *ngIf="errMsg">
+                        {{errMsg}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Sales Projection Commitment</h6>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Staff ID</label>
+                            <ng-select [items]="allEmployee" bindValue="invid" #fstaffids="ngModel" name="fstaffids"
+                                [(ngModel)]="selectStaff" [searchFn]="StaffSearchFn" placeholder="Search By ID or Name">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Month</label>
+                            <select class="form-control" #fmonth="ngModel" [(ngModel)]="selectMonth" name="fmonth">
+                                <option value="" selected>Select Month</option>
+                                <option *ngFor="let m of months" [value]="m">{{m}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Year</label>
+                            <select class="form-control" #fyear="ngModel" [(ngModel)]="selectYear" name="fyear">
+                                <option value="" selected>Select year</option>
+                                <option *ngFor="let m of years" [value]="m">{{m}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select #filter="ngModel" [(ngModel)]="selectStatus">
+                                <option value="">All</option>
+                                <option value="approved">Approved</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Language</label>
+                            <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                #leadtatlang="ngModel" [(ngModel)]="Lang" name="leadtatlang" (change)="onChange()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Level</label>
+                            <ng-select [items]="LeadLevelDrop" [searchable]="true" placeholder="Select Level"
+                                #tatlevel="ngModel" [(ngModel)]="Level" name="tatlevel" (change)="onChange()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">
+                                        {{item.name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Team</label>
+                            <ng-select [items]="allTeams" bindValue="_id" #teamid="ngModel" [(ngModel)]="teamFilter"
+                                name="teamid" placeholder="Search By Team Name">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.name}} - {{item.team_lead}} -
+                                        {{item.team_lead_name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary btn-block mt-4" (click)="refresh()">Search</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="row my-2">
+                    <div class="col-sm-3" *ngIf="selection.hasValue()">
+                        <button type="button" class="btn btn-success btn-block" (click)="onApprove()">Approve</button>
+                    </div>
+                    <div class="col-sm-3" *ngIf="selection.hasValue()">
+                        <button type="button" class="btn btn-danger btn-block" (click)="onDelete()">Delete</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="select" sticky>
+                            <th mat-header-cell cdkDrag *matHeaderCellDef>
+                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    [checked]="selection.hasValue() && isEntirePageSelected()"
+                                    [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row,i)">
+                                </mat-checkbox>
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Staff_ID">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Staff_ID}} <br> {{getName(row.Staff_ID)}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Month">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Month </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Month}} - {{row.Year}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="ServiceName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Service Name</th>
+                            <td mat-cell *matCellDef="let row"> {{row.ServiceCode}} <br> {{row.ServiceName}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Fees">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fees</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Fees | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Counts">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Counts </th>
+                            <td mat-cell *matCellDef="let row"> {{row.Counts}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalCommit_Counts | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Booked_Rev">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Booked Revenue(Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Booked_Rev | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalCommit_Booked_Rev | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Payment_Recv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment Received(Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.Payment_Recv | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalCommit_Payment_Recv | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Net_Payment_Recv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Net Payment Received</th>
+                            <td mat-cell *matCellDef="let row"> {{getNetAmount(row.Payment_Recv) | currency:'INR'}}
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getNetAmount(totalCommit_Payment_Recv) |
+                                currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="Admin_Approved">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Approved By Admin</th>
+                            <td mat-cell *matCellDef="let row" [style.color]="row.Admin_Approved?'green':'red'">
+                                {{row.Admin_Approved?'Approved':'Pending'}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
+                            <td mat-cell *matCellDef="let row">
+                                <a placement="top" ngbTooltip="Edit Projection" (click)="onEdit(row)"> <i
+                                        class="feather icon-edit icon-xs mr-2"></i></a>
+                            </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

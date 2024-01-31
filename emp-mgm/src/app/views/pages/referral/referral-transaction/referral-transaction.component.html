@@ -1,0 +1,114 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Referral</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Referral Transaction</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Referral Transaction</h6>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <label>Start Date</label>
+                        <input type="date" name="srtrange" #srtrange="ngModel" (change)="filter()"
+                            [(ngModel)]="srtRange" class="form-control">
+                    </div>
+                    <div class="col-sm-2">
+                        <label>End Date</label>
+                        <input type="date" name="torange" #torange="ngModel" (change)="filter()" [(ngModel)]="toRange"
+                            class="form-control">
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Filter by type</label>
+                            <ng-select [items]="filterType" #servicefilter1="ngModel" [(ngModel)]="typefilter"
+                                name="servicefilter" placeholder="Search By Type" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Filter by Student Id
+                            </label>
+                            <ng-select [items]="FilterbyStu" #StudentID="ngModel" [(ngModel)]="stuFilter"
+                                name="StudentID" placeholder="Search By Student Id" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Filter by Transaction Type</label>
+                            <ng-select [items]="filterTxnType" #txnFilter="ngModel" [(ngModel)]="txntypefilter"
+                                name="txnFilter" placeholder="Search By Transaction Type" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" #pag="ngModel" (keyup)="changePage()"
+                            [(ngModel)]="pageSizeOptions" placeholder="Search">
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort >
+
+                        <ng-container matColumnDef="details" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Details </th>
+                            <td mat-cell *matCellDef="let row"> {{row.details}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="txn_type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Transaction Type</th>
+                            <td mat-cell *matCellDef="let row"  [ngStyle]="{
+                                'color':row.txn_type === 'CREDIT'?'green':'red'
+                                }"> {{row.txn_type}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="amount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.txn_type === 'CREDIT'?'green':'red'
+                                }"> {{row.amount}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.date | date: 'mediumDate'}}<br>{{row.date | date: 'shortTime'}}</p>
+                        </ng-container>
+
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                            <td mat-cell *matCellDef="let row"> {{row.type}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="user_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> User Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.user_invid}} <br> {{row.user_name}} </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSize]="pageSizeOptions"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

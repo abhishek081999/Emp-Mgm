@@ -1,0 +1,88 @@
+
+<!-- Model For Follow My Portfolio Added -->
+
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Follow My Portfolio</h5>
+    <button type="button" class="close" (click)="close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form #lessonForm="ngForm" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Portfolio Name*<a placement="top" ngbTooltip="Title"><i class="small-icon" data-feather="help-circle"
+                            appFeatherIcon></i></a></label>
+                <input type="text" class="form-control" #portfolio_name="ngModel"
+                    [(ngModel)]="followmyportfolio.portfolio_name" name=" portfolio_name" required
+                    placeholder=" Portfolio Name">
+    
+    
+                <p class="text-danger mt-1"
+                    *ngIf="portfolio_name?.errors?.required && (lessonForm.submitted || portfolio_name.dirty || portfolio_name.touched)">
+                    This field is required.</p>
+    
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Upload Image*</label>
+                <input id="img" type="file" accept="picture/*" name="picture" (change)="handelFileInput($event)"
+                    class="file-upload-default" required>
+                <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                    <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
+                    <span class="input-group-append">
+                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Risk*</label>
+                <ng-select [items]="Risk" [searchable]="true" placeholder="Select Risk" #risk="ngModel"
+                    [(ngModel)]="followmyportfolio.risk" name="risk" required>
+                </ng-select>
+                <p class="text-danger mt-1" *ngIf="risk?.errors?.required && ( risk.dirty || risk.touched)">
+                    This field is required.</p>
+            </div>
+        </div>
+    
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Category*</label>
+                <ng-select [items]="Category" [searchable]="true" placeholder="Select category" #category="ngModel"
+                    [(ngModel)]="followmyportfolio.category" name="category" required>
+                </ng-select>
+                <p class="text-danger mt-1" *ngIf="category?.errors?.required && ( category.dirty || category.touched)">
+                    This field is required.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Short Description*</label>
+                <textarea rows="3" class="form-control" style="height:60px;" placeholder="" #short_description="ngModel"
+                    [(ngModel)]="followmyportfolio.short_description" name="short_description" required>
+                                    </textarea>
+                <p class="text-danger mt-1"
+                    *ngIf="short_description?.errors?.required && ( short_description.dirty || short_description.touched)">
+                    This field is required.</p>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <label>About*</label>
+            <quill-editor [(ngModel)]="followmyportfolio.about" #about="ngModel" name="about" placeholder="About..."
+                [styles]="{height:'170px'}" [modules]="quillConfig" [required]="true">
+            </quill-editor>
+            <p class="text-danger mt-1" *ngIf="about?.errors?.required && ( about.dirty || about.touched)">
+                This field is required.</p>
+        </div>
+    </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close()">Exit</button>
+    <button [disabled]="!lessonForm.valid" (click)="submitForm()" class="btn btn-primary m-2">Submit</button>
+</div>

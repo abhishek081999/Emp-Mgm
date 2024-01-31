@@ -1,0 +1,138 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Ban Students</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Student Ban</h6>
+                <form #refundForm="ngForm" (ngSubmit)="refundForm.valid && postrefund()">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <ng-select 
+                                    [items]="coursecodes"
+                                    #code="ngModel" 
+                                    [(ngModel)]="coursecode" 
+                                    name="coursecode"
+                                    placeholder="Search By Course Code"
+                                    required>
+                                </ng-select>
+                                <p class="text-danger mt-1" *ngIf="code?.errors?.required && (code.dirty || code.touched || refundForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div *ngIf="isavailable">
+                    <ul class="list-unstyled">
+                        <li>
+                            <mat-checkbox
+                                [checked]="allComplete"
+                                [color]="task.color"
+                                [indeterminate]="someComplete()"
+                                (change)="setAll($event.checked)">
+                                {{task.name}} 
+                            </mat-checkbox>
+                        </li>
+                        <li *ngFor="let subtask of task.subtasks">
+                            <mat-checkbox 
+                            [(ngModel)]="subtask.completed"
+                                [color]="subtask.color"
+                                (ngModelChange)="updateAllComplete()">
+                                {{subtask.name}} 
+                                <span *ngIf="!subtask.completed" class="badge badge-success">Active</span>
+                                <span *ngIf="subtask.completed" class="badge badge-danger">Inactive</span>
+                            </mat-checkbox>
+                        </li>
+                    </ul>
+                    <button (click)="onbanned(refundForm)" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Banned Student List</h6>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+                        
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row.id}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="email">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                            <td mat-cell *matCellDef="let row"> {{row.email}} </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="phone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                            <td mat-cell *matCellDef="let row"> {{row.phone}} </td>
+                        </ng-container>
+                    
+                        <ng-container matColumnDef="coursename">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Name </th>
+                            <td mat-cell *matCellDef="let row" > {{row.coursename}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="coursecode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
+                            <td mat-cell *matCellDef="let row" > {{row.coursecode}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="startdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Start Date </th>
+                            <td mat-cell *matCellDef="let row" > {{row.startdate | date: 'longDate'}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="expiry_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> End Date </th>
+                            <td mat-cell *matCellDef="let row" > {{row.expiry_date | date: 'longDate'}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="products">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Products </th>
+                            <td mat-cell *matCellDef="let row" > {{row.products}} </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="main-wrapper">
+
+    <!-- partial:sidebar -->
+    <app-admin-sidebar></app-admin-sidebar>
+    <!-- partial -->
+  
+    <div class="page-wrapper">
+  
+      <!-- partial:navbar -->
+      <app-admin-navbar></app-admin-navbar>
+      <!-- partial -->
+  
+      <div class="page-content">
+  
+        <!-- Spinner for lazyload modules -->
+        <div *ngIf="isLoading" class="spinner-wrapper">
+          <div class="spinner">Loading...</div>
+        </div>
+  
+        <div contentAnimate *ngIf="!isLoading">
+          <router-outlet></router-outlet>
+        </div>
+  
+      </div>
+  
+      <!-- partial:footer -->
+      <app-footer></app-footer>
+      <!-- partial -->
+  
+    </div>
+  
+  
+  </div>

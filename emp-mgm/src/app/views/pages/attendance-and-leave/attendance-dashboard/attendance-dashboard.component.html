@@ -1,0 +1,44 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Attendance Dashboard</li>
+  </ol>
+</nav>
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+  <div>
+    <h4 class="mb-3 mb-md-0">Attendance Dashboard</h4>
+  </div>
+
+  <div class="d-flex align-items-center flex-wrap text-nowrap mr-5">
+    <button *ngIf="(!checkAttendanceSubmit() && !isMobileDevice)" id="submitButton" type="button" class="btn btn-primary btn-icon-text mb-2 mr-3 mb-md-0"
+      (click)="SubmitAttendance()" [disabled]="checkAttendanceSubmit()">Today's Attendance</button>
+
+    <!-- <p *ngIf="checkAttendanceSubmit()" class="mr-3" style="color: rgb(22, 199, 16); text-align: center;">
+      Today's Attendance already submitted
+    </p> -->
+
+    <button type="button" class="btn btn-success btn-icon-text mb-2 mr-3 mb-md-0"
+      (click)="RegularizeAttendance()">Regularize
+      Attendance</button>
+    <button type="button" class="btn btn-warning btn-icon-text mb-2 mb-md-0" routerLink="/admin/attendance-and-leave/leave-apply">Take
+      a Leave</button>
+  </div>
+</div>
+<div class="container-fluid pt-4">
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">Attendance Calender</h6>
+          <full-calendar defaultView="dayGridMonth" [header]="{
+                              left: 'prev,today,next',
+                              center: 'title',
+                              right: 'dayGridMonth,listMonth'
+                          }" noEventsMessage="" [plugins]="calendarPlugins" (eventClick)="handleEventClick($event)"
+            (dateClick)="handleEventClick($event)" [weekends]="true" [events]="events" [eventLimit]="false"
+            [editable]="false"></full-calendar>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

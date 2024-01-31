@@ -1,0 +1,59 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Lead Stages</li>
+    </ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+			<div class="card-body">
+                <h6 class="card-title">Lead Stages</h6>
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            <input 
+                                type="text" 
+                                name="newstage" 
+                                placeholder="Create New Stage" 
+                                #stage="ngModel" 
+                                [(ngModel)]="newstage"
+                                required
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button [disabled]="stage.invalid" class="btn btn-primary btn-block" (click)="createStage()">Create New Stage</button>
+                    </div>
+                </div>
+                <ngb-accordion [closeOthers]="true">
+                    <ngb-panel *ngFor="let stage of allStages; let i = index" id="r{{i}}"  title="{{stage.name}}">
+                        <ng-template ngbPanelContent>
+                            <ul>
+                                <li *ngFor="let s of stage.status">{{s}}</li>
+                            </ul>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <input 
+                                            type="text" 
+                                            name="newstatus" 
+                                            placeholder="Create New Status" 
+                                            #status="ngModel" 
+                                            [(ngModel)]="newstatus"
+                                            required
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <button [disabled]="status.invalid" class="btn btn-primary btn-block" (click)="createStatus(stage)">Add New Status</button>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </ngb-panel>
+                </ngb-accordion>
+            </div>
+        </div>
+    </div>
+</div>

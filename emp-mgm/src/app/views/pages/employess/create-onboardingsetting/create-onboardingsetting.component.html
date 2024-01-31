@@ -1,0 +1,379 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Employees</a></li>
+        <li class="breadcrumb-item active" aria-current="page">On-Boarding Setting</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Departments</h6>
+                <div class="row mt-3" *ngIf="isdepartmentsAvailable">
+                    <div class="col-4 col-md-3">
+                        <ul ngbNav #verticalNav="ngbNav" class="nav-tabs nav-tabs-vertical" orientation="vertical">
+                            <li *ngFor="let element of departments; let i = index" [ngbNavItem]="i">
+                                <a ngbNavLink (click)="onDeptSelect(element)">{{element.name}}</a>
+                                <ng-template ngbNavContent>
+                                    <h5 class="mb-2">{{element.name}}</h5>
+                                    <ul ngbNav #Employeeboarding="ngbNav" class="nav-tabs nav-fill">
+                                        <li [ngbNavItem]="1">
+                                            <a ngbNavLink (click)="OnBoarding()">On-Boarding</a>
+                                            <ng-template ngbNavContent>
+                                                <form (ngSubmit)="submitOnBoarding()">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="Name">Task Name:</label>
+                                                                <input type="text" id="taskname" name="taskname"
+                                                                    class="form-control"
+                                                                    placeholder="Enter your Full Task Name"
+                                                                    [(ngModel)]="OnBoardingtaskname" #taskname="ngModel"
+                                                                    required>
+                                                                <p class="text-danger mt-1"
+                                                                    *ngIf="taskname?.errors?.required && (taskname.dirty || taskname.touched )">
+                                                                    This field is required.</p>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>Task Owner</label>
+                                                                <ng-select [items]="employees"
+                                                                    [searchFn]="StaffSearchFn" [searchable]="true"
+                                                                    #employe="ngModel" [(ngModel)]="OnBoardingtaskOwner"
+                                                                    name="employe" placeholder="Select Employee"
+                                                                    bindValue="_id">
+                                                                    <ng-template ng-label-tmp let-item="item">
+                                                                        <span class="ng-value-label">{{item.fullName}} -
+                                                                            {{item.invid}}</span>
+                                                                    </ng-template>
+
+                                                                    <ng-template ng-option-tmp let-item="item">
+                                                                        {{item.fullName}} - {{item.invid}}
+                                                                    </ng-template>
+                                                                </ng-select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label>verification Owner</label>
+                                                                <ng-select [items]="employees"
+                                                                    [searchFn]="StaffSearchFn" [searchable]="true"
+                                                                    required #employe="ngModel"
+                                                                    [(ngModel)]="OnBoardingverificationOwner"
+                                                                    name="employe" placeholder="Select Employee"
+                                                                    bindValue="_id">
+                                                                    <ng-template ng-label-tmp let-item="item">
+                                                                        <span class="ng-value-label">{{item.fullName}} -
+                                                                            {{item.invid}}</span>
+                                                                    </ng-template>
+
+                                                                    <ng-template ng-option-tmp let-item="item">
+                                                                        {{item.fullName}} - {{item.invid}}
+                                                                    </ng-template>
+                                                                </ng-select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>Task Type</label>
+                                                                <ng-select [items]="TaskType" [searchable]="true"
+                                                                    bindValue="name" bindLabel="name"
+                                                                    #tasktype="ngModel" [(ngModel)]="OnBoardingtasktype"
+                                                                    class="wd-md-340 border-0 rounded-sm"
+                                                                    name="tasktype" placeholder="Select Task Type">
+                                                                </ng-select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>Priority</label>
+                                                                <ng-select [items]="Priority" [searchable]="true"
+                                                                    bindValue="name" bindLabel="name"
+                                                                    #priority="ngModel" [(ngModel)]="OnBoardingpriority"
+                                                                    class="wd-md-340 border-0 rounded-sm"
+                                                                    name="priority" placeholder="Select priority">
+                                                                </ng-select>
+                                                            </div>
+                                                        </div>
+
+                                                       
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>&nbsp;</label>
+                                                                <button *ngIf="!showUpdateButton" type="button" class="btn btn-primary btn-block" (click)="submitOnBoarding()">Submit</button>
+                                                                <button *ngIf="showUpdateButton" type="button" class="btn btn-primary btn-block" (click)="updateOnBoarding(selectedOnBoardingSetting)">Update</button>
+                                                            </div>
+                                                        </div>
+                                                        
+
+                                                    </div>
+
+
+                                                </form>
+                                            </ng-template>
+                                        </li>
+                                        <li [ngbNavItem]="2">
+                                            <a ngbNavLink (click)="OffBoarding()">Off-Boarding</a>
+                                            <ng-template ngbNavContent>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="Name">Task Name:</label>
+                                                            <input type="text" id="taskname" name="taskname"
+                                                                class="form-control"
+                                                                placeholder="Enter your Full Task Name"
+                                                                [(ngModel)]="OffBoardingtaskname" #taskname="ngModel"
+                                                                required>
+                                                            <p class="text-danger mt-1"
+                                                                *ngIf="taskname?.errors?.required && (taskname.dirty || taskname.touched )">
+                                                                This field is required.</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Task Owner</label>
+                                                            <ng-select [items]="employees" [searchFn]="StaffSearchFn"
+                                                                [searchable]="true" #employe="ngModel"
+                                                                [(ngModel)]="OffBoardingtaskOwner" name="employe"
+                                                                placeholder="Select Employee" bindValue="_id">
+                                                                <ng-template ng-label-tmp let-item="item">
+                                                                    <span class="ng-value-label">{{item.fullName}} -
+                                                                        {{item.invid}}</span>
+                                                                </ng-template>
+
+                                                                <ng-template ng-option-tmp let-item="item">
+                                                                    {{item.fullName}} - {{item.invid}}
+                                                                </ng-template>
+                                                            </ng-select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>verification Owner</label>
+                                                            <ng-select [items]="employees" [searchFn]="StaffSearchFn"
+                                                                [searchable]="true" required #employe="ngModel"
+                                                                [(ngModel)]="OffBoardingverificationOwner"
+                                                                name="employe" placeholder="Select Employee"
+                                                                bindValue="_id">
+                                                                <ng-template ng-label-tmp let-item="item">
+                                                                    <span class="ng-value-label">{{item.fullName}} -
+                                                                        {{item.invid}}</span>
+                                                                </ng-template>
+
+                                                                <ng-template ng-option-tmp let-item="item">
+                                                                    {{item.fullName}} - {{item.invid}}
+                                                                </ng-template>
+                                                            </ng-select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Task Type</label>
+                                                            <ng-select [items]="TaskType" [searchable]="true"
+                                                                bindValue="name" bindLabel="name" #tasktype="ngModel"
+                                                                [(ngModel)]="OffBoardingtasktype"
+                                                                class="wd-md-340 border-0 rounded-sm" name="tasktype"
+                                                                placeholder="Select Task Type">
+                                                            </ng-select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Priority</label>
+                                                            <ng-select [items]="Priority" [searchable]="true"
+                                                                bindValue="name" bindLabel="name" #priority="ngModel"
+                                                                [(ngModel)]="OffBoardingpriority"
+                                                                class="wd-md-340 border-0 rounded-sm" name="priority"
+                                                                placeholder="Select priority">
+                                                            </ng-select>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>&nbsp;</label>
+                                                            <button type="button" class="btn btn-primary btn-block"
+                                                                (click)="submitOffBoarding()">Submit</button>
+                                                        </div>
+                                                    </div> -->
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>&nbsp;</label>
+                                                            <button *ngIf="!showUpdateButton" type="button" class="btn btn-primary btn-block" (click)="submitOffBoarding()">Submit</button>
+                                                            <button *ngIf="showUpdateButton" type="button" class="btn btn-primary btn-block" (click)="updateOffBoarding(selectedOnBoardingSetting)">Update</button>
+                                                        </div>
+                                                    </div>
+                                                    
+
+                                                </div>
+
+                                            </ng-template>
+
+                                        </li>
+
+
+                                    </ul>
+                                    <div [ngbNavOutlet]="Employeeboarding" class="border border-top-0 p-3 rounded">
+                                    </div>
+                                    <div class="container-fluid" style="margin-top: 50px;">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <h6 class="card-title my-3">Filter By Departments Setting Task</h6>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label>Search</label>
+                                                    <input class="form-control" type="text" placeholder="Search..."
+                                                        (keyup)="FilterSearch($event)">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12 grid-margin"
+                                                *ngFor="let item of getAllOnBoardingSetting | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                                                <div class="card cards custom-card">
+                                                    <h5 class="titlelimit m-1">
+                                                        <span>
+                                                            <i *ngIf="item.priority === 'High'"
+                                                                class="mdi mdi-chevron-double-up"
+                                                                style="font-size:21px; color: red; padding: 10px;"></i>
+                                                            <i *ngIf="item.priority === 'Medium'"
+                                                                class="mdi mdi-format-align-center"
+                                                                style="font-size:21px; color: yellowgreen; padding: 10px;"></i>
+                                                            <i *ngIf="item.priority === 'Low'"
+                                                                class="mdi mdi-chevron-double-down"
+                                                                style="font-size:21px; color: blue; padding: 10px;"></i>
+                                                        </span>
+                                                        {{item?.taskname}}
+                                                    </h5>
+
+                                                    <div class="card-body d-flex justify-content-around">
+                                                        <p *ngIf="item.tasktype"> Task Type: {{item.tasktype}}</p>
+                                                        <p *ngIf="item.verificationOwner_name"> verification Owner:
+                                                            {{item?.verificationOwner_name}} -
+                                                            {{item?.verificationOwner_invid}}</p>
+                                                        <p *ngIf="item.taskOwner_name"> Task Owner:
+                                                            {{item?.taskOwner_name}} -
+                                                            {{item.taskOwner_invid}}</p>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end">
+                                                        <div class="three-dots" (click)="toggleButtons()">
+                                                            <i class="feather icon-more-horizontal icon-md p-3"></i>
+                                                        </div>                                                 
+                                                        <a *ngIf="showEditButton" (click)="editOnBoardingSetting(item)" placement="top" ngbTooltip="Edit">
+                                                            <i class="feather icon-edit-2 icon-md p-3"></i>
+                                                        </a>                                                        
+                                                        <a *ngIf="showDeleteButton" (click)="deleteOnBoardingSetting(item)" placement="top" ngbTooltip="Delete">
+                                                            <i class="feather icon-trash-2 icon-md p-3"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-8 col-md-9">
+                        <div [ngbNavOutlet]="verticalNav" class="tab-content-vertical border p-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- <div class="row profile-body">
+
+    <div class="container-fluid">
+        <div class="card rounded">
+            <div class="card-body">
+                
+
+                
+ 
+             
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div> -->
+
+
+
+<!-- 
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>
+                Department</label>
+            <ng-select [items]="departments" [searchable]="true" bindValue="_id" bindLabel="name" #department="ngModel"
+                [(ngModel)]="departmentfilter" class="wd-md-340 border-0 rounded-sm" name="department"
+                placeholder="Select Departments">
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Task Owner</label>
+            <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true" required #employe="ngModel"
+                [(ngModel)]="TaskOwnerfilter" name="employe" placeholder="Select Employee" bindValue="_id">
+                <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{item.fullName}} -
+                        {{item.invid}}</span>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.fullName}} - {{item.invid}}
+                </ng-template>
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>verification Owner</label>
+            <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true" required #employe="ngModel"
+                [(ngModel)]="verificationOwnerfilter" name="employe" placeholder="Select Employee" bindValue="_id">
+                <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{item.fullName}} -
+                        {{item.invid}}</span>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+                    {{item.fullName}} - {{item.invid}}
+                </ng-template>
+            </ng-select>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Task Type</label>
+            <ng-select [items]="TaskType" [searchable]="true" bindValue="name" bindLabel="name" #tasktype="ngModel"
+                [(ngModel)]="tasktypefilter" class="wd-md-340 border-0 rounded-sm" name="tasktype"
+                placeholder="Select Task Type">
+            </ng-select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="button" class="btn btn-primary btn-block" (click)="filter()">Submit</button>
+        </div>
+    </div>
+
+</div> -->

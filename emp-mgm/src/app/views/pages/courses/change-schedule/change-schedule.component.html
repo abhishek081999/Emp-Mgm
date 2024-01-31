@@ -1,0 +1,89 @@
+<div class="modal-header">
+    <h5 class="modal-title">Change Schedule</h5>
+    <button type="button" class="close" (click)="activeModal.close('by: close icon')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+
+    <form #scheduleForm="ngForm" (ngSubmit)="scheduleForm.valid && submitForm()">
+        <p style="color: red;padding: 0px;">All * Fields are Mandatory</p>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <!-- <label>Date*<a ngbTooltip="Class Date"><i class="small-icon" data-feather="help-circle"
+                            appFeatherIcon></i></a></label> -->
+                    <input type="date" class="form-control" [min]="MINDATE" #class_date="ngModel"
+                        [(ngModel)]="schedule.class_date" (change)="checkstatus()" required name="class_date">
+                    <p class="text-danger mt-1"
+                        *ngIf="class_date?.errors?.required && (scheduleForm.submitted || class_date.dirty || class_date.touched)">
+                        This field is required.</p>
+                    <p class="text-danger mt-1"
+                        *ngIf="class_date?.errors?.min && (scheduleForm.submitted || class_date.dirty || class_date.touched)">
+                        Min date is {{MINDATE}}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <!-- <label>Start Time*<a ngbTooltip="Class Start Time"><i class="small-icon"
+                        data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                <ng-select [items]="allSlots" [searchable]="true" appendTo="ngb-modal-window"
+                    placeholder="Select Start Time" #start_time="ngModel" [(ngModel)]="schedule.start_slot"
+                    name="start_time" bindValue="start_min" bindLabel="slot" required (change)="checkstatus()">
+                </ng-select>
+                <p class="text-danger mt-1"
+                    *ngIf="start_time?.errors?.required && (scheduleForm.submitted || start_time.dirty || start_time.touched)">
+                    This field is required.</p>
+            </div>
+            <div class="col-md-4">
+                <!-- <label>End Time*<a ngbTooltip="Class End Time"><i class="small-icon"
+                        data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                <ng-select [items]="allSlots" [searchable]="true" appendTo="ngb-modal-window"
+                    placeholder="Select End Time" #end_time="ngModel" [(ngModel)]="schedule.end_slot" name="end_time"
+                    bindValue="start_min" bindLabel="slot" required (change)="checkstatus()">
+                </ng-select>
+                <p class="text-danger mt-1"
+                    *ngIf="end_time?.errors?.required && (scheduleForm.submitted || end_time.dirty || end_time.touched)">
+                    This field is required.</p>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <!-- <label>Instructor*</label> -->
+                    <ng-select [items]="allIns" [searchable]="true" placeholder="Select Instructor"
+                        #instructor="ngModel" appendTo="ngb-modal-window" [(ngModel)]="schedule.instructor_id"
+                        name="instructor" bindValue="_id" required (change)="checkstatus()" [searchFn]="StaffSearchFn">
+                        <ng-template ng-label-tmp let-item="item">
+                            <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                        </ng-template>
+                        
+                        <ng-template ng-option-tmp let-item="item">
+                            {{item.invid}} - {{item.fullName}}
+                        </ng-template>
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="instructor?.errors?.required && (scheduleForm.submitted || instructor.dirty || instructor.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <!-- <label>Licence*</label> -->
+                    <ng-select [items]="allLicence" [searchable]="true" (change)="checkstatus()"
+                        placeholder="Select Zoom Licence" #licence="ngModel" [(ngModel)]="schedule.licence"
+                        name="licence" bindValue="_id" bindLabel="email" required appendTo="ngb-modal-window">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="licence?.errors?.required && (scheduleForm.submitted || licence.dirty || licence.touched)">
+                        This field is required.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-warning" *ngIf="errormsg">
+            {{errormsg}}
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button [disabled]="scheduleForm.invalid" (click)="submitForm()" class="btn btn-primary"> Submit</button>
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()"> Close</button>
+</div>

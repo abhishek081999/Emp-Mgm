@@ -1,0 +1,189 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Leads Tats Report</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Leads Tat Report</h6>
+                </div>
+                <form (ngSubmit)="submit()">
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" #date="ngModel" [(ngModel)]="startDate" name="date"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" #date="ngModel" [(ngModel)]="endDate" name="date"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Language</label>
+                                <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language"
+                                    #leadtatlang="ngModel" [(ngModel)]="LeadTatLang" name="leadtatlang"
+                                    (change)="onchange()">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Level</label>
+                                <ng-select [items]="LeadLevelDrop" bindValue="_id" [searchable]="true"
+                                    placeholder="Select Level" #tatlevel="ngModel" [(ngModel)]="LeadTatLevel"
+                                    name="tatlevel">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">
+                                            {{item.name}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.name}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Team</label>
+                                <ng-select [items]="allTeams" bindValue="_id" #teamid="ngModel"
+                                    [(ngModel)]="teamname" name="teamid" placeholder="Search By Team Name">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}</span>
+                                    </ng-template>
+        
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <!-- <ng-container matColumnDef="teamname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.teamname}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="teamlead">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead ID</th>
+                            <td mat-cell *matCellDef="let row"> {{row.teamlead}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="teamleadname" >
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team Lead Name</th>
+                            <td mat-cell *matCellDef="let row"> {{row.teamleadname}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container> -->
+
+                        <ng-container matColumnDef="_id" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff ID </th>
+                            <td mat-cell *matCellDef="let row"> {{row._id}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="leadownername" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.leadownername}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_COUNT'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_COUNT'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{row[col+'_COUNT']}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount(col+'_COUNT')}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_MAXIMUM'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_MAXIMUM'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row[col+'_MAXIMUM'])}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1(col+'_MAXIMUM'))}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_MINIMUM'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_MINIMUM'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row[col+'_MINIMUM'])}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1(col+'_MINIMUM'))}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_AVERAGE'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_AVERAGE'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{time(row[col+'_AVERAGE'])}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{time(getcount1(col+'_AVERAGE'))}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_IDEAL'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_IDEAL'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{row[col+'_IDEAL']}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount(col+'_IDEAL')}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_DUE'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_DUE'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{row[col+'_DUE']}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount(col+'_DUE')}}</td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col+'_OVERDUE'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{col+'_OVERDUE'}} </th>
+                            <td mat-cell *matCellDef="let row"> {{row[col+'_OVERDUE']}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{getcount(col+'_OVERDUE')}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="staff-details" sticky>
+                            <th mat-header-cell *matHeaderCellDef colspan="2"> Staff Details </th>
+                        </ng-container>
+
+                        <ng-container *ngFor="let col of tatdisplaylabel" [matColumnDef]="col">
+                            <th mat-header-cell *matHeaderCellDef colspan="4"> {{col}} </th>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="tatdisplaylabel1; sticky: true" class="first-header-row">
+                        </tr>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

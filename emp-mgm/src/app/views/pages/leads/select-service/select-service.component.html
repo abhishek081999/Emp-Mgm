@@ -1,0 +1,120 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Select Service</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-4">
+            <select #servicetype="ngModel" [(ngModel)]="data.servicetype" name="servicetype" class="form-control"
+                (change)="servicetypechange()">
+                <option value="">Select Service Type</option>
+                <option value="course">Course</option>
+                <option value="insignia">Insignia</option>
+                <option value="invesmentor">Invesmentor</option>
+                <option value="product">Product</option>
+                <option value="subscription">Subscription</option>
+                <option value="insignia_subscription">Insignia Subscription</option>
+            </select>
+        </div>
+        <div class="col-sm-8">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="coursetype">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Type </th>
+                <td mat-cell *matCellDef="let row"> {{row.coursetype}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="coursecode">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                <td mat-cell *matCellDef="let row"> {{row.coursecode}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="coursename">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.coursename}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="course_code">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                <td mat-cell *matCellDef="let row"> {{row.course_code}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="course_language">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Language </th>
+                <td mat-cell *matCellDef="let row"> {{row.course_language}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="courselanguage">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Language </th>
+                <td mat-cell *matCellDef="let row"> {{row.courselanguage}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="course_name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.course_name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="coursestartdate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Batch Start Date </th>
+                <td mat-cell *matCellDef="let row">{{row.coursestartdate | date: 'mediumDate'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="start_date">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Batch Start Date </th>
+                <td mat-cell *matCellDef="let row">{{row.start_date | date: 'mediumDate'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="productid">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Code </th>
+                <td mat-cell *matCellDef="let row"> {{row.productid}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Code </th>
+                <td mat-cell *matCellDef="let row"> {{row.code}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="short_code">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Short Code </th>
+                <td mat-cell *matCellDef="let row"> {{row.short_code}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="teachername">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Instructor </th>
+                <td mat-cell *matCellDef="let row"> {{row.teachername}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="min_selling_price">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Min Selling Price </th>
+                <td mat-cell *matCellDef="let row"> {{row.min_selling_price}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                <td mat-cell *matCellDef="let row"><a class="mr-2" (click)="select(row)">Select</a></td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[7, 25, 50, 100, 200]"></mat-paginator>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+</div>

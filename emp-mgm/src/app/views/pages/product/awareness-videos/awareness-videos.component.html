@@ -1,0 +1,103 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Awareness Videos</li>
+    </ol>
+</nav>
+
+<form #lessonForm="ngForm" enctype="multipart/form-data" (ngSubmit)="lessonForm.valid && submitForm($event)">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Awareness Videos</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Title*<a placement="top" ngbTooltip="Title"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #title="ngModel" [(ngModel)]="awarenessVideos.title"
+                                    name="name" required placeholder="Awareness Video Title">
+                                <p class="text-danger mt-1"
+                                    *ngIf="title.errors?.required && (lessonForm.submitted || title.dirty || title.touched)">
+                                    This field is required.</p>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Video Url*<a placement="top" ngbTooltip="Video Url"><i class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #video_url="ngModel" [(ngModel)]="awarenessVideos.video_url" name="video_url"
+                                    required placeholder="Awareness Video Url">
+                                <p class="text-danger mt-1"
+                                    *ngIf="video_url.errors?.required && (lessonForm.submitted || video_url.dirty || video_url.touched)">
+                                    This field is required.</p>
+                        
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Upload Image*</label>
+                                <input id="img" type="file" accept="image/*" name="picture"
+                                    (change)="handelFileInput($event)" class="file-upload-default" required>
+                                <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload Image">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'"
+                        *ngIf="(lessonForm.submitted || lessonForm.dirty || lessonForm.touched) && lessonForm.invalid">
+                        You Missed Some Fields
+                    </ngb-alert>
+                    <button class="btn btn-primary mt-2">Submit</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+<div class="row profile-body">
+    <!-- filters -->
+    <div class="container-fluid">
+
+        <div class="container-fluid" style="margin-top: 50px;">
+            <div class="row">
+                <div class="col-md-3 grid-margin"
+                    *ngFor="let item of allAwarenessVideos | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+
+                    <div class="card cards">
+                        <img ngbTooltip="Click to Play Video" (click)="playvideo(item)" class="card-img-top" [src]="item.thumbnail" [alt]="item.title">
+                        <div class="card-body">
+                            <h5 class="titlelimit">{{item.title}}</h5>
+                            <p class="mt-2"> Published On : {{item.publish_date | date: 'mediumDate'}}</p>
+
+                            <button *ngIf="!item.approve" (click)="Approve(item)"
+                                class="btn btn-success btn-block my-2">Approve
+                            </button>
+                            <button (click)="Delete(item._id)" class="btn btn-danger mr-2 mb-1">Delete
+                            </button>
+                            <button (click)="editAwarenessVideos(item)" class="btn btn-primary">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- pages -->
+<ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+    (pageChange)="pagechange()">
+</ngb-pagination>

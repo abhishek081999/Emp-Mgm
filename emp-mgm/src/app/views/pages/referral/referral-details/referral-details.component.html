@@ -1,0 +1,254 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Referral</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Referral Details</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Referral Details</h6>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Filter by Active/Inactive
+                            </label>
+                            <ng-select [items]="FilterActivity" #activefilter="ngModel" [(ngModel)]="activityFilter"
+                                name="activefilter" placeholder="Search By Active/Inactive" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Filter by Student Id
+                            </label>
+                            <ng-select [items]="FilterbyStu" #StudentID="ngModel" [(ngModel)]="stuFilter"
+                                name="StudentID" placeholder="Search By Student Id" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Filter by Referee 
+                            </label>
+                            <ng-select [items]="FilterbyRef" #Referee="ngModel" [(ngModel)]="refFilter"
+                                name="Referee" placeholder="Search By Referee" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" #pag="ngModel" (keyup)="changePage()"
+                            [(ngModel)]="pageSizeOptions" placeholder="Search">
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                    <!-- <div class="col-sm-4" *ngIf="selection.hasValue()">
+                        <ng-select 
+                            [items]="allUser"
+                            bindLabel="invid"
+                            #employeeid="ngModel" 
+                            [(ngModel)]="employee" 
+                            class="wd-md-340 border-0 rounded-sm"
+                            name="employeeid"
+                            [searchFn]="StaffSearchFn"
+                            placeholder="Search By ID or Name"
+                            (change)="onassignstaff()"
+                            >
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+                        
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                       
+
+                    </div> -->
+                    <div class="col-sm-4" *ngIf="selection.hasValue()">
+                        <ng-select 
+                            [items]="actv"
+                            bindLabel="invid"
+                            #employeeid="ngModel" 
+                            [(ngModel)]="actvity" 
+                            class="wd-md-340 border-0 rounded-sm"
+                            name="employeeid"
+                            placeholder="Active/Inactive"
+                            (change)="Activity()"
+                            >
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item}}</span>
+                            </ng-template>
+                        
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <div class="col-sm-4 mb-2" *ngIf="selection.hasValue()">
+                        <button type="button" class="btn btn-danger btn-block"
+                            (click)="addTransactionModal(exportModal)">Add Trasnsaction</button>
+                    </div>
+
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="select" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    [checked]="selection.hasValue() && isEntirePageSelected()"
+                                    [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row,i)">
+                                </mat-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="referal_code" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Referral Code </th>
+                            <td mat-cell *matCellDef="let row"  [ngStyle]="{
+                                'color':row.isActive?'green':'red'
+                                }"> {{row.referal_code}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="referal_link">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Referral Link </th>
+                            <td mat-cell *matCellDef="let row"> {{row.referal_link}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="referred_by_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Referred by Name </th>
+                            <td mat-cell *matCellDef="let row">{{row.referred_by_invid}} <br> {{row.referred_by_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="user_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> User Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.user_invid}} <br> {{row.user_name}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="invescash_earned">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Invescash Earned </th>
+                            <td mat-cell *matCellDef="let row"> {{row.invescash_earned}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="invescash_redeemed">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Invescash Redeemed </th>
+                            <td mat-cell *matCellDef="let row"> {{row.invescash_redeemed}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="current_balance">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Current Balance </th>
+                            <td mat-cell *matCellDef="let row"> {{row.current_balance}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="join_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Join Date </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.join_date | date: 'mediumDate'}}<br>{{row.join_date | date: 'shortTime'}}</p>
+                        </ng-container>
+
+                        <ng-container matColumnDef="isActive">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Is Active </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.isActive?'green':'red'
+                                }"> {{row.isActive?'Active':'Inactive'}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSize]="pageSizeOptions"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<ng-template #exportModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Transaction</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #addTransactionForm="ngForm">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Details*</label>
+                        <input type="text" class="form-control" #Details="ngModel" [(ngModel)]="transaction.details"
+                            name="details" required autocomplete="off" placeholder="Details">
+                        <p class="text-danger mt-1"
+                            *ngIf="Details?.errors?.required && (addTransactionForm.submitted || Details.dirty || Details.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>txn type</label>
+                        <ng-select [items]="txnType" placeholder="Select Lead Status" #txntype="ngModel"
+                            [(ngModel)]="transaction.txn_type" name="txn type">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Amount*</label>
+                        <input type="text" class="form-control" #Amount="ngModel" [(ngModel)]="transaction.amount"
+                            name="amount" required autocomplete="off" placeholder="Amount">
+                        <p class="text-danger mt-1"
+                            *ngIf="Amount?.errors?.required && (addTransactionForm.submitted || Amount.dirty || Amount.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" #Date="ngModel" [(ngModel)]="transaction.date"
+                            class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <ng-select [items]="Type" #tyype="ngModel" [(ngModel)]="transaction.type" name="type"
+                            placeholder="Type">
+                        </ng-select>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+        <button [disabled]="addTransactionForm.invalid" type="button" class="btn btn-primary"
+            (click)="modal.close('Submit')">Add Transaction</button>
+
+    </div>
+</ng-template>

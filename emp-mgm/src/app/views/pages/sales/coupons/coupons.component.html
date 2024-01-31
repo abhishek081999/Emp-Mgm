@@ -1,0 +1,323 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Sales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Coupons</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Create Coupons</h6>
+                <form #couponForm="ngForm" (ngSubmit)="couponForm.valid && postCoupon(couponForm)">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Month*</label>
+                                <select 
+                                    class="form-control" 
+                                    #month="ngModel" 
+                                    [(ngModel)]="newcoupon.month" 
+                                    name="month" 
+                                    required>
+                                    <option value="" selected>Select Month</option>
+                                    <option value="A">January</option>
+                                    <option value="B">February</option>
+                                    <option value="C">March</option>
+                                    <option value="D">April</option>
+                                    <option value="E">May</option>
+                                    <option value="F">June</option>
+                                    <option value="G">July</option>
+                                    <option value="H">August</option>
+                                    <option value="I">September</option>
+                                    <option value="J">October</option>
+                                    <option value="K">November</option>
+                                    <option value="L">December</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="month?.errors?.required && (month.dirty || month.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Startdate<a placement="top" ngbTooltip="Coupon Start date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="date"
+                                    class="form-control"
+                                    #startdate="ngModel" 
+                                    [(ngModel)]="newcoupon.startdate" 
+                                    name="startdate">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Expirydate<a placement="top" ngbTooltip="Coupon Expiry date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="date"
+                                    class="form-control"
+                                    #expirydate="ngModel" 
+                                    [(ngModel)]="newcoupon.expirydate" 
+                                    name="expirydate">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Coupon Type<a placement="top" ngbTooltip="Fixed Discount or Percentage Discount"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <select 
+                                    class="form-control" 
+                                    #type="ngModel" 
+                                    [(ngModel)]="newcoupon.type" 
+                                    name="type" 
+                                    required>
+                                    <option value="" selected>Select Type</option>
+                                    <option value="fixed">Fixed</option>
+                                    <option value="percentage">Percentage</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="type?.errors?.required && (type.dirty || type.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Minimum Balance<a placement="top" ngbTooltip="Minimum Balance Required for apply the coupon"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #minimumbal="ngModel" 
+                                    [(ngModel)]="newcoupon.minimumbal" 
+                                    name="minimumbal"
+                                    required
+                                    placeholder="Minimum balance">
+                                    <p class="text-danger mt-1" *ngIf="minimumbal?.errors?.required && (minimumbal.dirty || minimumbal.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Discount Price<a placement="top" ngbTooltip="for Fixed enter only the value for percentage only the percentage value"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #price="ngModel" 
+                                    [(ngModel)]="newcoupon.price" 
+                                    name="price"
+                                    required
+                                    placeholder="Discount price">
+                                    <p class="text-danger mt-1" *ngIf="price?.errors?.required && (price.dirty || price.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Number Of Use<a placement="top" ngbTooltip="0 for unlimited time"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #numberofuse="ngModel" 
+                                    [(ngModel)]="newcoupon.numberofuse" 
+                                    name="numberofuse"
+                                    required
+                                    placeholder="How Many time the coupon can be used">
+                                    <p class="text-danger mt-1" *ngIf="month?.errors?.required && (month.dirty || month.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Staff Category*</label>
+                                <select
+                                    class="form-control" 
+                                    #prefixcode="ngModel"
+                                    [(ngModel)]="newcoupon.prefixcode"
+                                    name="prefixcode"
+                                    (change)="staffchange()"
+                                    required>
+                                    <option value="" selected>Select Staff Category</option>
+                                    <option value="EM">Employee</option>
+                                    <option value="BA">Business Associate</option>
+                                    <option value="AP">Affiliate Partner</option>
+                                    <option value="SP">Admin</option>
+                                    <option value="IN">Instructor</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="prefixcode?.errors?.required && (prefixcode.dirty || prefixcode.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" *ngIf="!isedit">
+                            <div class="form-group">
+                                <label>Staff IDs*</label>
+                                <ng-select
+                                    [items]="allStaff"
+                                    [multiple]=true
+                                    bindLabel="invid"
+                                    groupBy="role"
+                                    [selectableGroup]="true"
+                                    [selectableGroupAsModel]="false"
+                                    [closeOnSelect]="false"
+                                    bindValue="invid"
+                                    #staffids="ngModel" 
+                                    name="staffids"
+                                    placeholder="Search By ID or Name"
+                                    [(ngModel)]="newcoupon.staffids"
+                                    [searchFn]="StaffSearchFn"
+                                    required>
+                                    <ng-template ng-optgroup-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="item-{{index}}" type="checkbox" name="item-{{index}}" [ngModel]="item$.selected"/> ALL {{item.role | uppercase}}
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input id="item-{{index}}" type="checkbox" name="item-{{index}}" [ngModel]="item$.selected"/> {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1" *ngIf="staffids?.errors?.required && (staffids.dirty || staffids.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4" *ngIf="isedit">
+                            <div class="form-group">
+                                <label>Staff ID*</label>
+                                <ng-select 
+                                    [items]="allStaff"
+                                    bindLabel="invid"
+                                    bindValue="invid"
+                                    #staffids="ngModel" 
+                                    name="staffids"
+                                    [(ngModel)]="newcoupon.staffids"
+                                    required
+                                    placeholder="Search By ID"
+                                    >
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                    </ng-template>
+                                
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1" *ngIf="staffids?.errors?.required && (staffids.dirty || staffids.touched || couponForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Submit</button>
+                  </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Coupon List</h6>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"  placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="row my-2">
+                    <div class="col-sm-3" *ngIf="selection.hasValue()">
+                        <button type="button" class="btn btn-success btn-block" (click)="onApprove()">Approve</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+    
+                        <ng-container matColumnDef="select" sticky>
+                            <th mat-header-cell cdkDrag  *matHeaderCellDef >
+                            <mat-checkbox (change)="$event ? masterToggle() : null"
+                                            [checked]="selection.hasValue() && isEntirePageSelected()"
+                                            [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                            [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                            *ngIf="!row.approve"
+                                            (change)="$event ? selection.toggle(row) : null"
+                                            [checked]="selection.isSelected(row)"
+                                            [aria-label]="checkboxLabel(row,i)">
+                            </mat-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="couponcode" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Coupon Code </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.couponcode}} </td>
+                        </ng-container>
+                            
+                        <ng-container matColumnDef="staffid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff ID </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.staffid}} </td>
+                        </ng-container>
+                            
+                        <ng-container matColumnDef="staffname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff Name </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.staffname}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="month">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Month </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.month}} </td>
+                        </ng-container>
+                        
+                        <ng-container matColumnDef="year">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Year </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.year}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="startdate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Start Date </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.startdate | date: 'longDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expirydate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.expirydate | date: 'longDate'}} </td>
+                        </ng-container>
+                          
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.type}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="numberofuse">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Number of Use </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.numberofuse}} </td>
+                        </ng-container>
+                          
+                        <ng-container matColumnDef="minimumbal">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Minimum Balance </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.minimumbal}} </td>
+                        </ng-container>
+                          
+                        <ng-container matColumnDef="price">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Price </th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" > {{row.price}} </td>
+                        </ng-container>
+    
+                        <ng-container matColumnDef="approve">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                            <td mat-cell class="tdclass" *matCellDef="let row" [style.color]="row.approve?'green':'red'"> {{row.approve?'Approve':'Pending'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
+                            <td mat-cell class="tdclass" *matCellDef="let row">
+                                <a *ngIf="!row.approve" placement="top" ngbTooltip="Edit Coupon" (click)="onEdit(row)"> <i class="feather icon-edit icon-xs mr-2"></i></a>
+                                <a *ngIf="!row.approve" (click)="onDelete(row._id)" placement="top" ngbTooltip="Delete Coupon"> <i class="feather icon-trash-2 icon-xs mr-2"></i></a> 
+                            </td>                          
+                        </ng-container>
+                  
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" ></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

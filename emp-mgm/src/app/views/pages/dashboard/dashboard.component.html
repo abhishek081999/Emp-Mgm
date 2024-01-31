@@ -1,0 +1,724 @@
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+  <div>
+    <h4 class="mb-3 mb-md-0">Welcome to Invesmate</h4>
+  </div>
+
+  <div class="d-flex align-items-center flex-wrap text-nowrap">
+    <button *ngIf="(!checkAttendanceSubmit() && !isMobileDevice)" id="submitButton" type="button"
+      class="btn btn-primary btn-icon-text mb-2 mb-md-0" (click)="SubmitAttendance()" [disabled]="isMobileDevice"
+      [disabled]="checkAttendanceSubmit()">Today's Attendance</button>
+    <!-- <p *ngIf="checkAttendanceSubmit()" style="color: rgb(22, 199, 16); text-align: center;">
+        Today's Attendance already submitted
+      </p> -->
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-12 stretch-card">
+    <div class="row flex-grow">
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/students/students-list'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="users" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Students</h6>
+                <h4 class="mb-2">{{allStudentsCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/employees/employee-list'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="users" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Employees</h6>
+                <h4 class="mb-2">{{employeeCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/courses/course-list'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-blue">
+                  <i data-feather="book" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Courses</h6>
+                <h4 class="mb-2">{{allCoursesCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/courses/course-list'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="book" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Pending Courses</h6>
+                <h4 class="mb-2">{{allUnapproveCourseCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/instructor/instructor-list'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-red">
+                  <i data-feather="users" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Instructors</h6>
+                <h4 class="mb-2">{{allInsCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-12 stretch-card">
+    <div class="row flex-grow"> -->
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/accounts/accounts'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-blue">
+                  <i data-feather="trending-up" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Earning (Without GST)</h6>
+                <h4 class="mb-2">{{totalEarning | currency:'INR'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/accounts/part-payment-history'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-red">
+                  <i data-feather="trending-down" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Due (With GST)</h6>
+                <h4 class="mb-2">{{totalDue | currency:'INR'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/communication/messages'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="mail" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Unread Messages</h6>
+                <h4 class="mb-2">{{allUnreadMsgCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/communication/messages'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="mail" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Instructor Unread Message</h6>
+                <h4 class="mb-2">{{allUnreadInsMsgCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-12 stretch-card">
+    <div class="row flex-grow"> -->
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/leads/leads'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-red">
+                  <i data-feather="monitor" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Leads</h6>
+                <h4 class="mb-2">{{allLeadsCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/students/certificates'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="award" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Certificate Request</h6>
+                <h4 class="mb-2">{{allCertReqCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/courses/reviews'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-blue">
+                  <i data-feather="star" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Unapproved Reviews</h6>
+                <h4 class="mb-2">{{allUnapprovedRatingsCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/courses/feedbacks'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="file-text" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">New Feedback</h6>
+                <h4 class="mb-2">{{allFeedbackCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-12 stretch-card">
+    <div class="row flex-grow"> -->
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/leads/onboarding-list'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="alert-circle" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Pending Onboarding</h6>
+                <h4 class="mb-2">{{pendingOnboardingCount}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/leads/leads'>
+        <div class="card" (click)="leadassignedcm()">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-blue">
+                  <i data-feather="user-plus" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Lead Assigned ({{today | date:'MMM-yy'}})</h6>
+                <h4 class="mb-2">{{totalLeadAssigned}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/leads/leads'
+        (click)="leadredirect('Fresh')">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="phone-outgoing" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Fresh Lead Pending</h6>
+                <h4 class="mb-2">{{totalFreshLeadPending}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/leads/leads'
+        (click)="leadredirect('Not Connected')">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="phone-missed" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Not Connected Pending</h6>
+                <h4 class="mb-2">{{totalNotConnectedPending}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div>
+  </div>
+</div> 
+
+<div class="row">
+  <div class="col-12 col-xl-12 stretch-card">
+    <div class="row flex-grow"> -->
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/leads/leads'
+        (click)="leadredirect('Pipeline')">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="phone-call" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Pipeline Pending</h6>
+                <h4 class="mb-2">{{totalInProgressPending}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation" routerLink='/admin/leads/leads'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-blue">
+                  <i data-feather="monitor" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Demo Given ({{today | date:'MMM-yy'}})</h6>
+                <h4 class="mb-2">{{totalDemoGiven}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/sales/sales-projection-report'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="target" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Sales Projection ({{today | date:'MMM-yy'}}) (Without GST)</h6>
+                <h4 class="mb-2">{{SalesProjection| number:'1.2-2'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/sales/sales-projection-report'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-yellow">
+                  <i data-feather="database" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Pro Rata Projection ({{today | date:'MMM-yy'}}) (Without GST)</h6>
+                <h4 class="mb-2">{{ProRataProjection| number:'1.2-2'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div>
+  </div>
+</div>
+ <div class="row">
+  <div class="col-12 col-xl-12 stretch-card">
+    <div class="row flex-grow"> -->
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/sales/sales-projection-report'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="trending-up" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Actual Net Revenue ({{today | date:'MMM-yy'}}) (Without GST)</h6>
+                <h4 class="mb-2">{{ActualRevenue | number:'1.2-2'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/sales/sales-projection-report'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="trending-up" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Pending Verification ({{today | date:'MMM-yy'}}) (Without GST)</h6>
+                <h4 class="mb-2">{{pendingVerification | number:'1.2-2'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/sales/sales-projection-report'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-blue">
+                  <i data-feather="info" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Surplus Or Deficit ({{today | date:'MMM-yy'}}) (Without GST)</h6>
+                <h4 class="mb-2" [style.color]="SurplusDeficit>=0?'green':'red'">{{SurplusDeficit | number:'1.2-2'}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/attendance-and-leave/Requests'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="file-text" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Attendance Pending</h6>
+                <h4 class="mb-2">{{attendance_Count}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/attendance-and-leave/Requests'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="file-text" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Regularize Pending</h6>
+                <h4 class="mb-2">{{regularize_attend_Count}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/attendance-and-leave/Requests'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="file-text" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Leave Pending</h6>
+                <h4 class="mb-2">{{leavelequest_Count}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 grid-margin stretch-card cursor-pointer flip-animation"
+        routerLink='/admin/attendance-and-leave/attendance-roster'>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-3 col-md-3 col-xl-3 p-0">
+                <div class="mt-md-3 mt-xl-0 color-green">
+                  <i data-feather="file-text" appFeatherIcon class="icon-xl mb-1"></i>
+                </div>
+              </div>
+              <div class="col-9 col-md-9 col-xl-9">
+                <h6 class="card-title mb-2">Shift Roster Pending</h6>
+                <h4 class="mb-2">{{shiftroster_Count}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- row -->
+
+<div class="row">
+  <div class="col-xl-6 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+          <h6 class="card-title mb-0">Number of Student Converted</h6>
+        </div>
+        <div class="flot-wrapper">
+          <apx-chart [series]="apexChart1Options.series" [colors]="apexChart1Options.colors"
+            [chart]="apexChart1Options.chart" [dataLabels]="apexChart1Options.dataLabels"
+            [xaxis]="apexChart1Options.xaxis" [yaxis]="apexChart1Options.yaxis" [stroke]="apexChart1Options.stroke"
+            [tooltip]="apexChart1Options.tooltip"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+          <h6 class="card-title mb-0">Total Booked Revenue (With GST)</h6>
+        </div>
+        <div class="flot-wrapper">
+          <apx-chart [series]="apexChart2Options.series" [colors]="apexChart2Options.colors"
+            [chart]="apexChart2Options.chart" [dataLabels]="apexChart2Options.dataLabels"
+            [xaxis]="apexChart2Options.xaxis" [yaxis]="apexChart2Options.yaxis" [stroke]="apexChart2Options.stroke"
+            [tooltip]="apexChart2Options.tooltip"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+          <h6 class="card-title mb-0">Total Payment Received (Without GST)</h6>
+        </div>
+        <div class="flot-wrapper">
+          <apx-chart [series]="apexChart3Options.series" [colors]="apexChart3Options.colors"
+            [chart]="apexChart3Options.chart" [dataLabels]="apexChart3Options.dataLabels"
+            [xaxis]="apexChart3Options.xaxis" [yaxis]="apexChart3Options.yaxis" [stroke]="apexChart3Options.stroke"
+            [tooltip]="apexChart3Options.tooltip"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+          <h6 class="card-title mb-0">Total Due (With GST)</h6>
+        </div>
+        <div class="flot-wrapper">
+          <apx-chart [series]="apexChart4Options.series" [colors]="apexChart4Options.colors"
+            [chart]="apexChart4Options.chart" [dataLabels]="apexChart4Options.dataLabels"
+            [xaxis]="apexChart4Options.xaxis" [yaxis]="apexChart4Options.yaxis" [stroke]="apexChart4Options.stroke"
+            [tooltip]="apexChart4Options.tooltip"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+          <h6 class="card-title mb-0">Total GST</h6>
+        </div>
+        <div class="flot-wrapper">
+          <apx-chart [series]="apexChart5Options.series" [colors]="apexChart5Options.colors"
+            [chart]="apexChart5Options.chart" [dataLabels]="apexChart5Options.dataLabels"
+            [xaxis]="apexChart5Options.xaxis" [yaxis]="apexChart5Options.yaxis" [stroke]="apexChart5Options.stroke"
+            [tooltip]="apexChart5Options.tooltip"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-6 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
+          <h6 class="card-title mb-0">Sales Projection vs Actual Sales (Without GST)</h6>
+        </div>
+        <div class="flot-wrapper">
+          <apx-chart [series]="apexChart6Options.series" [colors]="apexChart6Options.colors"
+            [chart]="apexChart6Options.chart" [dataLabels]="apexChart6Options.dataLabels"
+            [xaxis]="apexChart6Options.xaxis" [yaxis]="apexChart6Options.yaxis" [stroke]="apexChart6Options.stroke"
+            [tooltip]="apexChart6Options.tooltip"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- row -->
+
+<div class="row">
+  <div class="col-lg-6 col-xl-6 grid-margin grid-margin-xl-0 stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-2">
+          <h6 class="card-title mb-0">Courses</h6>
+          <div ngbDropdown class="mb-2">
+            <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton6">
+              <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownMenuButton6">
+              <a ngbDropdownItem class="d-flex align-items-center" routerLink="/admin/courses/course-list"><i
+                  data-feather="eye" appFeatherIcon class="icon-sm mr-2"></i> <span class="">View All</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex flex-column fh-450" [perfectScrollbar]>
+          <a *ngFor="let course of allCourse" [routerLink]="['/admin/courses/course-list', course.coursecode]"
+            class="d-flex align-items-center border-bottom py-3">
+            <div class="mr-3">
+              <img src="{{imageurl}}{{course.coursepicture}}" class="wd-100" alt="{{course.coursename}}">
+            </div>
+            <div class="w-100">
+              <div class="d-flex justify-content-between">
+                <h6 class="text-body mb-2">{{course.coursename}}</h6>
+              </div>
+              <p class="text-muted tx-13">Course Code: {{ course.coursecode }}</p>
+              <p class="text-muted tx-13">Course Type: {{ course.coursetype }}</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 col-xl-6 grid-margin grid-margin-xl-0 stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-2">
+          <h6 class="card-title mb-0">Notice Board</h6>
+          <div ngbDropdown class="mb-2">
+            <button ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton6">
+              <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal" appFeatherIcon></i>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownMenuButton6">
+              <a ngbDropdownItem class="d-flex align-items-center" routerLink="/admin/communication/noticeboard"><i
+                  data-feather="eye" appFeatherIcon class="icon-sm mr-2"></i> <span class="">View All</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <owl-carousel-o [options]="autoPlayExampleOptions">
+            <!-- [options]="customOptions" -->
+            <ng-template carouselSlide *ngFor="let item of allNotice" [id]="item._id">
+              <div class="card fh-450" [perfectScrollbar]>
+
+                <img *ngIf="item.image" class="card-img-top p-2" [src]="item.image" [alt]="item.title">
+
+                <div class="card-body follow-my-portfolio">
+                  <h5 class="mb-3" *ngIf="item?.tags && item?.tags?.length>0">
+                    <span *ngFor="let i of item?.tags" class="badge badge-primary m-1">{{i}}</span>
+                  </h5>
+                  <h3 class="mb-2">{{ item.title }}</h3>
+
+                  <quill-view-html [content]="item.description" class="limit-text" theme="snow"></quill-view-html>
+                  <p class="text-muted mt-3">{{ item.published_date | date:'medium'}}</p>
+                </div>
+              </div>
+            </ng-template>
+          </owl-carousel-o>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- row -->

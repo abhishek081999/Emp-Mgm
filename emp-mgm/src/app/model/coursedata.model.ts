@@ -1,0 +1,24 @@
+export class CourseData {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  coursename: string;
+  startdate: Date;
+  registration_date: Date;
+  coursecode: string;
+  products: string;
+  productsprice: number;
+  coursetype: string;
+  bookedamount: number;
+  paymentreceived: number;
+  due: number;
+  // teachername:string;
+  couponcode: string;
+  coursebundle?: string;
+  status: string;
+  whatsapp_number?: string;
+  telegram_number?: string;
+  gst?: number;
+  expiry_date?: Date;
+};

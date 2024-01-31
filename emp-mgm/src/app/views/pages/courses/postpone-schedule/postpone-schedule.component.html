@@ -1,0 +1,254 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Postpone Schedule</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" #startDateAtten="ngModel" [(ngModel)]="startDate" name="startDateAtten"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" #endDateAtten="ngModel" [(ngModel)]="endDate" name="endDate"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Instructor</label>
+                            <ng-select [items]="allIns" [searchable]="true" placeholder="Select Instructor"
+                                #instructor="ngModel" [(ngModel)]="instructors" name="instructors" bindValue="_id"
+                                [searchFn]="StaffSearchFn">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Courses</label>
+                            <ng-select [items]="allCourses" [searchable]="true" placeholder="Select Courses"
+                                #courses="ngModel" [(ngModel)]="coursesFilter" name="courses" bindValue="_id"
+                                [searchFn]="CourseSearchFn">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.coursecode}}
+                                        - {{item.coursename}}-
+                                        {{item.coursestartdate |
+                                        date:'mediumDate'}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.coursecode}} -
+                                    {{item.coursename}} -
+                                    {{item.coursestartdate |
+                                    date:'mediumDate'}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Schedule Status</label>
+                            <ng-select [items]="Status" [searchable]="true" placeholder="Filter Schedule Status"
+                                #status="ngModel" [(ngModel)]="StatusFilter" name="Status">
+
+                            </ng-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="ScheduleFilter()">Search</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary mt-30px btn-block " (click)="Export()">Export</button>
+                    </div>
+
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <input class="form-control" name="search" type="text" placeholder="Search..."
+                                (keyup)="filtersearch($event)">
+                        </div>
+                    </div>
+
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="course_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> course name
+                            </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{'color':row.approved?'green':'orange' }">
+                                {{row.course_code}} <br>
+                                {{row.course_name}} <br>
+                                {{row.coursestartdate | date:'mediumDate'}}
+
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="approved">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status
+                            </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{'color':row.approved?'green':'orange' }">
+
+                                {{row.approved?'Approved':'Pending'}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="start_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> start time
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.start_time | date: 'mediumDate'}}<br>{{row.start_time |
+                                    date: 'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="postpone_start_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> postpone <br> start time
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.postpone_start_time | date: 'mediumDate'}}<br>{{row.postpone_start_time |
+                                    date: 'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="end_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> end time
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.end_time | date: 'mediumDate'}}<br>{{row.end_time |
+                                    date: 'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="postpone_end_time">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> postpone <br> end time
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <p>{{row.postpone_end_time | date: 'mediumDate'}}<br>{{row.postpone_end_time |
+                                    date: 'shortTime'}}</p>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="instructor_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> instructor
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.instructor_name}} - {{row.instructor_invid}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="postponeinstructor_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> postpone instructor
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.postponeinstructor_name}} - {{row.postponeinstructor_invid}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="zoom_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> zoom details
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.zoom_name}} <br>
+                                {{row.zoom_email}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="postponezoom_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Postpone zoom details
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.postponezoom_name}} <br>
+                                {{row.postponezoom_email}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="postpone_reason_type">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> reason type
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.postpone_reason_type}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="postpone_reason">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> reason
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.postpone_reason}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="announcement_reason">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Announcement <br> reason
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.announcement_reason}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="sendNotification">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Send Notification
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.sendNotification?'Yes':'No'}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="option">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Options
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <a ngbDropdown class="dropdown drop" *ngIf="!row.approved">
+                                    <button type="button" id="insdropdown" ngbDropdownToggle
+                                        class="btn p-0 m-3 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="More Options"
+                                            class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                        <a *ngIf="!row.approved" ngbDropdownItem (click)="Approve(row)"><i
+                                                class="feather icon-check icon-xs mr-2"></i> Approve schedule
+                                        </a>
+                                        <a *ngIf="!row.approved" ngbDropdownItem (click)="editSchedule(row)">
+                                            <i class='feather icon-edit-2 icon-xs mr-2'></i> Edit schedule
+                                        </a>
+                                        <a *ngIf="!row.approved" ngbDropdownItem (click)="deleteSchedule(row._id)">
+                                            <i class="feather icon-trash-2 icon-xs mr-2"></i> Delete schedule
+                                        </a>
+                                    </div>
+                                </a>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                        </tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

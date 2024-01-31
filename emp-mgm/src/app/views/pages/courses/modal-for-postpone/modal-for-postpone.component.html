@@ -1,0 +1,209 @@
+<!--  Postpone Model -->
+
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Postpone Schedule</h5>
+    <button type="button" class="close" (click)="activeModal.close('close')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="container" style="height: auto;">
+        <h6 class="card-title">Previous Schedule</h6>
+        <div class="row">
+            <div class="col-md-12">
+                <ng-select [items]="allCourses" [searchable]="true" placeholder="Course"
+                    [(ngModel)]="postponeSchedule.course_id" name="course_id" bindValue="_id" [readonly]="true">
+                    <ng-template ng-label-tmp let-item="item">
+                        <span class="ng-value-label">{{item.coursecode}}
+                            - {{item.coursename}}-
+                            {{item.coursestartdate |
+                            date:'mediumDate'}}</span>
+                    </ng-template>
+
+                    <ng-template ng-option-tmp let-item="item">
+                        {{item.coursecode}} -
+                        {{item.coursename}} -
+                        {{item.coursestartdate |
+                        date:'mediumDate'}}
+                    </ng-template>
+                </ng-select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Class Date</label>
+                    <input type="date" readonly [(ngModel)]="postponeSchedule.class_date" name="class_date"
+                        class="form-control">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label>Start Time</label>
+                <ng-select [items]="allSlots" placeholder="Select Start Time" [(ngModel)]="postponeSchedule.start_slot"
+                    name="start_time" bindValue="start_min" bindLabel="slot" [readonly]="true">
+                </ng-select>
+            </div>
+            <div class="col-md-2">
+                <label>End Time</label>
+                <ng-select [items]="allSlots" placeholder="Select End Time" [(ngModel)]="postponeSchedule.end_slot"
+                    name="end_time" bindLabel="slot" bindValue="start_min" [readonly]="true">
+                </ng-select>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Instructor</label>
+                    <ng-select [items]="allIns" placeholder="Select Instructor"
+                        [(ngModel)]="postponeSchedule.instructorid" name="instructorid" bindValue="_id"
+                        [readonly]="true">
+                        <ng-template ng-label-tmp let-item="item">
+                            <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                        </ng-template>
+
+                        <ng-template ng-option-tmp let-item="item">
+                            {{item.invid}} - {{item.fullName}}
+                        </ng-template>
+                    </ng-select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Licence</label>
+                    <ng-select [items]="allLicence" placeholder="Select Zoom Licence"
+                        [(ngModel)]="postponeSchedule.licenceid" name="licenceid" bindValue="_id" bindLabel="email"
+                        [readonly]="true">
+                    </ng-select>
+                </div>
+            </div>
+        </div>
+
+        <form #postponescheduleForm="ngForm">
+            <h5 class="card-title my-3"> New Schedule</h5>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Class Date*</label>
+                        <input type="date" #postpone_class_date="ngModel" [min]="MINDATE"
+                            [(ngModel)]="postponeSchedule.postpone_class_date" name="postpone_class_date"
+                            class="form-control" (change)="checkstatus()">
+                        <p class="text-danger mt-1"
+                            *ngIf="postpone_class_date?.errors?.min && (postponescheduleForm.submitted || postpone_class_date.dirty || postpone_class_date.touched)">
+                            Min date is {{MINDATE}}</p>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label>Start Time*</label>
+                    <ng-select [items]="allSlots" [searchable]="true" placeholder="Select Start Time"
+                        #postpone_start_slot="ngModel" [(ngModel)]="postponeSchedule.postpone_start_slot"
+                        name="postpone_start_slot" bindValue="start_min" bindLabel="slot" required
+                        (change)="checkstatus()">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="postpone_start_slot?.errors?.required && (postponescheduleForm.submitted || postpone_start_slot.dirty || postpone_start_slot.touched)">
+                        This field is required.</p>
+                </div>
+                <div class="col-md-2">
+                    <label>End Time*</label>
+                    <ng-select [items]="allSlots" [searchable]="true" placeholder="Select End Time"
+                        #postpone_end_slot="ngModel" [(ngModel)]="postponeSchedule.postpone_end_slot"
+                        name="postpone_end_slot" bindLabel="slot" bindValue="start_min" required
+                        (change)="checkstatus()">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="postpone_end_slot?.errors?.required && (postponescheduleForm.submitted || postpone_end_slot.dirty || postpone_end_slot.touched)">
+                        This field is required.</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Instructor*</label>
+                        <ng-select [items]="allIns" [searchable]="true" placeholder="Select Instructor"
+                            #postpone_instructor_id="ngModel" [(ngModel)]="postponeSchedule.postpone_instructor_id"
+                            name="postpone_instructor_id" bindValue="_id" required [searchFn]="StaffSearchFn"
+                            (change)="checkstatus()">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="postpone_instructor_id?.errors?.required && (postponescheduleForm.submitted || postpone_instructor_id.dirty || postpone_instructor_id.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Licence*</label>
+                        <ng-select [items]="allLicence" [searchable]="true" placeholder="Select Zoom Licence"
+                            #postpone_licence_id="ngModel" [(ngModel)]="postponeSchedule.postpone_licence_id"
+                            name="postpone_licence_id" bindValue="_id" bindLabel="email" required
+                            (change)="checkstatus()">
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="postpone_licence_id?.errors?.required && (postponescheduleForm.submitted || postpone_licence_id.dirty || postpone_licence_id.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Reason Type*</label>
+                        <select class="form-control" #postpone_reason_type="ngModel"
+                            [(ngModel)]="postponeSchedule.postpone_reason_type" name="postpone_reason_type" required>
+                            <option value="">Select Reason Type</option>
+                            <option value="Instructor Medical Issue">Instructor Medical Issue</option>
+                            <option value="Instructor Personal Issue">Instructor Personal Issue</option>
+                            <option value="Official Purpose">Official Purpose</option>
+                            <option value="Holiday">Holiday</option>
+                            <option value="Others">Others</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="postpone_reason_type?.errors?.required && (postponescheduleForm.submitted || postpone_reason_type.dirty || postpone_reason_type.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Reason For Postpone Schedule*</label>
+                        <textarea rows="5" class="form-control" style="height:100px;"
+                            placeholder="Reason For Postpone Schedule" #postpone_reason="ngModel"
+                            [(ngModel)]="postponeSchedule.postpone_reason" name="postpone_reason" required>
+                                            </textarea>
+                        <p class="text-danger mt-1"
+                            *ngIf="postpone_reason?.errors?.required && (postponescheduleForm.submitted || postpone_reason.dirty || postpone_reason.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Send Notification?*</label>
+                        <select class="form-control" #sendNotification="ngModel" required [(ngModel)]="postponeSchedule.sendNotification" name="sendNotification">
+                            <option [ngValue]="true">Yes</option>
+                            <option [ngValue]="false">No</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="sendNotification?.errors?.required && (postponescheduleForm.submitted || sendNotification.dirty || sendNotification.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Reason to Show in Announcement*</label>
+                        <input type="text" class="form-control" placeholder="Reason to Show in Announcement"
+                            #announcement_reason="ngModel" [(ngModel)]="postponeSchedule.announcement_reason"
+                            name="announcement_reason" required>
+                        <p class="text-danger mt-1"
+                            *ngIf="announcement_reason?.errors?.required && (postponescheduleForm.submitted || announcement_reason.dirty || announcement_reason.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+
+            <ngb-alert class="mt-1" [dismissible]="false" [type]="'warning'" *ngIf="errormsg">
+                {{errormsg}}
+            </ngb-alert>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="submitForm()">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="activeModal.close('close')">Exit</button>
+    </div>
+</div>

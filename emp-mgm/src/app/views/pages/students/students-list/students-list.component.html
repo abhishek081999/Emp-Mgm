@@ -1,0 +1,107 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Students</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Students List</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Students List</h6>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="invid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Student ID </th>
+                            <td mat-cell *matCellDef="let row"><a (click)="profileview(row.invid)"
+                                    style="color: #737DF5;" ngbTooltip="View User Profile"> {{row.invid}} </a></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="fullName">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Full Name </th>
+                            <td mat-cell *matCellDef="let row"> {{row.fullName}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="email">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                            <td mat-cell *matCellDef="let row"> {{row.email}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telephone">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                            <td mat-cell *matCellDef="let row"> {{row.telephone}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="alternatenum">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Whatsapp </th>
+                            <td mat-cell *matCellDef="let row"> {{row.alternatenum}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="telegram">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Telegram </th>
+                            <td mat-cell *matCellDef="let row"> {{row.telegram}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="state">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> State </th>
+                            <td mat-cell *matCellDef="let row"> {{row.state}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="city">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> District </th>
+                            <td mat-cell *matCellDef="let row"> {{row.city}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="address">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Address </th>
+                            <td mat-cell *matCellDef="let row"> {{row.address}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="pincode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Pincode </th>
+                            <td mat-cell *matCellDef="let row"> {{row.pincode}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gstin">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> GSTIN </th>
+                            <td mat-cell *matCellDef="let row"> {{row.gstin}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gender">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th>
+                            <td mat-cell *matCellDef="let row"> {{row.gender}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="dob">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> DOB </th>
+                            <td mat-cell *matCellDef="let row"> {{row.dob}} </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

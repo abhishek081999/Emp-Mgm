@@ -1,0 +1,206 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">BCMB SALES REPORT </li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">BCMB SALES REPORT </h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Start Date*</label>
+                                <input type="date" #sdate="ngModel" [(ngModel)]="startDate" name="sdate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>End Date*</label>
+                                <input type="date" #edate="ngModel" [(ngModel)]="endDate" name="edate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Team</label>
+                            <ng-select [items]="allTeams" bindValue="_id" #teamid="ngModel" [(ngModel)]="team"
+                                name="teamid" placeholder="Search By Team Name">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.name}} - {{item.team_lead}} -
+                                        {{item.team_lead_name}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.name}} - {{item.team_lead}} - {{item.team_lead_name}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Employee</label>
+                            <ng-select [items]="allEmployee" bindValue="invid" #employeeid="ngModel"
+                                [(ngModel)]="employee" name="employeeid" placeholder="Search By Staff ID or Name"
+                                [searchFn]="StaffSearchFn">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Filter By Course Code</label>
+                                <ng-select [items]="coursecodes" #codeFilter="ngModel" [(ngModel)]="codefilter"
+                                    name="codeFilter" placeholder="Filter By Course Code" bindValue="id" bindLabel="id">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.id | uppercase}} {{item.date |
+                                            date:'mediumDate'}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.id | uppercase}} {{item.date | date:'mediumDate'}}
+                                    </ng-template>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="teamname">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Team </th>
+                            <td mat-cell *matCellDef="let row"> {{row.teamname}} <br> {{row.teamlead}} -
+                                {{row.teamleadname}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="coursecode">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
+                            <td mat-cell *matCellDef="let row"> {{row.coursecode}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="batch_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Batch Start Date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.batch_date | date:'mediumDate'}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="instructor">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Instructor </th>
+                            <td mat-cell *matCellDef="let row"> {{row.instructor | titlecase}}</td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="employee_id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee </th>
+                            <td mat-cell *matCellDef="let row"> {{row.employee_id}} - {{row.employee_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="seat_booked">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Seat Booked</th>
+                            <td mat-cell *matCellDef="let row"> {{row.seat_booked}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_seat_booked}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="partially_converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Partially <br> Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.partially_converted}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_partially_converted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="converted">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.converted}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_converted}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="active">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Active </th>
+                            <td mat-cell *matCellDef="let row"> {{row.active}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_active}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="inactive">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Inactive </th>
+                            <td mat-cell *matCellDef="let row"> {{row.inactive}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_inactive}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Reg. <br> Student </th>
+                            <td mat-cell *matCellDef="let row"> {{row.total}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_total}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="conversion_rate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Conversion Rate</th>
+                            <td mat-cell *matCellDef="let row"> {{row.conversion_rate | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_conversion_rate | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="active_rate">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Active Rate</th>
+                            <td mat-cell *matCellDef="let row"> {{row.active_rate | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_active_rate | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bookedamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Booked Amount (Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bookedamount | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalbookedamount | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paymentreceived">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Net Payment Received </th>
+                            <td mat-cell *matCellDef="let row"> {{row.paymentreceived | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totalpaymentreceived | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due (Incl. GST) </th>
+                            <td mat-cell *matCellDef="let row"> {{row.due | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{totaldue | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

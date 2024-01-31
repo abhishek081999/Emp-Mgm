@@ -1,0 +1,172 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Import Excel</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form #singleLeadForm="ngForm">
+        <div class="form-group">
+            <label>Upload Excel in Correct Format*</label>
+            <input id="backup" type="file"
+                accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                name="backup" (change)="handelFile($event)" class="file-upload-default" required>
+            <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Excel">
+                <span class="input-group-append">
+                    <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Lead Source*</label>
+                    <!--email-->
+                    <ng-select [items]="leadsource.sources" #source="ngModel" [(ngModel)]="newSingleLead.leadsource"
+                        name="source" (change)="Onchange()" required placeholder="Lead Source">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="source?.errors?.required && (singleLeadForm.submitted || source.dirty || source.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Language*</label>
+                    <ng-select [items]="alllang" [searchable]="true" placeholder="Select Language" required
+                        #CamLang="ngModel" [(ngModel)]="newSingleLead.language" (change)="Onchange()" name="language">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="CamLang?.errors?.required && (singleLeadForm.submitted || CamLang.dirty || CamLang.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Level*</label>
+                    <ng-select [items]="CampaignLevelDrop" [searchable]="true" placeholder="Select Level"
+                        #CamLvl="ngModel" [(ngModel)]="levelObj2" required (change)="Onchange()" name="Level">
+                        <ng-template ng-label-tmp let-item="item">
+                            <span class="ng-value-label">
+                                {{item.name}}</span>
+                        </ng-template>
+
+                        <ng-template ng-option-tmp let-item="item">
+                            {{item.name}}
+                        </ng-template>
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="CamLvl?.errors?.required && (singleLeadForm.submitted || CamLvl.dirty || CamLvl.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" name="excampaign" #excampaign="ngModel"
+                                [(ngModel)]="isExistingCampaign" (change)="Onchange()" class="form-check-input">
+                            <i class="input-frame"></i>
+                            Is Exsisting Campaign?
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="isExistingCampaign">
+                <div class="form-group">
+                    <label>Campaign Name</label>
+                    <ng-select [items]="existingCampaign" #campaign_name="ngModel"
+                        [(ngModel)]="newSingleLead.campaign_name" name="campaign_name" required
+                        placeholder="Select Campaign Name">
+                    </ng-select>
+                    <p class="text-danger mt-1"
+                        *ngIf="campaign_name?.errors?.required && (singleLeadForm.submitted || campaign_name.dirty || campaign_name.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="!isExistingCampaign">
+                <div class="form-group">
+                    <label>Campaign Date*</label>
+                    <input type="date" name="CampaignDate" #campaigndate="ngModel" required [(ngModel)]="campaignDate"
+                        (change)="Onchange()" class="form-control">
+                    <p class="text-danger mt-1"
+                        *ngIf="campaigndate?.errors?.required && (singleLeadForm.submitted || campaigndate.dirty || campaigndate.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="!isExistingCampaign">
+                <div class="form-group">
+                    <label>Campaign Name</label>
+                    <input type="text" class="form-control" #campaign_name="ngModel"
+                        [(ngModel)]="newSingleLead.campaign_name" name="campaign_name" autocomplete="off"
+                        placeholder="Campaign Name" readonly>
+                    <p class="text-danger mt-1"
+                        *ngIf="campaign_name?.errors?.required && (singleLeadForm.submitted || campaign_name.dirty || campaign_name.touched)">
+                        This field is required.</p>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <div class="table-responsive mt-3">
+        <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isEntirePageSelected()"
+                        [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                        [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row; let i = index">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row,i)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="leadsource">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Lead Source </th>
+                <td mat-cell *matCellDef="let row"> {{row.leadsource}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="leaddate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Lead Date </th>
+                <td mat-cell *matCellDef="let row"> {{row.leaddate | date: 'mediumDate'}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="phone">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
+                <td mat-cell *matCellDef="let row"> {{row.phone}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+                <td mat-cell *matCellDef="let row"> {{row.email}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="campaign_name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Campaign Name </th>
+                <td mat-cell *matCellDef="let row"> {{row.campaign_name}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+        </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[200]"></mat-paginator>
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+    <button type="button" class="btn btn-primary" [disabled]="singleLeadForm.invalid" (click)="upload()">Import Selected
+        ({{selection?.selected?.length}})</button>
+</div>

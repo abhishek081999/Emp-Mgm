@@ -1,0 +1,401 @@
+<!-- <nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Course Bundle</li>
+    </ol>
+</nav>
+
+<form #lessonForm="ngForm" enctype="multipart/form-data" (ngSubmit)="lessonForm.valid && submitForm($event)">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Course Bundle Basic Info</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Course Bundle title*<a placement="top" ngbTooltip="Title in 35-50 letters"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #coursename="ngModel" 
+                                    [(ngModel)]="newCourse.coursename" 
+                                    name="coursename"
+                                    required
+                                    minlength="35" 
+                                    maxlength="50"
+                                    placeholder="Course title">
+                                    Letter Count: {{newCourse.coursename.length}}/50 <i  *ngIf="newCourse.coursename.length>=35" class="small-icon" data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1" *ngIf="coursename?.errors?.required && (lessonForm.submitted || coursename.dirty || coursename.touched)">This field is required.</p>
+                                <p class="text-danger mt-1" *ngIf="coursename?.errors?.minlength && (lessonForm.submitted || coursename.dirty || coursename.touched)">Min length mustbe 35.</p>
+                                <p class="text-danger mt-1" *ngIf="coursename?.errors?.maxlength && (lessonForm.submitted || coursename.dirty || coursename.touched)">Max length mustbe 50.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Course Bundle Code</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #coursecode="ngModel" 
+                                    [(ngModel)]="newCourse.coursecode" 
+                                    name="coursecode"
+                                    disabled
+                                    placeholder="Course Code Auto generated">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Course Bundle Price*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #courseprice="ngModel" 
+                                    [(ngModel)]="newCourse.courseprice" 
+                                    name="courseprice"
+                                    required
+                                    placeholder="Course Price">
+                                <p class="text-danger mt-1" *ngIf="courseprice?.errors?.required && (lessonForm.submitted || courseprice.dirty || courseprice.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Course Bundle Discounted Price</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #discountedprice="ngModel" 
+                                    [(ngModel)]="newCourse.discountedprice" 
+                                    name="discountedprice"
+                                    placeholder="Course Discounted Price">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Course Bundle Duration*<a placement="top" ngbTooltip="In Hours"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #courseduration="ngModel" 
+                                    [(ngModel)]="newCourse.courseduration" 
+                                    name="courseduration"
+                                    required
+                                    placeholder="Course Duration in Hours i.e. 28 Hours">
+                                <p class="text-danger mt-1" *ngIf="courseduration?.errors?.required && (lessonForm.submitted || courseduration.dirty || courseduration.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>No. of Lesson*<a  placement="top" ngbTooltip="i.e. 40,50"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #numberoflesson="ngModel" 
+                                    [(ngModel)]="newCourse.numberoflesson" 
+                                    name="numberoflesson"
+                                    required
+                                    placeholder="Number Of Lesson">
+                                <p class="text-danger mt-1" *ngIf="numberoflesson?.errors?.required && (lessonForm.submitted || numberoflesson.dirty || numberoflesson.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                      
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Course Bundle picture*</label>
+                                <input
+                                    id="file"
+                                    type="file"
+                                    class="form-control"
+                                    name="coursepicture"
+                                    accept="image/*"
+                                    (change)="handelFile($event,newCourse,'coursepicture')"
+                                    required>
+                                <p class="text-danger mt-1" *ngIf="lessonForm.submitted && !newCourse.coursepicture">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Intro Video link<a placement="top" ngbTooltip="Embed url"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #introvideo="ngModel" 
+                                    [(ngModel)]="newCourse.introvideo" 
+                                    name="introvideo"
+                                    placeholder="Intro Video">
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Category*</label>
+                                <ng-select
+                                    [items]="categories"
+                                    [multiple]="true"
+                                    [closeOnSelect]="false"
+                                    [searchable]="true"
+                                    placeholder="Select Categories"
+                                    #coursecategory="ngModel" 
+                                    [(ngModel)]="newCourse.coursecategory" 
+                                    name="coursecategory"
+                                    required>
+                                </ng-select>
+                                <p class="text-danger mt-1" *ngIf="coursecategory?.errors?.required && (lessonForm.submitted || coursecategory.dirty || coursecategory.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                            <label>Brochure(if any)</label>
+                            <input
+                                id="file"
+                                type="file"
+                                accept="application/pdf"
+                                class="form-control"
+                                name="brochure"
+                                (change)="handelFile($event,newCourse,'brochure')">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Upcoming Course Bundle?</label>
+                                <select 
+                                    class="form-control"
+                                    #upcoming="ngModel" 
+                                    [(ngModel)]="newCourse.upcoming" 
+                                    name="upcoming">
+                                    <option  [ngValue]="true">Yes</option>
+                                    <option  [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Emi Available?</label>
+                                <select 
+                                    class="form-control"
+                                    #emi="ngModel" 
+                                    [(ngModel)]="newCourse.emiavailable" 
+                                    name="emi">
+                                    <option  [ngValue]="true">Yes</option>
+                                    <option  [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Course Bundle Description</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Course Description* <a  placement="top" ngbTooltip="Description in minimum 150 Letters"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea 
+                                    rows="5" 
+                                    class="form-control" 
+                                    style="height:100px;" 
+                                    placeholder="Description in minimum 150 Letters"
+                                    #coursedescription="ngModel" 
+                                    [(ngModel)]="newCourse.coursedescription" 
+                                    name="coursedescription"
+                                    minlength="150"
+                                    required>
+                                </textarea>
+                                Letter Count: {{newCourse.coursedescription.length}} <i  *ngIf="newCourse.coursedescription.length>=150" class="small-icon" data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1" *ngIf="coursedescription?.errors?.required && (lessonForm.submitted || coursedescription.dirty || coursedescription.touched)">This field is required.</p>
+                                <p class="text-danger mt-1" *ngIf="coursedescription?.errors?.minlength && (lessonForm.submitted || coursedescription.dirty || coursedescription.touched)">Min length is 150 Letters.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Benefits of The Course Bundle*<a  placement="top" ngbTooltip="Benefits of The course separated by coma (,)"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea 
+                                    rows="5" 
+                                    class="form-control" 
+                                    style="height:100px;" 
+                                    placeholder="Benefits of The course bundle separated by coma (,)"
+                                    #benefits="ngModel" 
+                                    [(ngModel)]="coursebenefits" 
+                                    name="benefits"
+                                    required>
+                                </textarea>
+                                <p class="text-danger mt-1" *ngIf="benefits?.errors?.required && (lessonForm.submitted || benefits.dirty || benefits.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Who Should Join the Course Bundle?*<a  placement="top" ngbTooltip="who should join The course separated by coma (,)"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea 
+                                    rows="5" 
+                                    class="form-control" 
+                                    style="height:100px;" 
+                                    placeholder="who should join The course bundle separated by coma (,)"
+                                    #audience="ngModel" 
+                                    [(ngModel)]="courseaudience" 
+                                    name="audience"
+                                    required>
+                                </textarea>
+                                <p class="text-danger mt-1" *ngIf="audience?.errors?.required && (lessonForm.submitted || audience.dirty || audience.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Sidepanel Title<a  placement="top" ngbTooltip="Sidepanel Title "><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    class="form-control" 
+                                    placeholder="Sidepanel Title "
+                                    #ddt="ngModel"
+                                    [(ngModel)]="newCourse.sidepanel.title" 
+                                    name="ddt">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Sidepanel Details<a  placement="top" ngbTooltip="Sidepanel Details separated by semicolon (;)"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea 
+                                    rows="5" 
+                                    class="form-control" 
+                                    style="height:100px;" 
+                                    placeholder="Sidepanel Details separated by semicolon (;)"
+                                    #dd="ngModel" 
+                                    [(ngModel)]="sidepaneldetails" 
+                                    name="dd">
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Up-Sale Products<a placement="top" ngbTooltip="select Multiple"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                            <ng-select
+                                [items]="allPackage"
+                                [multiple]="true"
+                                [closeOnSelect]="false"
+                                [searchable]="true"
+                                placeholder="Select Up-Sale Products"
+                                #crosssale="ngModel" 
+                                [(ngModel)]="newCourse.crosssale" 
+                                bindValue="_id"
+                                bindLabel="name"
+                                name="crosssale" >
+                            </ng-select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Cross-Sale Products<a placement="top" ngbTooltip="select Multiple"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                            <ng-select
+                                [items]="allCourse"
+                                [multiple]="true"
+                                [closeOnSelect]="false"
+                                [searchable]="true"
+                                placeholder="Select Cross-Sale Products"
+                                #upsale="ngModel" 
+                                bindValue="_id"
+                                bindLabel="coursename"
+                                [(ngModel)]="newCourse.upsale" 
+                                name="upsale">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Course Bundle Courses</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="wd-100p">
+                                <tr *ngFor="let course of cbundlecourse; let in=index">
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <ng-select 
+                                                        [items]="allCourse"
+                                                        bindLabel="coursecode"
+                                                        #courseid="ngModel" 
+                                                        [(ngModel)]="course.course" 
+                                                        name="courseid{{in}}" 
+                                                        required>
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1" *ngIf="courseid?.errors?.required && (lessonForm.submitted || courseid.dirty || courseid.touched)">This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                <input 
+                                                    readonly
+                                                    type="text" 
+                                                    class="form-control"
+                                                    name="coursename{{in}}"
+                                                    [value]="getcoursename(course.course)"
+                                                    placeholder="Course Name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control"
+                                                    #title="ngModel" 
+                                                    min="0"
+                                                    max="100"
+                                                    [(ngModel)]="course.percentage" 
+                                                    name="title{{in}}"
+                                                    required
+                                                    placeholder="percentage(%)*">
+                                                    <p class="text-danger mt-1" *ngIf="title?.errors?.required && (lessonForm.submitted || title.dirty || title.touched)">This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                <input 
+                                                    readonly
+                                                    type="text" 
+                                                    class="form-control"
+                                                    name="amount{{in}}"
+                                                    disabled
+                                                    [value]="getamount(course.percentage)"
+                                                    placeholder="Amount">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group"> 
+                                                    <a (click)="removeForm(in)"><i class="small-icon" data-feather="minus-circle" appFeatherIcon></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <a (click)="addForm()" class="btn btn-primary"><i class="small-icon" data-feather="plus-circle" appFeatherIcon></i>Add Course</a>                          
+                        </div>
+                    </div>
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'" *ngIf="(lessonForm.submitted || lessonForm.dirty || lessonForm.touched) && lessonForm.invalid">
+                        You Missed Some Fields
+                    </ngb-alert>
+                    <button class="btn btn-primary mt-2">Submit</button>
+                    <p class="mb-2 mt-2" *ngIf="isupload">
+                        <ngb-progressbar type="primary" [value]="progressvalue" [showValue]="true"></ngb-progressbar>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form> -->

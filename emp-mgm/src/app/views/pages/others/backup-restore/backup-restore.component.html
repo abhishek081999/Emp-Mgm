@@ -1,0 +1,47 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Others</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Backup-restore</li>
+    </ol>
+</nav>
+
+<div class="row">
+	<div class="col-md-6 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Backup Database</h6>
+                <button (click)="backup()" class="btn btn-primary">Download Backup</button>
+            </div>
+		</div>
+	</div>
+    <!-- <div class="col-md-6 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Restore Database</h6>
+                <form #bookForm="ngForm" (ngSubmit)="bookForm.valid && submit($event)" class="forms-sample">
+                    <div class="form-group">
+                        <label>Upload Backup File(.gz file)*</label>
+                        <input 
+                            id="backup"
+                            type="file" 
+                            accept="application/gzip"
+                            name="backup"
+                            (change)="handelFile($event)"
+                            class="file-upload-default" 
+                            required
+                        >
+                        <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                          <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload File">
+                          <span class="input-group-append">
+                            <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                          </span>
+                        </div>
+                    </div>
+                    <button [disabled]="!isfilepresent" type="submit" class="btn btn-primary mr-2 mb-3">Submit</button>
+                    <p *ngIf="isupload"><ngb-progressbar type="primary" [value]="progressvalue" [striped]="true" [showValue]="true" [animated]="true"></ngb-progressbar></p>
+                </form>
+                
+            </div>
+		</div>
+	</div> -->
+</div>

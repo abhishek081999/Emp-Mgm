@@ -1,0 +1,142 @@
+<div class="container">
+    <form #EmpRegForm="ngForm" (ngSubmit)="EmpRegForm.valid && submit()">
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                        class="form-control" placeholder="Enter your email" [(ngModel)]="signup.email" #Email="ngModel"
+                        required>
+                    <p class="text-danger mt-1"
+                        *ngIf="Email?.errors?.required && (Email.dirty || Email.touched || EmpRegForm.submitted)">
+                        This field is required.</p>
+                    <p class="text-danger mt-1" *ngIf="Email?.errors?.pattern">Please enter a valid email address.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <div class="password-input-container">
+                        <label>Password:</label>
+
+                        <input [type]="showPassword ? 'text' : 'password'" name="password" class="form-control"
+                            [(ngModel)]="signup.password" placeholder="Enter your Password" #Password="ngModel"
+                            required>
+
+                        <i *ngIf="showPassword && signup.password" (click)="togglePasswordVisibility()"
+                            class="feather eye-icon icon-eye icon-xs ml-2" style="color: rgb(9, 181, 9);"></i>
+                        <i *ngIf="!showPassword && signup.password" (click)="togglePasswordVisibility()"
+                            class="feather eye-icon icon-eye-off icon-xs ml-2"></i>
+                    </div>
+
+                    <p class="text-danger mt-1"
+                        *ngIf="Password?.errors?.required && (Password.dirty || Password.touched || EmpRegForm.submitted)">
+                        This field is required.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <div class="password-input-container">
+                        <label>Confirm Password:</label>
+                        <input [type]="showPassword ? 'text' : 'password'" name="password"
+                            placeholder="Re-enter your Password" class="form-control" #Confirm="ngModel"
+                            [(ngModel)]="confirmPassword" (change)="passwordsMatch()" required>
+
+                        <i *ngIf="showPassword && confirmPassword" (click)="togglePasswordVisibility()"
+                            class="feather eye-icon icon-eye icon-xs ml-2" style="color: rgb(9, 181, 9);"></i>
+                        <i *ngIf="!showPassword && confirmPassword" (click)="togglePasswordVisibility()"
+                            class="feather eye-icon icon-eye-off icon-xs ml-2"></i>
+
+                    </div>
+
+                    <p class="text-danger mt-1" *ngIf="!passwordsMatch() ">
+                        The passwords are not same</p>
+                </div>
+            </div>
+
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="Name">Full Name:</label>
+                    <input type="text" id="Name" name="Name" class="form-control" placeholder="Enter your Full Name"
+                        [(ngModel)]="signup.fullName" #name="ngModel" required>
+                    <p class="text-danger mt-1"
+                        *ngIf="name?.errors?.required && (name.dirty || name.touched || EmpRegForm.submitted)">
+                        This field is required.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="text" id="phone" name="phone" pattern="[6-9][0-9]{9}" class="form-control"
+                        placeholder="Enter your Phone Number" [(ngModel)]="signup.telephone" #phone="ngModel" required>
+                    <p class="text-danger mt-1"
+                        *ngIf="phone?.errors?.required && (phone.dirty || phone.touched || EmpRegForm.submitted)">
+                        This field is required.</p>
+                    <p class="text-danger mt-1" *ngIf="phone?.errors?.pattern">
+                        Please enter a valid mobile number. </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="wp">Whatsapp Number:</label>
+                    <input type="text" id="wp" name="wp" pattern="[6-9][0-9]{9}" class="form-control"
+                        placeholder="Enter your Whatsapp Number" [(ngModel)]="signup.alternatenum" #wp="ngModel"
+                        required>
+                    <p class="text-danger mt-1"
+                        *ngIf="wp?.errors?.required && (wp.dirty || wp.touched || EmpRegForm.submitted)">
+                        This field is required.</p>
+                    <p class="text-danger mt-1" *ngIf="wp?.errors?.pattern">
+                        Please enter a valid mobile number. </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>
+                        Department</label>
+                    <ng-select [items]="departments" [searchable]="true" bindValue="_id"
+                        bindLabel="name" #departmentAtten="ngModel" [(ngModel)]="signup.department"
+                        class="wd-md-340 border-0 rounded-sm" name="departmentAtten"
+                        placeholder="Select Departments">
+                    </ng-select>
+                </div>
+            </div>
+            <button [disabled]="!passwordsMatch() || EmpRegForm.invalid" type="submit" style="width: 100%;"
+                class="btn btn-primary">Register</button>
+        </div>
+
+    </form>
+
+</div>
+
+<div class="container mt-5">
+    <div class="table-responsive" *ngIf="isSubmit">
+        <table class="table table-hover table-bordered" cellspacing="0">
+            <thead class="thead-light">
+                <tr>
+                    <th>Staff Id</th>
+                    <th>Full Name</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>WhatsApp Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ signupres.invid }}</td>
+                    <td>{{ signupres.fullName }}</td>
+                    <td>{{ employee_dep?.name }}</td>
+                    <td>{{ signupres.email }}</td>
+                    <td>{{ signupres.telephone }}</td>
+                    <td>{{ signupres.alternatenum }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

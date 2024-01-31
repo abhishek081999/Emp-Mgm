@@ -1,0 +1,163 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Support</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Chat Feedback</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="card">
+        <div class="card-body">
+            <div class="card-title">FeedBack</div>
+            <!-- <div class="row mb-2">
+                <div class="col-md-6"></div>
+            </div> -->
+            <div class="row mb-2">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Student*</label>
+                        <ng-select [items]="allstudents" required placeholder="Search by Student ID" #studentid="ngModel"
+                            [(ngModel)]="student" (change)="filter()" name="studentid" bindValue="invid">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item?.invid}} - {{item?.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item?.invid}} - {{item?.fullName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Agent </label>
+                        <ng-select [items]="allEmployes" [searchable]="true" required
+                            placeholder="Search by Agent " #EmpId="ngModel" [(ngModel)]="Emps" bindValue="invid"
+                            bindLabel="fullName" (change)="filter()" name="EmpId">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item?.invid}} - {{item?.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item?.invid}} - {{item?.fullName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Resolve Status</label>
+                        <ng-select [items]="isResolveddrop" placeholder="Select Resolve Status" #IsResolve="ngModel"
+                            [(ngModel)]="IsResolved" (change)="filter()" name="resolvestatus">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                </div>
+            </div>
+
+            <div *ngIf="isLoading" class="spinner-wrapper">
+                <div class="spinner">Loading...</div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                    matSort>
+
+                    <ng-container matColumnDef="userName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Student
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.userName}} - {{row.userInvid}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="agentName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Agent
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.agentName}} - {{row.agentInvid}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.type}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="is_resolved">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Resolved?
+                        </th>
+                        <td mat-cell *matCellDef="let row" [ngStyle]="{'color':row.is_resolved?'green':'red'}">
+                            {{row.is_resolved?'Yes':'No'}} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="rating">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Rating
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.rating}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="comment">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Comment
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.comment}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="conv_point">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Point
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.conv_point}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="initiated_at">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Initiated At
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.initiated_at | date:'medium'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="acknowledged_at">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Acknowledged At
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.acknowledged_at | date:'medium'}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="response_tat">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Response TAT
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{getLoginHours(row.initiated_at,row.acknowledged_at)}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="resolved_at">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Resolve At
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{row.resolved_at | date:'medium'}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="resolve_tat">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Resolve TAT
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{getLoginHours(row.acknowledged_at,row.resolved_at)}} </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                    </tr>
+                </table>
+            </div>
+            <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+
+        </div>
+    </div>
+</div>

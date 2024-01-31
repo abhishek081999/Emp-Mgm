@@ -1,0 +1,350 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Products</li>
+    </ol>
+</nav>
+
+<form #productForm="ngForm" (ngSubmit)="productForm.valid && submitForm(productForm)">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Product Basic Info</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Product Name*</label>
+                                <input type="text" class="form-control" #name="ngModel" [(ngModel)]="product.name"
+                                    name="name" required autocomplete="off" placeholder="Product name" minlength="35"
+                                    maxlength="50">
+                                Letter Count: {{product?.name?.length}}/50 <i *ngIf="product?.name?.length>=35"
+                                    class="small-icon" data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.required && (productForm.submitted || name.dirty || name.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.minlength && (productForm.submitted || name.dirty || name.touched)">
+                                    Min length mustbe 35.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.maxlength && (productForm.submitted || name.dirty || name.touched)">
+                                    Max length mustbe 50.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Product Code</label>
+                                <input type="text" class="form-control" #productid="ngModel"
+                                    [(ngModel)]="product.productid" name="productid" disabled
+                                    placeholder="Product Code Auto generated">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Product Price*</label>
+                                <input type="text" class="form-control" #price="ngModel" [(ngModel)]="product.price"
+                                    name="price" required placeholder="Product Price">
+                                <p class="text-danger mt-1"
+                                    *ngIf="price?.errors?.required && (productForm.submitted || price.dirty || price.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Product Discounted Price</label>
+                                <input type="text" class="form-control" #discounted_price="ngModel"
+                                    [(ngModel)]="product.discounted_price" name="discounted_price"
+                                    placeholder="Product Discounted Price">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Product Duration<a placement="top" ngbTooltip="In Hours"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #duration="ngModel"
+                                    [(ngModel)]="product.duration" name="duration"
+                                    placeholder="Product Duration in Hours i.e. 28 Hours">
+                                <p class="text-danger mt-1"
+                                    *ngIf="duration?.errors?.required && (productForm.submitted || duration.dirty || duration.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Product Validity*<a placement="top" ngbTooltip="In Days (0 for Lifetime)"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #validity="ngModel"
+                                    [(ngModel)]="product.validity" name="validity" required
+                                    placeholder="Product Validity in Days i.e. 7,15,30.. (0 for Lifetime)">
+                                <p class="text-danger mt-1"
+                                    *ngIf="validity?.errors?.required && (productForm.submitted || validity.dirty || validity.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Upload Image*</label>
+                                <input id="img" type="file" accept="image/*" name="img"
+                                    (change)="handelFileInput1($event)" class="file-upload-default" required>
+                                <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled=""
+                                        placeholder="Upload Image">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Intro Video link<a placement="top" ngbTooltip="Embed url"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #intro="ngModel" [(ngModel)]="product.intro"
+                                    name="intro" placeholder="Intro Video">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Product Type*</label>
+                                <select class="form-control" #type="ngModel" [(ngModel)]="product.type" name="type"
+                                    required>
+                                    <option value="">Select Product Type</option>
+                                    <option value="Normal">Normal Product</option>
+                                    <option value="Live Market Practice">Live Market Practice</option>
+                                    <option value="One to One Mentorship">One to One Mentorship</option>
+                                    <option value="Portfolio Checkup">Portfolio Checkup</option>
+                                    <option value="Live Technical Support Chat">Live Technical Support Chat</option>
+                                    <option value="Market Research">Market Research</option>
+                                    <option value="Invesletter">Invesletter</option>
+                                    <option value="Follow My Portfolio">Follow My Portfolio</option>
+                                    <option value="Wealth Insights">Wealth Insights</option>
+                                    <option value="Awareness Videos">Awareness Videos</option>
+
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="type?.errors?.required && (productForm.submitted || type.dirty || type.touched)">
+                                    This field is required.</p>
+
+                            </div>
+                        </div>
+                       
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Product Language*</label>
+                                <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                    #language="ngModel" [(ngModel)]="product.language" name="language" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="language?.errors?.required && (productForm.submitted || language.dirty || language.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3" *ngIf="product.type === 'Portfolio Checkup'">
+                            <div class="form-group">
+                                <label>Number of Stocks*</label>
+                                <input type="text" class="form-control" #stocks="ngModel"
+                                    [(ngModel)]="product.no_of_stocks" name="stocks" required
+                                    placeholder="Number of Stocks">
+                                <p class="text-danger mt-1"
+                                    *ngIf="stocks?.errors?.required && (productForm.submitted || stocks.dirty || stocks.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3"
+                            *ngIf="product.type === 'Live Market Practice' || product.type === 'One to One Mentorship' || product.type === 'Live Technical Support Chat'">
+                            <div class="form-group">
+                                <label>No. of Sessions*<a placement="top" ngbTooltip="i.e. 2,4"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #no_of_sessions="ngModel"
+                                    [(ngModel)]="product.no_of_sessions" name="no_of_sessions" required
+                                    placeholder="Number Of Sessions">
+                                <p class="text-danger mt-1"
+                                    *ngIf="no_of_sessions?.errors?.required && (productForm.submitted || no_of_sessions.dirty || no_of_sessions.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Hide Product?*</label>
+                                <select class="form-control" #hide="ngModel" [(ngModel)]="product.disable" name="hide" required>
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="hide?.errors?.required && (productForm.submitted || hide.dirty || hide.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Supported Device?*</label>
+                                <select class="form-control" #device="ngModel" [(ngModel)]="product.device_type" name="device" required>
+                                    <option value="">Select Supported Device</option>
+                                    <option value="All">All Device</option>
+                                    <option value="App">App</option>
+                                    <option value="Website">Website</option>
+                                </select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="device?.errors?.required && (productForm.submitted || device.dirty || device.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6" *ngIf="product.type === 'Normal'">
+                            <div class="form-group">
+                                <label>Product Url</label>
+                                <input type="text" class="form-control" #url="ngModel" [(ngModel)]="product.url"
+                                    name="url" autocomplete="off" placeholder="Url">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Minimum Selling Price*</label>
+                                <input type="text" class="form-control" #min_selling_price="ngModel"
+                                    [(ngModel)]="product.min_selling_price" name="min_selling_price"
+                                    placeholder="Minimum Selling Price" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="min_selling_price?.errors?.required && (productForm.submitted || min_selling_price.dirty || min_selling_price.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="product.type === 'Market Research'">
+                            <div class="form-group">
+                                <label>Market Research Category*</label>
+                                <ng-select [items]="market_research_category" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                    placeholder="Select Categories" #marketresearchcategory="ngModel"
+                                    [(ngModel)]="product.market_research_category" name="marketresearchcategory" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="marketresearchcategory?.errors?.required && (productForm.submitted || marketresearchcategory.dirty || marketresearchcategory.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3" *ngIf="product.type === 'Wealth Insights'">
+                            <div class="form-group">
+                                <label>Wealth Insights Category*</label>
+                                <ng-select [items]="wealth_insights_category" [multiple]="true" [closeOnSelect]="false" [searchable]="true"
+                                    placeholder="Select Categories" #wealthinsightscategory="ngModel"
+                                    [(ngModel)]="product.market_research_category" name="wealthinsightscategory" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="wealthinsightscategory?.errors?.required && (productForm.submitted || wealthinsightscategory.dirty || wealthinsightscategory.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Product Description</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Product Description* <a placement="top"
+                                        ngbTooltip="Description in minimum 150 Letters"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Description in minimum 150 Letters" #description="ngModel"
+                                    [(ngModel)]="product.description" name="description" minlength="150" required>
+                                </textarea>
+                                Letter Count: {{product?.description?.length}} <i
+                                    *ngIf="product?.description?.length>=150" class="small-icon"
+                                    data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1"
+                                    *ngIf="description?.errors?.required && (productForm.submitted || description.dirty || description.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="description?.errors?.minlength && (productForm.submitted || description.dirty || description.touched)">
+                                    Min length is 150 Letters.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Benefits of The Product*<a placement="top"
+                                        ngbTooltip="Benefits of The course separated by coma (,)"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Benefits of The course separated by coma (,)" #benefits="ngModel"
+                                    [(ngModel)]="productbenefits" name="benefits" required>
+                                </textarea>
+                                <p class="text-danger mt-1"
+                                    *ngIf="benefits?.errors?.required && (productForm.submitted || benefits.dirty || benefits.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Who Should Purchase the Product?*<a placement="top"
+                                        ngbTooltip="who should join The course separated by coma (,)"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="who should join The course separated by coma (,)" #audience="ngModel"
+                                    [(ngModel)]="productaudience" name="audience" required>
+                                </textarea>
+                                <p class="text-danger mt-1"
+                                    *ngIf="audience?.errors?.required && (productForm.submitted || audience.dirty || audience.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Sidepanel Title<a placement="top" ngbTooltip="Sidepanel Title "><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <input class="form-control" placeholder="Sidepanel Title " #ddt="ngModel"
+                                    [(ngModel)]="product.sidepanel.title" name="ddt">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Sidepanel Details<a placement="top"
+                                        ngbTooltip="Sidepanel Details separated by semicolon (;)"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Sidepanel Details separated by semicolon (;)" #dd="ngModel"
+                                    [(ngModel)]="sidepaneldetails" name="dd">
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+
+                    <!-- <div class="row">
+                        <div class="col-md-6">
+                            <label>Up-Sale Products<a placement="top" ngbTooltip="select Multiple"><i class="small-icon"
+                                        data-feather="help-circle" appFeatherIcon></i></a></label>
+                            <ng-select [items]="allProduct" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" placeholder="Select Up-Sale Products" #upsale="ngModel"
+                                [(ngModel)]="product.up_sale" bindValue="_id" bindLabel="name" name="upsale">
+                            </ng-select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Cross-Sale Products<a placement="top" ngbTooltip="select Multiple"><i
+                                        class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                            <ng-select [items]="allProduct" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" placeholder="Select Cross-Sale Products" #crosssale="ngModel"
+                                name="crosssale" bindValue="_id" bindLabel="name" [(ngModel)]="product.cross_sale">
+                            </ng-select>
+                        </div>
+                    </div> -->
+                    <!-- /row-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'"
+        *ngIf="(productForm.submitted || productForm.dirty || productForm.touched) && productForm.invalid">
+        You Missed Some Fields
+    </ngb-alert>
+    <button class="btn btn-primary mt-2">Submit</button>
+    <p class="mb-2 mt-2" *ngIf="isupload">
+        <ngb-progressbar type="primary" [value]="progressvalue" [showValue]="true"></ngb-progressbar>
+    </p>
+</form>

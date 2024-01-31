@@ -1,0 +1,137 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insignia</a></li>
+        <li class="breadcrumb-item active" aria-current="page"> INSIGNIA RANGE WISE CONVERSION REPORT</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title"> INSIGNIA RANGE WISE CONVERSION REPORT </h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" #sdate="ngModel" [(ngModel)]="startDate" name="sdate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" #edate="ngModel" [(ngModel)]="endDate" name="edate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="employee_code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee </th>
+                            <td mat-cell *matCellDef="let row"> {{row.employee_code}} - {{row.employee_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="range_1">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Insignia <br> Range 1 <br> &lt; 2000 </th>
+                            <td mat-cell *matCellDef="let row"> {{row.range_1}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_range_1}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="range_2">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Insignia <br> Range 2 <br> 2001 - 15000 </th>
+                            <td mat-cell *matCellDef="let row"> {{row.range_2}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_range_2}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="range_3">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Insignia <br> Range 3 <br> 15001 - 25000 </th>
+                            <td mat-cell *matCellDef="let row"> {{row.range_3}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_range_3}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="range_4">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Insignia <br> Range 4 <br> 25001 - 35000</th>
+                            <td mat-cell *matCellDef="let row"> {{row.range_4}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_range_4}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="range_5">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Insignia <br> Range 5 <br> 35001 - 50000 </th>
+                            <td mat-cell *matCellDef="let row"> {{row.range_5}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_range_5}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="range_6">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Insignia <br> Range 6 <br> 50000+ </th>
+                            <td mat-cell *matCellDef="let row"> {{row.range_6}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_range_6}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Insignia <br> Total</th>
+                            <td mat-cell *matCellDef="let row"> {{row.total}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_total}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="booked_amount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Booked Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.booked_amount | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_booked_amount | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="payment_received">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Received </th>
+                            <td mat-cell *matCellDef="let row"> {{row.payment_received | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_payment_received | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Due</th>
+                            <td mat-cell *matCellDef="let row"> {{row.due | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_due | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="average_order_value">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average <br>Order Value</th>
+                            <td mat-cell *matCellDef="let row"> {{row.average_order_value | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_average_order_value | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Policy List</li>
+    </ol>
+</nav>
+
+
+<!-- Table Data -->
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Policy List</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input class="form-control wd-md-200 border-0 rounded-sm" name="search" #search="ngModel"
+                [(ngModel)]="searchq" type="text" placeholder="Search..." (keyup)="filter()">
+        </div>
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select  
+                name="orderby" 
+                #statusfilter="ngModel" 
+                [(ngModel)]="pagefilter" 
+                class="form-control wd-md-200 border-0 rounded-sm" 
+                (change)="filter()">
+                    <option value="">Any status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6" *ngFor="let policylist of getAllpolicylist">
+            <div class="card m-3 border border-light">
+                <div class="card-body">
+                    <h4>{{policylist.policy_name | titlecase}}
+                        <span *ngIf="policylist.is_active" class="badge badge-pill badge-success mr-1">Active</span>
+                        <span *ngIf="!policylist.is_active" class="badge badge-pill badge-warning mr-1">InActive</span>
+                    </h4>
+                    <div class="m-4">
+                        <h5 class="card-text"><strong>Description :</strong> {{policylist.description}}</h5>
+                        <p class="card-text"><strong>Accrual Method :</strong> {{policylist.accrual_method}}</p>
+                        <p class="card-text"><strong>Leave Type :</strong> {{policylist.leave_type}}</p>
+                        <p class="card-text"><strong>Max Carry Days :</strong> {{policylist.max_carry_days}}</p>
+                        <p class="card-text"><strong>Max Consecutive :</strong> {{policylist.max_consecutive}}</p>
+                        <p class="card-text"><strong>Total Per Year :</strong> {{policylist.total_per_year}}</p>
+                        <p class="card-text"><strong>Waiting Period length :</strong>{{policylist.waiting_period_length}}</p>
+                        <p class="card-text"><strong>Waiting Period Unit :</strong> {{policylist.waiting_period_unit}}</p>
+                    </div>
+                </div>
+                <div class="float-right m-2">
+                    <div ngbDropdown class="dropdown float-right">
+                        <span class="m-2">In-Active</span><label class="switch">
+                            <input type="checkbox" [(ngModel)]="policylist.is_active"
+                                (change)="Active(policylist._id, policylist)">
+                            <span class="slider round"></span>
+                        </label><span class="m-2">Active</span>|
+        
+                        <button type="button" id="jobdropdown" ngbDropdownToggle
+                            class="btn p-0 m-1 no-dropdown-toggle-icon">
+                            <i ngbTooltip="Settings" class="feather icon-settings icon-md text-muted pb-3px "></i>
+                        </button>
+                        <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                            <button (click)="editpolicy(policylist)" ngbDropdownItem><i
+                                    class="feather icon-edit-2 icon-xs mr-2"></i> Edit Policy</button>
+                            <button (click)="duplicatepolicy(policylist)" ngbDropdownItem><i
+                                    class="feather icon-copy icon-xs mr-2"></i> Duplicate Policy</button>
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

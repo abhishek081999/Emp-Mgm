@@ -1,0 +1,288 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Question Set</li>
+    </ol>
+</nav>
+
+<form #quizForm="ngForm" enctype="multipart/form-data" (ngSubmit)="quizForm.valid && submitForm(quizForm)">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Exam Details</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Exam Name*<a placement="top" ngbTooltip="Exam Name"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #quizname="ngModel" 
+                                    [(ngModel)]="newquiz.quizname" 
+                                    name="quizname"
+                                    required
+                                    placeholder="Exam Name">
+                                <p class="text-danger mt-1" *ngIf="quizname?.errors?.required && (quizForm.submitted || quizname.dirty || quizname.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Exam Code</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #quizid="ngModel" 
+                                    [(ngModel)]="newquiz.quizid" 
+                                    name="quizid"
+                                    disabled
+                                    placeholder="Exam id Auto Genarated">
+                              </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Time (in minutes)*<a placement="top" ngbTooltip="Exam Time in minutes"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input 
+                                    type="number" 
+                                    class="form-control"
+                                    #time="ngModel" 
+                                    [(ngModel)]="newquiz.time" 
+                                    name="time"
+                                    min="1"
+                                    required
+                                    placeholder="Exam time">
+                                <p class="text-danger mt-1" *ngIf="time?.errors?.required && (quizForm.submitted || time.dirty || time.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Instructor Name*</label>
+                                <ng-select
+                                    [items]="allIns"
+                                    [searchable]="true"
+                                    placeholder="Select Instructor"
+                                    #teacherid="ngModel" 
+                                    [(ngModel)]="newquiz.teacherid"
+                                    name="teacherid" 
+                                    bindValue="_id"
+                                    required>
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                    </ng-template>
+    
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                            <p class="text-danger mt-1" *ngIf="teacherid?.errors?.required && (quizForm.submitted || teacherid.dirty || teacherid.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Num Of Attempt*<a placement="top" ngbTooltip="0 for Unlimited"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                        <input 
+                                            type="number" 
+                                            class="form-control"
+                                            #attempt="ngModel" 
+                                            [(ngModel)]="newquiz.numberofattempt" 
+                                            name="attempt"
+                                            min="0"
+                                            required
+                                            placeholder="Number of Attempt">
+                                        <p class="text-danger mt-1" *ngIf="attempt?.errors?.required && (quizForm.submitted || attempt.dirty || attempt.touched)">This field is required.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Total Marks<a placement="top" ngbTooltip="Total Marks Auto calculated"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control"
+                                            #total="ngModel" 
+                                            [(ngModel)]="newquiz.totalmarks" 
+                                            name="total"
+                                            disabled
+                                            placeholder="Total Marks Auto calculated">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Passing Marks*</label>
+                                        <input 
+                                            type="number" 
+                                            class="form-control"
+                                            #passing="ngModel" 
+                                            [(ngModel)]="newquiz.passingmarks" 
+                                            name="passing"
+                                            min="1"
+                                            required
+                                            placeholder="Passing Marks">
+                                        <p class="text-danger mt-1" *ngIf="passing?.errors?.required && (quizForm.submitted || passing.dirty || passing.touched)">This field is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Exam Type*<a placement="top" ngbTooltip="Evalutaion Test or Quiz Games"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <select 
+                                    class="form-control"
+                                    #type="ngModel" 
+                                    [(ngModel)]="newquiz.type"
+                                    required 
+                                    name="type">
+                                    <option value="">Select Type</option>
+                                    <option value="evaluationtest">Evaluation Test</option>
+                                    <option value="quizgames">Quiz Games</option>
+                                </select>
+                                <p class="text-danger mt-1" *ngIf="type?.errors?.required && (quizForm.submitted || type.dirty || type.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Questions</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="wd-100p">
+                                <tr *ngFor="let q of questions; let in=index">
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-11">
+                                                <ngb-accordion [closeOthers]="true">
+                                                    <ngb-panel title="{{q.question}}">
+                                                        <ng-template ngbPanelContent>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label>Question*<a placement="top" ngbTooltip="Question"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                        <input 
+                                                                            type="text" 
+                                                                            class="form-control"
+                                                                            #question="ngModel" 
+                                                                            [(ngModel)]="q.question" 
+                                                                            name="question{{in}}"
+                                                                            required
+                                                                            placeholder="Question">
+                                                                        <p class="text-danger mt-1" *ngIf="question?.errors?.required && (quizForm.submitted || question.dirty || question.touched)">This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Answer Type*<a placement="top" ngbTooltip="Single Choice or Multiple Choice"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                        <select 
+                                                                            class="form-control"
+                                                                            #anstype="ngModel" 
+                                                                            [(ngModel)]="q.anstype"
+                                                                            required 
+                                                                            (change)="typechange(q)"
+                                                                            name="anstype{{in}}">
+                                                                            <option value="">Select Answer Type</option>
+                                                                            <option value="single">Single Choice</option>
+                                                                            <option value="multiple">Multiple Choice</option>
+                                                                        </select>
+                                                                        <p class="text-danger mt-1" *ngIf="anstype?.errors?.required && (quizForm.submitted || anstype.dirty || anstype.touched)">This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Question Image<a placement="top" ngbTooltip="Question Image"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                        <input 
+                                                                        type="file" 
+                                                                        class="form-control"
+                                                                        accept="image/*"
+                                                                        (change)="handelFileInput($event,q)"
+                                                                        name="file{{in}}"
+                                                                        placeholder="file"
+                                                                        >                                          
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <hr>
+                                                                    <div class="row" *ngFor="let ops of q.options; let i=index">
+                                                                        <div *ngIf="q.anstype && q.anstype==='multiple'" class="col-md-1" style="padding: 0px 13px;">
+                                                                            <label>Ans*<a placement="top" ngbTooltip="Mark If it is the Answer"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                            <input required type="checkbox" name="ans{{in}}-{{i}}" #ans1="ngModel" [(ngModel)]="q.ans[i]">
+                                                                            <p class="text-danger mt-1" *ngIf="ans1?.errors?.required && (quizForm.submitted)">This field is required.</p>
+                                                                        </div>
+                                                                        <div *ngIf="q.anstype && q.anstype==='single'"  class="col-md-1" style="padding: 0px 13px;">
+                                                                            <label>Ans*<a placement="top" ngbTooltip="Mark If it is the Answer"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                            <input required type="radio" name="ans{{in}}" #ans="ngModel" [value]="i" [(ngModel)]="q.ans">
+                                                                            <p class="text-danger mt-1" *ngIf="ans?.errors?.required && (quizForm.submitted)">This field is required.</p>
+                                                                        </div>
+                                                                        <div class="col-md-6" >
+                                                                            <div class="form-group">
+                                                                                <label>Option*<a placement="top" ngbTooltip="Option"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                                <input 
+                                                                                    type="text" 
+                                                                                    class="form-control"
+                                                                                    #option="ngModel" 
+                                                                                    [(ngModel)]="ops.option" 
+                                                                                    name="option{{in}}-{{i}}"
+                                                                                    required
+                                                                                    placeholder="Option">
+                                                                                <p class="text-danger mt-1" *ngIf="option?.errors?.required && (quizForm.submitted || option.dirty || option.touched)">This field is required.</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <div class="form-group">
+                                                                                <label>Option Image<a placement="top" ngbTooltip="Option Image"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                                                                                <input 
+                                                                                type="file" 
+                                                                                accept="image/*"
+                                                                                class="form-control"
+                                                                                (change)="handelFileInput1($event,ops)"
+                                                                                name="file{{in}}-{{i}}"
+                                                                                placeholder="file"
+                                                                                >                                          
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-1" style="padding: 28px 15px;">
+                                                                            <div class="form-group"> 
+                                                                                <a (click)="removeOps(q,q.options,i)"><i class="small-icon" data-feather="minus-circle" appFeatherIcon></i></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <a (click)="addOps(q,q.options)" class="btn btn-primary"><i class="small-icon" data-feather="plus-circle" appFeatherIcon></i>Add Options</a>
+                                                                    <hr>
+                                                                </div>
+                                                            </div>
+                                                        </ng-template>
+                                                    </ngb-panel>
+                                                </ngb-accordion>
+                                                </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group"> 
+                                                    <a class="delete" (click)="removeForm(in)"><i class="small-icon" data-feather="minus-circle" appFeatherIcon></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <a (click)="addForm()" class="btn btn-primary"><i class="small-icon" data-feather="plus-circle" appFeatherIcon></i>Add Question</a>
+                        </div>
+                    </div>
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'" *ngIf="(quizForm.submitted || quizForm.dirty || quizForm.touched) && quizForm.invalid">
+                        You Missed Some Fields
+                    </ngb-alert>
+                    <button class="btn btn-primary mt-2">Submit</button>
+                    <p class="mb-2 mt-2" *ngIf="isupload">
+                        <ngb-progressbar type="primary" [value]="progressvalue" [showValue]="true"></ngb-progressbar>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,101 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Subscription</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Subscription</h6>
+                <form #packageForm="ngForm" (ngSubmit)="packageForm.valid && submitForm()">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Package Name</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #name="ngModel" 
+                                    [(ngModel)]="newpackage.name" 
+                                    name="name"
+                                    required
+                                    placeholder="Package name">
+                                <p class="text-danger mt-1" *ngIf="name?.errors?.required && (name.dirty || name.touched || packageForm.submitted)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <h6>Features</h6>
+                            <table class="wd-1009">
+                                <tr *ngFor="let f of allfeature; let i=index">
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input 
+                                                    type="text" 
+                                                    class="form-control"
+                                                    #days="ngModel" 
+                                                    [(ngModel)]="f.days" 
+                                                    name="days{{i}}"
+                                                    placeholder="Number of days">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <input 
+                                                    type="text" 
+                                                    class="form-control"
+                                                    #price="ngModel" 
+                                                    [(ngModel)]="f.price" 
+                                                    name="price{{i}}"
+                                                    placeholder="Price">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <a class="delete" (click)="removeForm(i)"><i class="small-icon" data-feather="minus-circle" appFeatherIcon></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <a (click)="addForm()" class="btn btn-primary"><i class="small-icon" data-feather="plus-circle" appFeatherIcon></i>Add Item</a>
+                    <button class="btn btn-primary ml-2">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card" *ngFor="let p of allPackage">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>{{p.name}}
+                            <span *ngIf="p.approve" class="badge badge-pill badge-success mr-1">Approved</span>
+                            <span *ngIf="!p.approve" class="badge badge-pill badge-warning mr-1">Pending</span>
+                        </h5>
+                    </div>
+                    <div class="col-md-12">
+                        <ul class="list-unstyled">
+                            <li *ngFor="let f of p.package">{{f.days}} days subscription {{f.price | currency:'INR'}}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <button (click)="onEdit(p)" class="btn btn-primary mr-2"><i class="small-icon" data-feather="edit-2" appFeatherIcon></i> Edit Package</button>
+                        <button (click)="onDelete(p._id)" class="btn btn-danger mr-2"><i class="small-icon" data-feather="trash-2" appFeatherIcon></i> Delete Package</button>
+                        <button *ngIf="!p.approve" (click)="onApprove(p)" class="btn btn-success"><i class="small-icon" data-feather="check-circle" appFeatherIcon></i> Approve Package</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,195 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Product</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Market Research Subscription</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Market Research Subscription</h6>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" #pag="ngModel" (keyup)="changePage()"
+                            [(ngModel)]="pageSizeOptions" placeholder="Search">
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" name="srtrange" #srtrange="ngModel" (change)="filter()"
+                                [(ngModel)]="srtRange" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" name="torange" #torange="ngModel" (change)="filter()"
+                                [(ngModel)]="toRange" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Filter by Active/Expired
+                            </label>
+                            <ng-select [items]="FilterActivity" #activefilter="ngModel" [(ngModel)]="activityFilter"
+                                name="activefilter" placeholder="Search By Active/Expired" (change)="filter()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <!-- <div class="col-sm-4" *ngIf="selection.hasValue()">
+                        <ng-select 
+                            [items]="allUser"
+                            bindLabel="invid"
+                            #employeeid="ngModel" 
+                            [(ngModel)]="employee" 
+                            class="wd-md-340 border-0 rounded-sm"
+                            name="employeeid"
+                            [searchFn]="StaffSearchFn"
+                            placeholder="Search By ID or Name"
+                            (change)="onassignstaff()"
+                            >
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+                        
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                       
+
+                    </div> -->
+                    <!-- <div class="col-sm-4 mb-2" *ngIf="selection.hasValue()">
+                        <button type="button" class="btn btn-danger btn-block"
+                            (click)="addTransactionModal(exportModal)">Add Trasnsaction</button>
+                    </div> -->
+
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="last_staff_id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Staff Id </th>
+                            <td mat-cell *matCellDef="let row"> {{row.last_staff_id}} <br> {{row.last_staff_name}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="studentinvid">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status==='Expired'?'red':'green'
+                                }"> {{row.studentinvid}} <br> {{row.studentname}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Product Name </th>
+                            <td mat-cell *matCellDef="let row">{{row.product_code}} <br> {{row.product_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_revenue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Revenue (Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_revenue | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="net_revenue">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Net Revenue</th>
+                            <td mat-cell *matCellDef="let row"> {{row.net_revenue | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="gst">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>GST</th>
+                            <td mat-cell *matCellDef="let row"> {{row.gst | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total_due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Due (Incl. GST)</th>
+                            <td mat-cell *matCellDef="let row"> {{row.total_due | currency:'INR'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="last_purchase">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Subscription Date </th>
+                            <td mat-cell *matCellDef="let row"> {{row.last_purchase | date: 'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="number_of_purchase">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>No of times Subscribe </th>
+                            <td mat-cell *matCellDef="let row"> {{row.number_of_purchase}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expiry_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status==='Expired'?'red':'green'
+                                }"> {{row.expiry_date | date: 'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                            <td mat-cell *matCellDef="let row" [ngStyle]="{
+                                'color':row.status==='Expired'?'red':'green'
+                                }"> {{row.status}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                            <td mat-cell *matCellDef="let row">
+                                <div ngbDropdown class="dropdown"  container="body">
+                                    <button type="button" id="insdropdown" ngbDropdownToggle
+                                        class="btn p-0 no-dropdown-toggle-icon">
+                                        <i ngbTooltip="More Options"
+                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                        <button (click)="changeexpiry(changeModal,row)" ngbDropdownItem><i
+                                                class="feather icon-calendar icon-xs mr-2"></i> Change
+                                            Expiry Date</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSize]="pageSizeOptions"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<ng-template #changeModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change Expiry Date</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="date" #expdate="ngModel" [(ngModel)]="exp" name="expdate" class="form-control">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>

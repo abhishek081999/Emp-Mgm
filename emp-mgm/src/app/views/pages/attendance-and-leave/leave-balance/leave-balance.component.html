@@ -1,0 +1,263 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Attendance & Leave</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Leave Balance</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label> Employee</label>
+                            <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                #dept_head="ngModel" [(ngModel)]="nameFilter" name="dept_head"
+                                placeholder="Filter by Name" bindValue="_id">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.fullName}} - {{item.invid}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Leave Policy</label>
+                            <ng-select [items]="policies" [searchable]="true" placeholder="Filter by Leave Policy"
+                                bindLabel="policy_name" bindValue="_id" #policynameFilter="ngModel"
+                                [(ngModel)]="policyNameFilter" name="policynameFilter">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Department</label>
+                            <ng-select [items]="departments" [searchable]="true" bindValue="_id" bindLabel="name"
+                                #departmentid="ngModel" [(ngModel)]="DepartmentFilter"
+                                class="wd-md-340 border-0 rounded-sm" name="department_id"
+                                placeholder="Select Departments">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Manager</label>
+                            <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                                #dept_head="ngModel" [(ngModel)]="managerFilter" name="dept_head"
+                                placeholder="Filter by Manager" bindValue="invid">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.fullName}} - {{item.invid}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary btn-block" (click)="filter()">Search</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary btn-block" (click)="addLeaveBalance(modal)">Add
+                            Balance</button>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Search</label>
+                            <input class="form-control" name="search" type="text" placeholder="Search..."
+                                (keyup)="filtersearch($event)">
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+                        <ng-container matColumnDef="employee_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Name
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.employee_name}} - {{row.employee_invid}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="policy_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Policy
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.policy_name}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="balance">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Current <br> Balance
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.balance}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="department">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Department
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.department}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="manager_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Manager
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                {{row.manager_name}} - {{row.manager_invid}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="option">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Options
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <!-- {{row.option | date: 'mediumDate'}} -->
+                                <button type="button" class="btn btn-outline-primary"
+                                    (click)="history(historyModal, row)">History</button>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                        </tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Edit pop-up  model -->
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> Add/Remove Leave Balance</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #pForm="ngForm">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label> Employee</label>
+                        <ng-select [items]="employees" [searchFn]="StaffSearchFn" [searchable]="true"
+                            #employee="ngModel" [(ngModel)]="leaveBalance.employee_id" name="employee"
+                            placeholder="Employee Name" bindValue="_id" required>
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.fullName}} - {{item.invid}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.fullName}} - {{item.invid}}
+                            </ng-template>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="employee?.errors?.required && ( employee.dirty || employee.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Leave Policy</label>
+                        <ng-select [items]="policies" [searchable]="true" placeholder="Leave Policy"
+                            bindLabel="policy_name" bindValue="_id" #policynameFilter="ngModel"
+                            [(ngModel)]="leaveBalance.policy_id" name="policynameFilter" required>
+                        </ng-select>
+                        <p class="text-danger mt-1"
+                            *ngIf="policynameFilter?.errors?.required && ( policynameFilter.dirty || policynameFilter.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="max_balance_days">Add/Remove Leave Balance :</label>
+                        <input type="text" class="form-control" id="change_balance" [(ngModel)]="leaveBalance.amount"
+                            name="change_balance">
+                        <p class="text-danger mt-1"
+                            *ngIf="change_balance?.errors?.required && ( change_balance.dirty || change_balance.touched)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="!pForm.valid" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Exit</button>
+    </div>
+</ng-template>
+
+<ng-template #historyModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Logs</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-9">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-primary btn-block" (click)="historyExport()">Export</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource1"
+                matSort>
+
+                <ng-container matColumnDef="transaction_date">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                    <td mat-cell *matCellDef="let row">
+                        <p>{{row.transaction_date | date: 'mediumDate'}}<br>{{row.transaction_date | date: 'shortTime'}}
+                        </p>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="leave_transaction_type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Details </th>
+                    <td mat-cell *matCellDef="let row"> {{row.leave_transaction_type}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+                    <td mat-cell *matCellDef="let row"> {{row.amount}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['transaction_date','leave_transaction_type','amount']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['transaction_date','leave_transaction_type','amount'];"></tr>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>

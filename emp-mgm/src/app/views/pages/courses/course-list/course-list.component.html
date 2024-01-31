@@ -1,0 +1,149 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Courses</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Courses</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div>
+        <h4 class="mb-3 mb-md-0">Courses</h4>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <input class="form-control wd-md-200 border-0 rounded-sm" name="search" #search="ngModel"
+                [(ngModel)]="searchq" type="text" placeholder="Search..." (keyup)="filter()">
+        </div>
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <ng-select style=" width: 84%;" [items]="languages" [searchable]="true" placeholder="Select Language Filter...." #courselanguage="ngModel"
+                [(ngModel)]="languagefilter" name="courselanguage" (change)="filter()" required>
+            </ng-select>
+        </div>
+
+
+
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-0 rounded-sm">
+                    <i class="feather icon-filter icon-sm cursor-pointer"></i>
+                </div>
+            </div>
+            <select name="orderby" #statusfilter="ngModel" [(ngModel)]="pagefilter"
+                class="form-control wd-md-200 border-0 rounded-sm" (change)="filter()">
+                <option value="">Any status</option>
+                <option value="approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Upcoming">Upcoming</option>
+                <option value="Mycourses">My Courses</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-wrapper">
+    <div class="spinner">Loading...</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2"
+                        *ngFor="let course of alllistfinal  | slice: (currentPage-1) * pageSize : currentPage * pageSize;">
+                        <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="{{imageurl}}{{course.coursepicture}}" class="wd-100p"
+                                        alt="{{course.coursename}}">
+                                </div>
+                                <div class="col-md-9">
+                                    <h5>{{course.coursename | titlecase}}
+                                        <span *ngIf="course.approved"
+                                            class="badge badge-pill badge-success mr-1">Approved</span>
+                                        <span *ngIf="!course.approved"
+                                            class="badge badge-pill badge-warning mr-1">Pending</span>
+                                        <span
+                                            *ngIf="course.coursetype==='Free Recorded Class' || course.coursetype==='Free Live Class'"
+                                            class="badge badge-pill badge-primary mr-1">{{course.coursetype}}</span>
+                                        <span *ngIf="course.courses" class="badge badge-pill badge-success mr-1">Course
+                                            Bundle</span>
+                                        <span *ngIf="course.upcoming"
+                                            class="badge badge-pill badge-primary mr-1">Upcoming Course</span>
+                                        <span *ngIf="course.disable"
+                                            class="badge badge-pill badge-danger mr-1">Hidden</span>
+                                    </h5>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Duration :</strong> {{course.courseduration}}</li>
+                                        <li><strong>Course Code :</strong> {{course.coursecode}}</li>
+                                        <li *ngIf="course?.lesson"><strong>Teacher
+                                                :</strong><a>{{course.teachername}}</a></li>
+                                        <li *ngIf="course?.courses"><strong>Teacher :</strong> {{course.teachername}}
+                                        </li>
+                                        <li *ngIf="course?.lesson"><strong>Student Registered :</strong>
+                                            {{course.numberofstudents}}</li>
+                                        <li><strong>Ratings :</strong> {{course.rating | number:'1.1-1'}}/5</li>
+                                        <li
+                                            *ngIf="course.coursetype==='Free Live Class' || course.coursetype==='Paid Live Class' || course.coursestartdate">
+                                            <strong>Start date :</strong> {{course.coursestartdate | date:
+                                            'mediumDate'}}</li>
+
+                                        <li><strong>Language :</strong> {{course.courselanguage}}</li>
+                                        <li><strong>Course Type :</strong> {{course.coursetype}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div ngbDropdown class="dropdown">
+                                <button type="button" id="jobdropdown" ngbDropdownToggle
+                                    class="btn p-0 no-dropdown-toggle-icon">
+                                    <i ngbTooltip="Settings"
+                                        class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                </button>
+                                <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                                    <button (click)="editCourse(course)" ngbDropdownItem><i
+                                            class="feather icon-edit-2 icon-xs mr-2"></i> Edit Course</button>
+                                    <button (click)="duplicateCourse(course)" ngbDropdownItem><i
+                                            class="feather icon-copy icon-xs mr-2"></i> Duplicate Course</button>
+                                    <button *ngIf="course.approved && course.lesson" (click)="duplicateCourse1(course)"
+                                        ngbDropdownItem><i class="feather icon-book icon-xs mr-2"></i> New
+                                        Batch</button>
+                                    <button *ngIf="!course.approved" (click)="onApprove(course)" ngbDropdownItem><i
+                                            class="feather icon-check-circle icon-xs mr-2"></i> Approve course</button>
+                                    <button *ngIf="course.lesson"
+                                        [routerLink]="['/admin/courses/course-list', course.coursecode]"
+                                        ngbDropdownItem><i class="feather icon-eye icon-xs mr-2"></i> Go To
+                                        Course</button>
+                                    <button *ngIf="!course.approved" (click)="onDelete(course)" ngbDropdownItem><i
+                                            class="feather icon-trash-2 icon-xs mr-2"></i> Delete Course</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6>Course description</h6>
+                                <p>{{course.coursedescription}}</p>
+                            </div>
+                        </div>
+                        <hr>
+                    </li>
+                </ul>
+                <ngb-pagination class="d-flex justify-content-end pagination-rounded" [collectionSize]="totalSize"
+                    [(page)]="currentPage" [pageSize]="pageSize" [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
+                    (pageChange)="pagechange()">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>

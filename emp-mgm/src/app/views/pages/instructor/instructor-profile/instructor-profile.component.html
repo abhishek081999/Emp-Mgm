@@ -1,0 +1,150 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin/instructor/instructor-list">Instructors</a></li>
+        <li class="breadcrumb-item"><a routerLink="/admin/instructor/instructor-list">Instructors List</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Instructor Profile</li>
+    </ol>
+</nav>
+
+<div class="profile-page tx-13">
+    <div class="row profile-body">
+        <!-- left wrapper start -->
+        <div class="d-md-block col-md-4 col-xl-3 left-wrapper">
+            <div class="card rounded">
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="figure mb-3">
+                            <img width="150px" height="150px" [src]="ins.image" alt="{{ins.fullName | titlecase}}">
+                        </div>
+                        <div class="info text-center">
+                            <h4 class="name font-weight-bold mb-0">{{ins.fullName | titlecase}}</h4>
+                            <p class="email text-muted mb-3">{{ins.invid}}</p>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-6 p-0 mb-2">
+                            <h4>{{ins.numberofstudents}}</h4>
+                            <p>Students</p>
+                        </div>
+                        <div class="col-md-6 p-0 mb-2">
+                            <h4>{{ins.numberofonlinecourses}}</h4>
+                            <p>Courses</p>
+                        </div>
+                        <div class="col-md-6 p-0 mb-2">
+                            <h4>{{ins.rating | number:'1.1-1'}}</h4>
+                            <p>Ratings</p>
+                        </div>
+                        <div class="col-md-6 p-0 mb-2">
+                            <h4>{{getavgrating(ins._id) | number:'1.1-1'}}</h4>
+                            <p>Feedback</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">Mobile Number:</label>
+                        <p class="text-muted">{{ins.telephone}}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">Whatsapp Number:</label>
+                        <p class="text-muted">{{ins.alternativenumber}}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">Email:</label>
+                        <p class="text-muted">{{ins.email}}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">Date of Birth:</label>
+                        <p class="text-muted">{{ins.dob | date:'longDate'}}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">Address:</label>
+                        <p class="text-muted">{{ins.address}}, Pin-{{ins.pincode}}, {{ins.city}}, {{ins.state}}, {{ins.country}}</p>
+                    </div>
+                    <div class="mt-3 d-flex social-links">
+                        <a *ngIf="ins.facebook" target="blank" href="{{ins.facebook}}" class="btn d-flex align-items-center justify-content-center border mr-2 btn-icon p-0 facebook" ngbTooltip="{{ins.facebook}}">
+                            <i data-feather="facebook" appFeatherIcon></i>
+                        </a>
+                        <a *ngIf="ins.twitter" href="{{ins.twitter}}" target="blank" class="btn d-flex align-items-center justify-content-center border mr-2 btn-icon p-0 twitter" ngbTooltip="{{ins.twitter}}">
+                            <i data-feather="twitter" appFeatherIcon></i>
+                        </a>
+                        <a *ngIf="ins.instagram" href="{{ins.instagram}}" target="blank" class="btn d-flex align-items-center justify-content-center border mr-2 btn-icon p-0 instagram" ngbTooltip="{{ins.instagram}}">
+                            <i data-feather="instagram" appFeatherIcon></i>
+                        </a>
+                        <a *ngIf="ins.linkdin" href="{{ins.linkdin}}" target="blank" class="btn d-flex align-items-center justify-content-center border mr-2 btn-icon p-0 linkedin" ngbTooltip="{{ins.linkdin}}">
+                            <i data-feather="linkedin" appFeatherIcon></i>
+                        </a>
+                    </div>
+                    <a href="{{imageurl}}{{ins.cv}}" target="blank" class="btn btn-primary btn-block mt-3"><i data-feather="download" class="icon-md mr-2" appFeatherIcon></i>Download CV</a>
+                </div>
+            </div>
+        </div>
+        <!-- left wrapper end -->
+        <!-- right wrapper start -->
+        <div class="col-md-8 col-xl-9 middle-wrapper">
+            <div class="row">
+                <div class="col-md-12 grid-margin">
+                    <div class="card rounded">
+                        <div class="card-body">
+                            <h5 class="mb-3">Bio</h5>
+                            <p class="mb-3 text-justify">{{ ins.bio }}</p>
+                            <h5 class="mb-3">Course Category</h5>
+                            <p class="mb-3">{{ ins.specialization }}</p>
+                            <h5 class="mb-3">Training Language</h5>
+                            <p class="mb-3">{{ ins.language }}</p>
+                            <p class="mb-3"><b>How do you like to provide your Training? </b>{{ins.trainingtype}}</p>
+                            <p class="mb-3"><b>Active in Stock Market / Capital Market / Financial Market?</b> {{ins.activeinmarket}}</p>
+                            <p class="mb-3"><b>Please confirm, if you are okay with providing Recorded Demo Class?</b> {{ins.democlass}}</p>
+                            <p class="mb-3"><b>Years of Experience in Teaching on Your Subject?</b> {{ins.experience}}</p>
+                            <h5 class="mb-3">Qualification</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name of Degree/Certificate</th>
+                                            <th>Validity</th>
+                                            <th>Certificate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let q of allQualifications">
+                                            <td>{{q.name}}</td>
+                                            <td>{{q.validity }}</td>
+                                            <td><a href="{{imageurl}}{{q.file}}" target="blank" class="btn btn-primary"><i class="icon-md pb-3px" data-feather="eye" appFeatherIcon></i> View Cetificate</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card rounded">
+                        <div class="card-body">
+                            <h5 class="mb-3">Courses</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Course Name</th>
+                                            <th>Course Duration</th>
+                                            <th>Students</th>
+                                            <th>Ratings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let course of courselist">
+                                            <td><a [routerLink]="['/admin/courses/course-list', course.coursecode]">{{course.coursename}}</a></td>
+                                            <td>{{course.courseduration}}</td>
+                                            <td>{{course.numberofstudents}}</td>
+                                            <td>{{course.rating | number:'1.1-1'}}/5</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- right wrapper end -->
+    </div>
+</div>

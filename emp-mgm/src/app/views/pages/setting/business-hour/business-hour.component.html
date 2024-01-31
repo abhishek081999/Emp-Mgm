@@ -1,0 +1,56 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Setting</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Business Hour</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Business Hour</h6>
+                <form [formGroup]="businessForm">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="color: black;">Week day</th>
+                                <th style="color: black;">Active</th>
+                                <th style="color: black;">Starting Hour</th>
+                                <th style="color: black;">Closing Hour</th>
+                            </tr>
+                        </thead>
+                        <tbody formArrayName="days">
+
+                            <tr *ngFor="let day of days.controls; let i = index" [formGroupName]="i">
+                                <td style="font-weight: bold;">{{ getDayName(i) }}</td>
+                                <td>
+                                    <label class="mb-0 toggle-switch">
+                                        <input type="checkbox" name="activty" formControlName="isActive"
+                                            class="form-control">
+                                        <span class="toggle-slider round"></span> </label>
+                                </td>
+                                <td>
+                                    <div class="input-container">
+                                        <input type="time" name="startingHour" placeholder="Enter Starting Hour"
+                                            formControlName="startingHour" class="styled-input">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-container">
+                                        <input type="time" name="closingHour" placeholder="Enter Closing Hour"
+                                            formControlName="closingHour" class="styled-input">
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h5>Display Message</h5> <br>
+                    <input type="text" placeholder="Live Market chat support will resume from (day) (start_time)"
+                        formControlName="displayMsg" size="30" class="custom-input">
+                </form>
+                <br>
+                <button class="btn btn-primary" (click)="businessFormData()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

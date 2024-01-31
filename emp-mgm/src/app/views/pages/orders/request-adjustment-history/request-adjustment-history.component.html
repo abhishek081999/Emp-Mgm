@@ -1,0 +1,101 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Request Adjustment History</h5>
+    <button type="button" class="close" (click)="activeModal.close()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+        No Request Adjustments Found.
+    </ngb-alert>
+    <div *ngIf="isLoading" class="spinner-wrapper">
+        <div class="spinner">Loading...</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+            matSort>
+
+            <ng-container matColumnDef="isApproved">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                <td mat-cell *matCellDef="let row">
+                    <span class="badge badge-success" *ngIf="row?.isApproved">Approved</span>
+                    <span class="badge badge-warning" *ngIf="!row?.isApproved">Pending</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="total_amount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Amount </th>
+                <td mat-cell *matCellDef="let row"> {{row?.total_amount | currency:'INR'}} <br>
+                    ({{row?.prev_total_amount | currency:'INR'}})
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="original_amount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Original Amount </th>
+                <td mat-cell *matCellDef="let row">{{row?.original_amount | currency:'INR'}} <br>
+                    ({{row?.prev_original_amount | currency:'INR'}}) </td>
+            </ng-container>
+
+            <ng-container matColumnDef="total_discount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Discount </th>
+                <td mat-cell *matCellDef="let row"> {{row?.total_discount | currency:'INR'}} <br>
+                    ({{row?.prev_total_discount | currency:'INR'}}) </td>
+            </ng-container>
+
+            <ng-container matColumnDef="requestedBy">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Requested By </th>
+                <td mat-cell *matCellDef="let row">{{row?.requestedBy_invid}} <br> {{row?.requestedBy_name}} <br>
+                    {{row?.requestDate | date:'medium'}} 
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="requestReason">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Reason </th>
+                <td mat-cell *matCellDef="let row"> {{row?.requestReason}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="approvedBy">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Approved By </th>
+                <td mat-cell *matCellDef="let row">{{row?.approvedBy_invid}} <br> {{row?.approvedBy_name}} <br>
+                    {{row?.approveDate | date:'medium'}} 
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="comments">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Comments </th>
+                <td mat-cell *matCellDef="let row"> {{row?.comments}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="options">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row;let rowIndex = dataIndex">
+                    <div ngbDropdown class="dropdown" container="body">
+                        <button type="button" id="insdropdown2" ngbDropdownToggle
+                            class="btn p-0 no-dropdown-toggle-icon">
+                            <i ngbTooltip="More Options"
+                                class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                        </button>
+                        <div ngbDropdownMenu aria-labelledby="insdropdown2">
+                            <button (click)="adjdetails(row)" ngbDropdownItem><i
+                                    class="feather icon-edit icon-xs mr-2"></i>
+                                Request Details</button>
+                            <button *ngIf="!row?.isApproved" (click)="approveRequest(row)"
+                                ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i>
+                                Approve Request</button>
+                            <button *ngIf="!row?.isApproved" (click)="deleteRequest(row)"
+                                ngbDropdownItem><i class="feather icon-x-circle icon-xs mr-2"></i>
+                                Delete Request</button>
+                        </div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+</div>

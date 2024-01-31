@@ -1,0 +1,198 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Portfolio Checkups</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Portfolio Checkups</h6>
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <form class="search-form">
+                            <label>Start Date</label>
+                            <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+                                <div class="input-group border rounded-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text border-0 rounded-sm">
+                                            <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                        </div>
+                                    </div>
+                                    <input type="date" #date="ngModel" [(ngModel)]="startDate" name="date"
+                                        class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-3">
+                        <form class="search-form">
+                            <label>End Date</label>
+                            <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+                                <div class="input-group border rounded-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text border-0 rounded-sm">
+                                            <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                        </div>
+                                    </div>
+                                    <input type="date" #date="ngModel" [(ngModel)]="endDate" name="date"
+                                        class="wd-md-200 border-0 rounded-sm" (change)="filter()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Mentor </label>
+                            <ng-select [items]="allMentor" [searchable]="true" placeholder="Search Instructor"
+                                #mentoridf="ngModel" [(ngModel)]="mentorFilter" name="mentoridf" bindValue="_id"
+                                bindLabel="fullName" (change)="filter()">
+                                <ng-template ng-label-tmp let-item="item">
+                                    <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                </ng-template>
+
+                                <ng-template ng-option-tmp let-item="item">
+                                    {{item.invid}} - {{item.fullName}}
+                                </ng-template>
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label>Status </label>
+                            <select name="orderby" #statusfilter="ngModel" [(ngModel)]="pagefilter" class="form-control"
+                                (change)="filter()">
+                                <option value="">Any status</option>
+                                <option value="validated">All Validated</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+
+                <ngb-alert [dismissible]="false" [type]="'primary'" *ngIf="!isavailable">
+                    No Portfolio Checkups Found.
+                </ngb-alert>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4" *ngIf="selection.hasValue()">
+                        <ng-select [items]="allMentor" bindLabel="invid" #employeeid="ngModel" [(ngModel)]="employee"
+                            class="wd-md-340 border-0 rounded-sm" name="employeeid" [searchFn]="StaffSearchFn"
+                            placeholder="Search By ID or Name" (change)="onassignstaff()">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.invid}} - {{item.fullName}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="select" sticky>
+                            <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>
+                                <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    [checked]="selection.hasValue() && isEntirePageSelected()"
+                                    [indeterminate]="selection.hasValue() && !isEntirePageSelected()"
+                                    [aria-label]="checkboxLabel()">
+                                </mat-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                                <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row,i)">
+                                </mat-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="mentor_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Mentor </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row"> {{row?.mentor_invid}} <br>
+                                {{row?.mentor_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="student_name" sticky>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Student </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row">{{row?.student_invid}} <br>
+                                {{row?.student_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="product_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Product </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row"> {{row?.product_code}} <br>
+                                {{row?.product_name}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="no_of_stocks">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> No Of Stocks </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row">
+                                {{row?.no_of_stocks}}/{{row?.maximum_no_stocks}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="validated">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Validated <br> (Pending) </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row">
+                                {{row?.validated}}({{row?.pending}}) </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="createdAt">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Portfolio Checkup <br> Initiated At
+                            </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row"> {{row?.createdAt |
+                                date:'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="updatedAt">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row"> {{row?.updatedAt |
+                                date:'mediumDate'}} <br> {{row?.updatedBy}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="purchase_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Purchase Date </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row"> {{row?.purchase_date |
+                                date:'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="expiry_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expiry Date </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row"> {{row?.expiry_date |
+                                date:'mediumDate'}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="isReplied">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Is Replied? </th>
+                            <td mat-cell (click)="gotoportfolio(row)" *matCellDef="let row">
+                                {{row?.isReplied?'YES':'NO'}} </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 200]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

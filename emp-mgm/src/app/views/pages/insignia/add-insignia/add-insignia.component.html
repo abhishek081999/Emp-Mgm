@@ -1,0 +1,734 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insigna</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Insignia</li>
+    </ol>
+</nav>
+<form #lessonForm="ngForm" enctype="multipart/form-data" (ngSubmit)="lessonForm.valid && submitForm($event)">
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Insignia</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Title*<a placement="top" ngbTooltip="Title in 35-50 letters"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #name="ngModel" [(ngModel)]="insignia.name"
+                                    name="name" required minlength="35" maxlength="50" placeholder="Insignia title">
+                                Letter Count: {{insignia.name.length}}/50 <i *ngIf="insignia.name.length>=35"
+                                    class="small-icon" data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.required && (lessonForm.submitted || name.dirty || name.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.minlength && (lessonForm.submitted || name.dirty || name.touched)">
+                                    Min length mustbe 35.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="name?.errors?.maxlength && (lessonForm.submitted || name.dirty || name.touched)">
+                                    Max length mustbe 50.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Insignia Code</label>
+                                <input type="text" class="form-control" #code="ngModel" [(ngModel)]="insignia.code"
+                                    name="code" disabled placeholder="Code Auto generated">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Insignia Price*</label>
+                                <input type="number" class="form-control" #price="ngModel" [(ngModel)]="insignia.price"
+                                    name="price" required placeholder="Insignia Price">
+                                <p class="text-danger mt-1"
+                                    *ngIf="price?.errors?.required && (lessonForm.submitted || price.dirty || price.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Insignia discounted Price</label>
+                                <input type="number" class="form-control" #discountedprice="ngModel"
+                                    [(ngModel)]="insignia.discountedprice" name="discountedprice"
+                                    placeholder="Insignia Discounted Price">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Duration*<a placement="top" ngbTooltip="In Months"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #duration="ngModel"
+                                    [(ngModel)]="insignia.duration" name="courseduration" required
+                                    placeholder="Insignia Duration in Months i.e. 28 Months">
+                                <p class="text-danger mt-1"
+                                    *ngIf="duration?.errors?.required && (lessonForm.submitted || duration.dirty || duration.touched)">
+                                    This field is required.</p>
+
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Insignia Validity*<a placement="top" ngbTooltip="In Days (0 for Lifetime)"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <input type="number" class="form-control" #validity="ngModel"
+                                    [(ngModel)]="insignia.validity" name="validity" required
+                                    placeholder="Insignia Validity in Months i.e. 7,15,30.. (0 for Lifetime)">
+                                <p class="text-danger mt-1"
+                                    *ngIf="validity?.errors?.required && (lessonForm.submitted || validity.dirty || validity.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Insignia picture*</label>
+                                <input id="file" type="file" class="form-control" name="picture" accept="image/*"
+                                    (change)="handelFile($event,insignia,'picture')" required>
+                                <p class="text-danger mt-1" *ngIf="lessonForm.submitted && !insignia.picture">This field
+                                    is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Instructor*</label>
+                                <ng-select [items]="teachernames" [multiple]="true" [closeOnSelect]="false"
+                                    [searchable]="true" bindValue="_id" placeholder="Select Instructors"
+                                    #instructor="ngModel" [(ngModel)]="insignia.instructors" name="instructor" required>
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.invid}} : {{item.fullName}}</span>
+                                    </ng-template>
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="instructor?.errors?.required && (lessonForm.submitted || instructor.dirty || instructor.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Intro Video link<a placement="top" ngbTooltip="Embed url"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="text" class="form-control" #introvideo="ngModel"
+                                    [(ngModel)]="insignia.introvideo" name="introvideo" placeholder="Intro Video">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Language*</label>
+                                <ng-select [items]="languages" [searchable]="true" placeholder="Select Language"
+                                    #language="ngModel" [(ngModel)]="insignia.language" name="language" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="language?.errors?.required && (lessonForm.submitted || language.dirty || language.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Subscription Package*<a placement="top"
+                                        ngbTooltip="Select Subscription Package"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <select class="form-control" #subscription="ngModel" [(ngModel)]="insignia.subscription"
+                                    name="subscription">
+                                    <option value="">Select Package</option>
+                                    <option *ngFor="let p of allSubscription" [value]="p._id">{{p.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Category*</label>
+                                <ng-select [items]="categories" [multiple]="true" [closeOnSelect]="false"
+                                    [searchable]="true" placeholder="Select Categories" #category="ngModel"
+                                    [(ngModel)]="insignia.category" name="category" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="category?.errors?.required && (lessonForm.submitted || category.dirty || category.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Brochure(if any)</label>
+                                <input id="file" type="file" accept="application/pdf" class="form-control"
+                                    name="brochure" (change)="handelFile($event,insignia,'brochure')">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Upcoming Insignia?</label>
+                                <select class="form-control" #upcoming="ngModel" [(ngModel)]="insignia.upcoming"
+                                    name="upcoming">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Emi Available?</label>
+                                <select class="form-control" #emi="ngModel" [(ngModel)]="insignia.emiavailable"
+                                    name="emi">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Hide Insignia?</label>
+                                <select class="form-control" #hide="ngModel" [(ngModel)]="insignia.disable" name="hide">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Short Code*</label>
+                                <ng-select [items]="insigniaSeriesList" [searchable]="true"
+                                    placeholder="Select Short Code" #short_code="ngModel"
+                                    [(ngModel)]="insignia.short_code" name="short_code" required>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="short_code?.errors?.required && (lessonForm.submitted || short_code.dirty || short_code.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Minimum Selling Price*</label>
+                                <input type="number" class="form-control" #min_selling_price="ngModel"
+                                    [(ngModel)]="insignia.min_selling_price" name="min_selling_price"
+                                    placeholder="Minimum Selling Price" required>
+                                <p class="text-danger mt-1"
+                                    *ngIf="min_selling_price?.errors?.required && (lessonForm.submitted || min_selling_price.dirty || min_selling_price.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Payment Modes</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Payment Mode two</label>
+                                <select name="method2" class="form-control" #method2="ngModel" (change)="pm2()"
+                                    [(ngModel)]="insignia.paymentmethodtwo">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Payment Mode three</label>
+                                <select name="method3" class="form-control" #method3="ngModel" (change)="pm3()"
+                                    [(ngModel)]="insignia.paymentmethodthree">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Payment Mode Four</label>
+                                <select name="method4" class="form-control" #method4="ngModel" (change)="pm4()"
+                                    [(ngModel)]="insignia.paymentmethodfour">
+                                    <option [ngValue]="true">Yes</option>
+                                    <option [ngValue]="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mode 2 Total Amount</label>
+                                <input type="number" class="form-control" #pmtwota="ngModel"
+                                    [(ngModel)]="insignia.paymentmtwo.totalamount" name="pmtwota" (change)="pm2sa()"
+                                    [disabled]="!insignia.paymentmethodtwo">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mode 2 First Installment Amount</label>
+                                <input type="number" class="form-control" #pmtwofa="ngModel"
+                                    [(ngModel)]="insignia.paymentmtwo.firstamount" name="pmtwofa" (change)="pm2sa()"
+                                    [disabled]="!insignia.paymentmethodtwo">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mode 2 Second Ins Amount</label>
+                                <input type="number" class="form-control" #pmtwosa="ngModel"
+                                    [(ngModel)]="insignia.paymentmtwo.secondamount" name="pmtwosa" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Mode 2 Second Ins Date<a placement="top"
+                                    ngbTooltip="Number of days after registration"><i class="small-icon"
+                                        data-feather="help-circle" appFeatherIcon></i></a></label>
+                            <input type="number" class="form-control" #pmtwod="ngModel"
+                                [(ngModel)]="insignia.paymentmtwo.date" name="pmtwod"
+                                [disabled]="!insignia.paymentmethodtwo">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 3 Total Amount</label>
+                                <input type="number" class="form-control" #pmthreeta="ngModel"
+                                    [(ngModel)]="insignia.paymentmthree.totalamount" name="pmthreeta" (change)="pm3sa()"
+                                    [disabled]="!insignia.paymentmethodthree">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 3 First Installment Amount</label>
+                                <input type="number" class="form-control" #pmthreefa="ngModel"
+                                    [(ngModel)]="insignia.paymentmthree.firstamount" name="pmthreefa" (change)="pm3sa()"
+                                    [disabled]="!insignia.paymentmethodthree">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 3 Second Installment Amount</label>
+                                <input type="number" class="form-control" #pmthreesa="ngModel"
+                                    [(ngModel)]="insignia.paymentmthree.secondamount" (change)="pm3sa()"
+                                    name="pmthreesa" [disabled]="!insignia.paymentmethodthree">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 3 Second Installment Date<a placement="top"
+                                        ngbTooltip="Number of days after registration"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="number" class="form-control" #pmthreefd="ngModel"
+                                    [(ngModel)]="insignia.paymentmthree.firstdate" name="pmthreefd"
+                                    [disabled]="!insignia.paymentmethodthree">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 3 Third Installment Amount</label>
+                                <input type="number" class="form-control" #pmthreetha="ngModel"
+                                    [(ngModel)]="insignia.paymentmthree.thirdamount" name="pmthreetha" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 3 Third Installment Date<a placement="top"
+                                        ngbTooltip="Number of days after registration"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="number" class="form-control" #pmthreesd="ngModel"
+                                    [(ngModel)]="insignia.paymentmthree.seconddate" name="pmthreesd"
+                                    [disabled]="!insignia.paymentmethodthree">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Total Amount</label>
+                                <input type="number" class="form-control" #pmfourta="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.totalamount" name="pmfourta" (change)="pm4sa()"
+                                    [disabled]="!insignia.paymentmethodfour">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 First Installment Amount</label>
+                                <input type="number" class="form-control" #pmfourfa="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.firstamount" name="pmfourfa" (change)="pm4sa()"
+                                    [disabled]="!insignia.paymentmethodfour">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Second Installment Amount</label>
+                                <input type="number" class="form-control" #pmfoursa="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.secondamount" (change)="pm4sa()" name="pmfoursa"
+                                    [disabled]="!insignia.paymentmethodfour">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Second Installment Date<a placement="top"
+                                        ngbTooltip="Number of days after registration"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="number" class="form-control" #pmfourfd="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.firstdate" name="pmfourfd"
+                                    [disabled]="!insignia.paymentmethodfour">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Third Installment Amount</label>
+                                <input type="number" class="form-control" #pmfourtha="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.thirdamount" name="pmfourtha"
+                                    [disabled]="!insignia.paymentmethodfour" (change)="pm4sa()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Third Installment Date<a placement="top"
+                                        ngbTooltip="Number of days after registration"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="number" class="form-control" #pmfoursd="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.seconddate" name="pmfoursd"
+                                    [disabled]="!insignia.paymentmethodfour">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Forth Installment Amount</label>
+                                <input type="number" class="form-control" #pmfourfo="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.forthamount" name="pmfourfo" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Mode 4 Forth Installment Date<a placement="top"
+                                        ngbTooltip="Number of days after registration"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <input type="number" class="form-control" #pmfoursc="ngModel"
+                                    [(ngModel)]="insignia.paymentmfour.thirddate" name="pmfoursc"
+                                    [disabled]="!insignia.paymentmethodfour">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Insignia Description</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Description* <a placement="top"
+                                        ngbTooltip="Description in minimum 150 Letters"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Description in minimum 150 Letters" #description="ngModel"
+                                    [(ngModel)]="insignia.description" name="description" minlength="150" required>
+                                </textarea>
+                                Letter Count: {{insignia.description.length}} <i
+                                    *ngIf="insignia.description.length>=150" class="small-icon"
+                                    data-feather="check-circle" appFeatherIcon></i>
+                                <p class="text-danger mt-1"
+                                    *ngIf="description?.errors?.required && (lessonForm.submitted || description.dirty || description.touched)">
+                                    This field is required.</p>
+                                <p class="text-danger mt-1"
+                                    *ngIf="description?.errors?.minlength && (lessonForm.submitted || description.dirty || description.touched)">
+                                    Min length is 150 Letters.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Benefits of The Insignia*<a placement="top"
+                                        ngbTooltip="Benefits of The insignia separated by coma (,)"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Benefits of The insignia separated by coma (,)" #benefits="ngModel"
+                                    [(ngModel)]="insigniabenefits" name="benefits" required>
+                                </textarea>
+                                <p class="text-danger mt-1"
+                                    *ngIf="benefits?.errors?.required && (lessonForm.submitted || benefits.dirty || benefits.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Who Should Join the Insignia?*<a placement="top"
+                                        ngbTooltip="who should join The insignia separated by coma (,)"><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="who should join The insignia separated by coma (,)" #audience="ngModel"
+                                    [(ngModel)]="insigniaaudience" name="audience" required>
+                                </textarea>
+                                <p class="text-danger mt-1"
+                                    *ngIf="audience?.errors?.required && (lessonForm.submitted || audience.dirty || audience.touched)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Sidepanel Title<a placement="top" ngbTooltip="Sidepanel Title "><i
+                                            class="small-icon" data-feather="help-circle"
+                                            appFeatherIcon></i></a></label>
+                                <input class="form-control" placeholder="Sidepanel Title " #ddt="ngModel"
+                                    [(ngModel)]="insignia.sidepanel.title" name="ddt">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Sidepanel Details<a placement="top"
+                                        ngbTooltip="Sidepanel Details separated by semicolon (;)"><i class="small-icon"
+                                            data-feather="help-circle" appFeatherIcon></i></a></label>
+                                <textarea rows="5" class="form-control" style="height:100px;"
+                                    placeholder="Sidepanel Details separated by semicolon (;)" #dd="ngModel"
+                                    [(ngModel)]="sidepaneldetails" name="dd">
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /row-->
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Cross-Sale Products<a placement="top" ngbTooltip="select Multiple"><i
+                                        class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                            <ng-select [items]="insigniaList" [multiple]="true" [closeOnSelect]="false"
+                                [searchable]="true" placeholder="Select Cross-Sale Products" #upsale="ngModel"
+                                bindValue="_id" bindLabel="name" [(ngModel)]="insignia.crosssale" name="crosssale">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <!-- /row-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Insignia Bundle Items</h6>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="wd-100p">
+                                <tr>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <label>
+                                                    Item type
+                                                </label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>
+                                                    Item Name
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label>
+                                                    Item price<a placement="top"
+                                                        ngbTooltip="Price for individual item"><i class="small-icon"
+                                                            data-feather="help-circle" appFeatherIcon></i></a>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label>
+                                                    Access On booking?<a placement="top"
+                                                        ngbTooltip="Is it accessable after sit booking"><i
+                                                            class="small-icon" data-feather="help-circle"
+                                                            appFeatherIcon></i></a>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label>
+                                                    Access On Full Payment?<a placement="top"
+                                                        ngbTooltip="Is it accessable after sit booking"><i
+                                                            class="small-icon" data-feather="help-circle"
+                                                            appFeatherIcon></i></a>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label>
+                                                    Access Date<a placement="top"
+                                                        ngbTooltip="After how many days student get access"><i
+                                                            class="small-icon" data-feather="help-circle"
+                                                            appFeatherIcon></i></a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngFor="let ins of insbundle; let in=index">
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <select class="form-control" name="itemType{{in}}" id="itemType"
+                                                        #itemType="ngModel" [(ngModel)]="ins.itemType"
+                                                        (change)="onChange(ins.itemType)" required>
+                                                        <!-- <option selected value="">Select an option</option> -->
+                                                        <option value="COURSE">COURSE</option>
+                                                        <option value="PRODUCT" disabled>PRODUCT</option>
+                                                        <option value="INVESMENTOR">INVESMENTOR</option>
+                                                    </select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="itemType?.errors?.required && (lessonForm.submitted || itemType.dirty || itemType.touched)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4" *ngIf="ins.itemType == 'COURSE'">
+                                                <div class="form-group">
+                                                    <ng-select [items]="CourseItem" bindValue="_id" #_id="ngModel"
+                                                        [(ngModel)]="ins.id" name="_id{{in}}" [searchFn]="SearchFn"
+                                                        required>
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item._id}} -
+                                                                {{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item._id}} - {{item.name}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="_id?.errors?.required && (lessonForm.submitted || _id.dirty || _id.touched)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4" *ngIf="ins.itemType == 'PRODUCT'">
+                                                <div class="form-group">
+                                                    <ng-select [items]="ProductItem" bindValue="_id" #_id="ngModel"
+                                                        [(ngModel)]="ins.id" name="_id{{in}}" [searchFn]="SearchFn"
+                                                        required>
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item._id}} -
+                                                                {{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item._id}} - {{item.name}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="_id?.errors?.required && (lessonForm.submitted || _id.dirty || _id.touched)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4" *ngIf="ins.itemType == 'INVESMENTOR'">
+                                                <div class="form-group">
+                                                    <ng-select [items]="InvesmentorItem" bindValue="_id" #_id="ngModel"
+                                                        [(ngModel)]="ins.id" name="_id{{in}}" [searchFn]="SearchFn"
+                                                        required>
+                                                        <ng-template ng-label-tmp let-item="item">
+                                                            <span class="ng-value-label">{{item._id}} -
+                                                                {{item.name}}</span>
+                                                        </ng-template>
+
+                                                        <ng-template ng-option-tmp let-item="item">
+                                                            {{item._id}} - {{item.name}}
+                                                        </ng-template>
+                                                    </ng-select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="_id?.errors?.required && (lessonForm.submitted || _id.dirty || _id.touched)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" minlength="1" maxlength="10"
+                                                    #itemPrice="ngModel" [(ngModel)]="ins.itemPrice"
+                                                    name="itemPrice{{in}}" id="exampleInputUsername1" autocomplete="off"
+                                                    [pattern]="numPattern" placeholder="Item Price" required>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="itemPrice?.errors?.required && (lessonForm.submitted || itemPrice.dirty || itemPrice.touched)">
+                                                    This field is required.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="itemPrice?.errors?.minlength && (lessonForm.submitted || itemPrice.dirty || itemPrice.touched)">
+                                                    Min length mustbe 1.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="itemPrice?.errors?.maxlength && (lessonForm.submitted || itemPrice.dirty || itemPrice.touched)">
+                                                    Max length mustbe 10.</p>
+                                                <p class="text-danger mt-1"
+                                                    *ngIf="itemPrice?.errors?.pattern && (lessonForm.submitted || itemPrice.dirty || itemPrice.touched)">
+                                                    Invalid Price.</p>
+
+                                            </div>
+
+                                            <!-- <div class="col-md-5">
+                                                <div class="form-group">
+                                                <input 
+                                                    readonly
+                                                    type="text" 
+                                                    class="form-control"
+                                                    name="name{{in}}"
+                                                    [value]="getcoursename(ins.insignia)"
+                                                    placeholder="Insignia Name">
+                                                </div>
+                                            </div> -->
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <!-- <label>Default access<a placement="top" ngbTooltip="select Multiple"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                                                    <input class="form-control" #defaultAccess="ngModel"
+                                                        [(ngModel)]="ins.defaultAccess" name="defaultAccess{{in}}"
+                                                        type="checkbox" id="checkInlineChecked">
+                                                    <!-- <p class="text-danger mt-1" *ngIf="title?.errors?.required && (lessonForm.submitted || title.dirty || title.touched)">This field is required.</p> -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <!-- <label>Default access<a placement="top" ngbTooltip="select Multiple"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                                                    <input class="form-control" #defaultAccess="ngModel"
+                                                        [(ngModel)]="ins.FullpaymentAccess"
+                                                        name="FullpaymentAccess{{in}}" type="checkbox"
+                                                        id="checkInlineChecked">
+                                                    <!-- <p class="text-danger mt-1" *ngIf="title?.errors?.required && (lessonForm.submitted || title.dirty || title.touched)">This field is required.</p> -->
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <!-- <label>Access Date<a placement="top" ngbTooltip="select Multiple"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label> -->
+                                                    <input type="text" class="form-control" name="accesdate{{in}}"
+                                                        #accesdate="ngModel" [(ngModel)]="ins.accessDate"
+                                                        placeholder="Access Date">
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="accesdate?.errors?.required && (lessonForm.submitted || accesdate.dirty || accesdate.touched)">
+                                                        This field is required.</p>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <a (click)="removeForm(in)"><i class="small-icon"
+                                                            data-feather="minus-circle" appFeatherIcon></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <a (click)="addForm()" class="btn btn-primary"><i class="small-icon"
+                                    data-feather="plus-circle" appFeatherIcon></i>Add Insignia Item</a>
+                        </div>
+                    </div>
+                    <ngb-alert class="mt-2" [dismissible]="false" [type]="'warning'"
+                        *ngIf="(lessonForm.submitted || lessonForm.dirty || lessonForm.touched) && lessonForm.invalid">
+                        You Missed Some Fields
+                    </ngb-alert>
+                    <button class="btn btn-primary mt-2">Submit</button>
+                    <p class="mb-2 mt-2" *ngIf="isupload">
+                        <ngb-progressbar type="primary" [value]="progressvalue" [showValue]="true"></ngb-progressbar>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

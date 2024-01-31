@@ -1,0 +1,21 @@
+.card-header {
+    background-color: #2196F3; 
+    color: white; 
+    padding: 15px;
+}
+
+.holiday-table {
+    width: 100%; 
+    border-collapse: collapse; 
+}
+
+.holiday-table th, .holiday-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; 
+}
+
+.holiday-table th {
+    background-color: #2196F3; 
+    color: white;
+}

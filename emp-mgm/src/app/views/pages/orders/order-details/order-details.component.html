@@ -1,0 +1,1313 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin/orders">Orders</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+        <h4 *ngIf="orderDetails?.orderID" class="mb-3 mb-md-0 mr-2">Order: {{orderDetails?.orderID}}</h4>
+        <h5
+            *ngIf="orderDetails?.status && (orderDetails?.is_submitted || orderDetails?.is_saved) && !orderDetails?.is_Error && !orderDetails?.is_refunded && !orderDetails?.is_shortClosed">
+            <span class="badge badge-success mr-4">{{orderDetails?.status}}</span>
+        </h5>
+        <h5
+            *ngIf="orderDetails?.status && (orderDetails?.is_refunded || orderDetails?.is_shortClosed) && !orderDetails?.is_Error">
+            <span class="badge badge-warning mr-4">{{orderDetails?.status}}</span>
+        </h5>
+        <h5 *ngIf="orderDetails?.status && orderDetails?.is_Error"><span
+                class="badge badge-danger mr-4">{{orderDetails?.status}}</span></h5>
+        <p class="mb-3 mb-md-0 mr-2">Total Amount: {{orderDetails?.total_amount | currency:'INR'}}</p>
+    </div>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+        <button type="button" class="btn btn-success btn-icon-text mb-2 mr-2 mb-md-0" *ngIf="isSave && !isFullDisable"
+            [disabled]="orderForm.invalid" (click)="submit()">Submit Order</button>
+        <button type="button" class="btn btn-success btn-icon-text mb-2 mr-2 mb-md-0" *ngIf="!isSave && !isFullDisable"
+            [disabled]="orderForm.invalid" (click)="updateOrder()">Update Order</button>
+        <!-- <div class="btn-group mr-2" *ngIf="isSave && !isFullDisable">
+            <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid" (click)="save()">Save</button>
+            <div class="btn-group" ngbDropdown role="group">
+                <button class="btn btn-primary dropdown-toggle-split p-1" ngbDropdownToggle></button>
+                <div ngbDropdownMenu>
+                    <button ngbDropdownItem [disabled]="orderForm.invalid" (click)="saveclose()">Save and Close</button>
+                </div>
+            </div>
+        </div>
+        <button *ngIf="orderDetails.orderID" type="button" class="btn btn-light btn-icon-text mb-2 mr-2 mb-md-0"
+            [disabled]="orderForm.invalid" (click)="copy()">Copy</button>-->
+        <button *ngIf="orderDetails.orderID" type="button" class="btn btn-light btn-icon-text mb-2 mr-2 mb-md-0"
+            (click)="history(historyModal)">History</button>
+        <div class="d-inline-block" ngbDropdown *ngIf="!isSave">
+            <button class="btn btn-light btn-icon no-dropdown-toggle-icon" id="dropdownButtonPrimary" ngbDropdownToggle>
+                <i ngbTooltip="More Options" class="feather icon-more-horizontal text-muted"></i>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownButtonPrimary">
+                <!-- <button ngbDropdownItem (click)="cancelorder()">Cancel Order</button> -->
+                <button *ngIf="!isFullDisable" ngbDropdownItem (click)="requestAdjustment()">Request Adjustment</button>
+                <button ngbDropdownItem (click)="adjustmentHistory()">Request Adjustment History</button>
+                <button *ngIf="orderDetails?.orderID && !orderDetails?.is_shortClosed" ngbDropdownItem
+                    (click)="shortClose()">Short Close</button>
+                <button *ngIf="orderDetails?.orderID && orderDetails?.is_shortClosed" ngbDropdownItem
+                    (click)="shortClose()">Reopen Order</button>
+                <button *ngIf="!isFullDisable" ngbDropdownItem (click)="requestRefund()">Request Refund</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="errMsg" class="alert alert-danger">{{errMsg}}</div>
+
+<form #orderForm="ngForm">
+    <div class="row">
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Student Details*</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <ng-select [items]="allStudent" [searchable]="true" placeholder="Search Student"
+                                    #Studentidf="ngModel" [(ngModel)]="orderDetails.student_id" name="Studentidf"
+                                    bindValue="_id" [searchFn]="UserSearchFn" required (change)="studentChange($event)"
+                                    [disabled]="!isEditable || isLeadOrderCreation || isFullDisable">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="Studentidf?.errors?.required && (Studentidf.dirty || Studentidf.touched || orderForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    Name: {{student?.fullName}}<br>
+                                    Invid: {{student?.invid}}<br>
+                                    State: {{student?.state}}
+
+                                </div>
+                                <div class="col-md-6">
+                                    Phone: {{student?.telephone}}<br>
+                                    Whatsapp: {{student?.alternatenum}}<br>
+                                    Email: {{student?.email}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Service Rep </h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <ng-select [items]="allEmployee" [searchable]="true" placeholder="Search Service Rep"
+                                    #employeef="ngModel" [(ngModel)]="orderDetails.sales_rep" name="employeef"
+                                    bindValue="invid" [searchFn]="UserSearchFn" (change)="employee = $event"
+                                    [disabled]="isFullDisable">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <span class="ng-value-label">{{item.invid}} - {{item.fullName}}</span>
+                                    </ng-template>
+
+                                    <ng-template ng-option-tmp let-item="item">
+                                        {{item.invid}} - {{item.fullName}}
+                                    </ng-template>
+                                </ng-select>
+                                <p class="text-danger mt-1"
+                                    *ngIf="employeef?.errors?.required && (employeef.dirty || employeef.touched || orderForm.submitted)">
+                                    This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    Name: {{employee?.fullName}}<br>
+                                    Invid: {{employee?.invid}}
+                                </div>
+                                <div class="col-md-6">
+                                    Phone: {{employee?.telephone}}<br>
+                                    Email: {{employee?.email}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs">
+                        <li [ngbNavItem]="1">
+                            <a ngbNavLink>Order Info</a>
+                            <ng-template ngbNavContent>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Coupon code</label>
+                                                    <!--email-->
+                                                    <ng-select [items]="allCoupon" [searchable]="true"
+                                                        placeholder="Search Coupon Code" #couponcode="ngModel"
+                                                        [(ngModel)]="orderDetails.coupon_code" name="couponcode"
+                                                        bindValue="couponcode" bindLabel="couponcode"
+                                                        (change)="coupon_code = $event;isApplyNeeded = true"
+                                                        [disabled]="isCouponApplied || isFullDisable">
+                                                    </ng-select>
+                                                    <p>
+                                                        Minimum Cart Value: {{coupon_code?.minimumbal |
+                                                        currency:'INR'}}<br>
+                                                        Coupon Value: {{coupon_code?.price | currency:'INR'}}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Payment Mode*</label>
+                                                    <select #mode="ngModel" [(ngModel)]="orderDetails.payment_mode"
+                                                        name="mode" required class="form-control"
+                                                        [disabled]="isFullDisable" (change)="modeChange()">
+                                                        <option value="">Select Mode</option>
+                                                        <option *ngFor="let mode of available_Modes"
+                                                            [disabled]="mode.disabled" [value]="mode.value">
+                                                            {{mode.title}}</option>
+                                                    </select>
+                                                    <p class="text-danger mt-1"
+                                                        *ngIf="mode?.errors?.required && (mode.dirty || mode.touched || orderForm.submitted)">
+                                                        This field is required.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 align-items-center d-flex justify-content-between">
+                                                <div>Is GST Bill Required?</div>
+                                                <div>
+                                                    <label class="mb-0 toggle-switch">
+                                                        <input type="checkbox" name="isGstBillRequired"
+                                                            #isGstBillRequired="ngModel" (change)="gstBill()"
+                                                            [(ngModel)]="orderDetails.isGstBillRequired"
+                                                            [disabled]="isFullDisable">
+                                                        <span class="toggle-slider round"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 align-items-center d-flex justify-content-between">
+                                                <div>Invescash Used</div>
+                                                <div>
+                                                    <label class="mb-0 toggle-switch">
+                                                        <input disabled type="checkbox" name="isInvescashUsed"
+                                                            #isInvescashUsed="ngModel"
+                                                            [(ngModel)]="orderDetails.isInvescashUsed">
+                                                        <span class="toggle-slider round"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Notes</label>
+                                            <textarea name="notes" cols="30" class="form-control" #notes="ngModel"
+                                                [(ngModel)]="orderDetails.notes" placeholder="Notes" rows="10"
+                                                [disabled]="isFullDisable"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <ngb-alert [dismissible]="false" [type]="'primary'"
+                                            *ngIf="isChangeBatchLoading">
+                                            <span class="spinner-border spinner-border-sm" role="status"
+                                                aria-hidden="true"></span>
+                                            Fetching Current Batch Registration Count. Please Wait...
+                                        </ngb-alert>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="table-responsive no-fix-height">
+                                            <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                                [dataSource]="dataSource" multiTemplateDataRows>
+
+                                                <ng-container matColumnDef="item_no">
+                                                    <th mat-header-cell *matHeaderCellDef> Item No. </th>
+                                                    <td mat-cell *matCellDef="let row; let i = dataIndex"> {{i+1}}</td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="item_type">
+                                                    <th mat-header-cell *matHeaderCellDef> Item Type </th>
+                                                    <td mat-cell *matCellDef="let row"> {{row?.item_type}}</td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="item_code">
+                                                    <th mat-header-cell *matHeaderCellDef> Item Details </th>
+                                                    <td mat-cell *matCellDef="let row"> {{row?.item_code}} <br>
+                                                        {{row?.item_name}} </td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="original_amount">
+                                                    <th mat-header-cell *matHeaderCellDef> Original Amount </th>
+                                                    <td mat-cell *matCellDef="let row">
+                                                        {{row?.original_amount | currency:'INR'}} <br>
+                                                        ({{(row?.amount - row?.original_amount) | currency:'INR'}})
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="amount">
+                                                    <th mat-header-cell *matHeaderCellDef> Discounted Amount </th>
+                                                    <td mat-cell *matCellDef="let row"> {{row?.amount | currency:'INR'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="options">
+                                                    <th mat-header-cell *matHeaderCellDef></th>
+                                                    <td mat-cell *matCellDef="let row;let rowIndex = dataIndex">
+                                                        <div ngbDropdown class="dropdown" container="body">
+                                                            <button type="button" id="insdropdown" ngbDropdownToggle
+                                                                class="btn p-0 no-dropdown-toggle-icon">
+                                                                <i ngbTooltip="More Options"
+                                                                    class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                                            </button>
+                                                            <div ngbDropdownMenu aria-labelledby="insdropdown">
+                                                                <button
+                                                                    *ngIf="isBatchChangeble && row.item_type==='COURSE'"
+                                                                    (click)="changeBatch(row, changeBatchModal)"
+                                                                    ngbDropdownItem><i
+                                                                        class="feather icon-repeat icon-xs mr-2"></i>
+                                                                    Change Batch</button>
+
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
+
+                                                <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+                                                <ng-container matColumnDef="expandedDetail">
+                                                    <td mat-cell *matCellDef="let p; let rowIndex = dataIndex"
+                                                        style="padding: 0px;" [attr.colspan]="displayedColumns.length">
+                                                        <div class="example-row-detail"
+                                                            [@detailExpand]="p == expandedElement ? 'expanded' : 'collapsed'">
+                                                            <div class="row example-row-description">
+                                                                <div class="col-md-3">
+                                                                    <div class="form-group">
+                                                                        <label>Service Type*</label>
+                                                                        <select #servicetype="ngModel"
+                                                                            [(ngModel)]="p.item_type"
+                                                                            name="servicetype-{{rowIndex}}" required
+                                                                            class="form-control"
+                                                                            [disabled]="!isEditable || isFullDisable"
+                                                                            (change)="serviceTypeValidation(p)">
+                                                                            <option value="">Select Service Type
+                                                                            </option>
+                                                                            <option value="COURSE">Course</option>
+                                                                            <option value="INSIGNIA">Insignia</option>
+                                                                            <option value="PRODUCT">Product</option>
+                                                                            <option value="SUBSCRIPTION">Subscription
+                                                                            </option>
+                                                                            <option value="INVESMENTOR">Invesmentor
+                                                                            </option>
+                                                                            <option value="INVESMENTOR_UPGRADE">
+                                                                                Invesmentor Upgrade</option>
+                                                                            <option value="INSIGNIA_SUBSCRIPTION">
+                                                                                Insignia Subscription
+                                                                            </option>
+                                                                        </select>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="servicetype?.errors?.required && (servicetype.dirty || servicetype.touched || orderForm.submitted)">
+                                                                            This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-9"
+                                                                    *ngIf="p.item_type === 'COURSE' || p.item_type === 'SUBSCRIPTION'">
+                                                                    <div class="form-group">
+                                                                        <label>Service code*</label>
+                                                                        <!--email-->
+                                                                        <ng-select class="no-clear" [items]="allCourse"
+                                                                            required placeholder="Search by Course Code"
+                                                                            #servicecode="ngModel" bindValue="_id"
+                                                                            dropdownPosition="bottom"
+                                                                            [searchable]="true"
+                                                                            [searchFn]="CourseSearchFn"
+                                                                            [(ngModel)]="p.item_id"
+                                                                            [disabled]="!isEditable || isFullDisable"
+                                                                            appendTo=".example-row-detail"
+                                                                            (change)="selectCourseItem(p, $event)"
+                                                                            name="servicecode-{{rowIndex}}"
+                                                                            [clearable]="false">
+                                                                            <ng-template ng-label-tmp let-item="item">
+                                                                                <span
+                                                                                    class="ng-value-label">{{item.coursecode}}
+                                                                                    - {{item.coursename}}-
+                                                                                    {{item.coursestartdate |
+                                                                                    date:'mediumDate'}}</span>
+                                                                            </ng-template>
+
+                                                                            <ng-template ng-option-tmp let-item="item">
+                                                                                {{item.coursecode}} -
+                                                                                {{item.coursename}} -
+                                                                                {{item.coursestartdate |
+                                                                                date:'mediumDate'}}
+                                                                            </ng-template>
+                                                                        </ng-select>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="servicecode?.errors?.required && (servicecode.dirty || servicecode.touched || orderForm.submitted)">
+                                                                            This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-9"
+                                                                    *ngIf="p.item_type === 'INSIGNIA' || p.item_type === 'INSIGNIA_SUBSCRIPTION'">
+                                                                    <div class="form-group">
+                                                                        <label>Service code*</label>
+                                                                        <!--email-->
+                                                                        <ng-select [items]="allInsignia" required
+                                                                            placeholder="Search by Insignia"
+                                                                            #servicecode="ngModel" bindValue="_id"
+                                                                            appendTo=".example-row-detail"
+                                                                            dropdownPosition="bottom"
+                                                                            [searchable]="true"
+                                                                            [disabled]="!isEditable || isFullDisable"
+                                                                            [searchFn]="InsigniaSearchFn"
+                                                                            [(ngModel)]="p.item_id"
+                                                                            name="servicecode-{{rowIndex}}"
+                                                                            (change)="selectInsigniaItem(p, $event)">
+                                                                            <ng-template ng-label-tmp let-item="item">
+                                                                                <span
+                                                                                    class="ng-value-label">{{item.code}}
+                                                                                    -
+                                                                                    {{item.name}}</span>
+                                                                            </ng-template>
+
+                                                                            <ng-template ng-option-tmp let-item="item">
+                                                                                {{item.code}} - {{item.name}}
+                                                                            </ng-template>
+                                                                        </ng-select>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="servicecode?.errors?.required && (servicecode.dirty || servicecode.touched || orderForm.submitted)">
+                                                                            This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-9" *ngIf="p.item_type === 'PRODUCT'">
+                                                                    <div class="form-group">
+                                                                        <label>Service code*</label>
+                                                                        <!--email-->
+                                                                        <ng-select [items]="allProduct" required
+                                                                            placeholder="Search by Product"
+                                                                            #servicecode="ngModel" bindValue="_id"
+                                                                            appendTo=".example-row-detail"
+                                                                            dropdownPosition="bottom"
+                                                                            [searchable]="true"
+                                                                            [disabled]="!isEditable || isFullDisable"
+                                                                            [searchFn]="ProductSearchFn"
+                                                                            [(ngModel)]="p.item_id"
+                                                                            name="servicecode-{{rowIndex}}"
+                                                                            (change)="selectProductItem(p, $event)">
+                                                                            <ng-template ng-label-tmp let-item="item">
+                                                                                <span
+                                                                                    class="ng-value-label">{{item.productid}}
+                                                                                    - {{item.name}}</span>
+                                                                            </ng-template>
+
+                                                                            <ng-template ng-option-tmp let-item="item">
+                                                                                {{item.productid}} - {{item.name}}
+                                                                            </ng-template>
+                                                                        </ng-select>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="servicecode?.errors?.required && (servicecode.dirty || servicecode.touched || orderForm.submitted)">
+                                                                            This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-9"
+                                                                    *ngIf="p.item_type === 'INVESMENTOR' || p.item_type === 'INVESMENTOR_UPGRADE'">
+                                                                    <div class="form-group">
+                                                                        <label>Service code*</label>
+                                                                        <!--email-->
+                                                                        <ng-select [items]="allInvesmentor" required
+                                                                            placeholder="Search by Invesmentor"
+                                                                            #servicecode="ngModel" bindValue="_id"
+                                                                            appendTo=".example-row-detail"
+                                                                            dropdownPosition="bottom"
+                                                                            [searchable]="true"
+                                                                            [disabled]="!isEditable || isFullDisable"
+                                                                            [searchFn]="InvesmentorSearchFn"
+                                                                            [(ngModel)]="p.item_id"
+                                                                            name="servicecode-{{rowIndex}}"
+                                                                            (change)="selectInvesmentorItem(p, $event)">
+                                                                            <ng-template ng-label-tmp let-item="item">
+                                                                                <span
+                                                                                    class="ng-value-label">{{item.code}}
+                                                                                    - {{item.name}}</span>
+                                                                            </ng-template>
+
+                                                                            <ng-template ng-option-tmp let-item="item">
+                                                                                {{item.code}} - {{item.name}}
+                                                                            </ng-template>
+                                                                        </ng-select>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="servicecode?.errors?.required && (servicecode.dirty || servicecode.touched || orderForm.submitted)">
+                                                                            This field is required.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-3" *ngIf="p.amount">
+                                                                    <div class="form-group mb-0">
+                                                                        <label>Amount*</label>
+                                                                        <input type="text" #amount="ngModel"
+                                                                            [(ngModel)]="p.amount"
+                                                                            name="amount-{{rowIndex}}"
+                                                                            class="form-control border-0 rounded-sm"
+                                                                            autocomplete="off"
+                                                                            placeholder="Enter Amount" disabled
+                                                                            (change)="validateAmount(p)"
+                                                                            [min]="p.original_amount" required>
+                                                                        <p class="text-danger mt-1"
+                                                                            *ngIf="amount?.errors?.required && (amount.dirty || amount.touched || orderForm.submitted)">
+                                                                            This field is required.</p>
+                                                                    </div>
+
+
+                                                                </div>
+                                                                <div class="col-md-6"
+                                                                    *ngIf="p.item_type === 'PRODUCT' || p.item_type === 'INSIGNIA' || p.item_type === 'INVESMENTOR' || p.item_type === 'INVESMENTOR_UPGRADE'">
+                                                                    <div class="form-group">
+                                                                        <label>Preferred Instructor (Optional)</label>
+                                                                        <ng-select [items]="allInstructor"
+                                                                            [searchable]="true"
+                                                                            placeholder="Search Instructor"
+                                                                            #instructor="ngModel"
+                                                                            appendTo=".example-row-detail"
+                                                                            dropdownPosition="bottom"
+                                                                            [(ngModel)]="p.preferred_ins_id"
+                                                                            bindValue="_id"
+                                                                            [disabled]="!isEditable || isFullDisable"
+                                                                            name="instructor-{{rowIndex}}"
+                                                                            [searchFn]="UserSearchFn">
+                                                                            <ng-template ng-label-tmp let-item="item">
+                                                                                <span
+                                                                                    class="ng-value-label">{{item.invid}}
+                                                                                    - {{item.fullName}}</span>
+                                                                            </ng-template>
+
+                                                                            <ng-template ng-option-tmp let-item="item">
+                                                                                {{item.invid}} - {{item.fullName}}
+                                                                            </ng-template>
+                                                                        </ng-select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12"
+                                                                    *ngIf="(p.item_type ==='SUBSCRIPTION' || p.item_type ==='INSIGNIA_SUBSCRIPTION') && subscriptionFound">
+                                                                    <h5 class="mt-3 mb-2">{{subscribe.name}}</h5>
+                                                                    <table width="100%" cellspacing="0">
+                                                                        <tr>
+                                                                            <td>Days</td>
+                                                                            <td>Price</td>
+                                                                            <td></td>
+                                                                        </tr>
+                                                                        <tr
+                                                                            *ngFor="let s of subscribepackage; let i=index">
+                                                                            <td>{{s.days}}</td>
+                                                                            <td>{{s.price | currency:'INR'}}</td>
+                                                                            <td><button
+                                                                                    (click)="selectSubscription(s,p)"
+                                                                                    class="btn btn-primary btn-block">
+                                                                                    Select </button></td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                                <div class="col-md-12"
+                                                                    *ngIf="p.item_type ==='INVESMENTOR_UPGRADE' && invesmentorUpgradeFounds">
+                                                                    <table width="100%" cellspacing="0">
+                                                                        <tr>
+                                                                            <td>Invesmentor</td>
+                                                                            <td>Price</td>
+                                                                            <td></td>
+                                                                        </tr>
+                                                                        <tr
+                                                                            *ngFor="let s of eligibleUpgrades; let i=index">
+                                                                            <td>{{s.item_name}} - {{s.item_code}}
+                                                                                ({{s.short_code}})</td>
+                                                                            <td>{{s.price | currency:'INR'}}</td>
+                                                                            <td><button
+                                                                                    (click)="selectInvesmentorUpgrade(s,p)"
+                                                                                    class="btn btn-primary btn-block">
+                                                                                    Select </button></td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
+
+                                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                                <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                                                    class="cursor-pointer example-element-row"
+                                                    [class.example-expanded-row]="expandedElement === element"
+                                                    (click)="expandedElement = expandedElement === element ? null : element; isAmountEditable = false">
+                                                </tr>
+                                                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
+                                                    class="example-detail-row">
+                                                </tr>
+                                            </table>
+                                            <!-- <button class="btn btn-primary mt-3 mr-2"
+                                                *ngIf="(!isEditable || isSave)  && !isFullDisable"
+                                                [disabled]="!orderDetails.payment_mode" (click)="AddService()">Add
+                                                Service
+                                                Item</button> -->
+                                            <button *ngIf="(isPayDue || isSave) && !isFullDisable"
+                                                class="btn btn-primary mt-3"
+                                                [disabled]="orderLines.length==0 && !orderDetails.payment_mode"
+                                                (click)="applyItemsChanges()">Apply</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </li>
+                        <li [ngbNavItem]="2">
+                            <a ngbNavLink>Installments</a>
+                            <ng-template ngbNavContent>
+                                <div class="table-responsive no-fix-height">
+                                    <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                        multiTemplateDataRows [dataSource]="dataSource1">
+
+                                        <ng-container matColumnDef="installment_number">
+                                            <th mat-header-cell *matHeaderCellDef> Installment </th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.installment_number}} </td>
+                                            <td mat-footer-cell *matFooterCellDef></td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="installment_date">
+                                            <th mat-header-cell *matHeaderCellDef> Date</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.installment_date |
+                                                date:'mediumDate'}}
+                                            </td>
+                                            <td mat-footer-cell *matFooterCellDef></td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="installment_amount">
+                                            <th mat-header-cell *matHeaderCellDef> Amount</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.installment_amount |
+                                                currency:'INR'}}
+                                            </td>
+                                            <td mat-footer-cell *matFooterCellDef>{{totalInsAmount | currency:'INR'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="gst">
+                                            <th mat-header-cell *matHeaderCellDef> GST</th>
+                                            <td mat-cell *matCellDef="let row"> {{(row?.sgst + row?.cgst + row?.igst) |
+                                                currency:'INR'}} </td>
+                                            <td mat-footer-cell *matFooterCellDef>{{totalInsGst | currency:'INR'}}</td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="charges">
+                                            <th mat-header-cell *matHeaderCellDef> Additional Charges</th>
+                                            <td mat-cell *matCellDef="let row"> {{(row?.additional_charges) |
+                                                currency:'INR'}} </td>
+                                            <td mat-footer-cell *matFooterCellDef>{{totalAdditionalCharges |
+                                                currency:'INR'}}</td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="net_amount">
+                                            <th mat-header-cell *matHeaderCellDef> Net Amount</th>
+                                            <td mat-cell *matCellDef="let row"> {{getNetAmount(row) | currency:'INR'}}
+                                            </td>
+                                            <td mat-footer-cell *matFooterCellDef>{{totalInsNetAmount | currency:'INR'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="due">
+                                            <th mat-header-cell *matHeaderCellDef> Due</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.is_Paid?0:row?.installment_amount
+                                                |
+                                                currency:'INR'}} </td>
+                                            <td mat-footer-cell *matFooterCellDef>{{totalInsDue | currency:'INR'}}</td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="status">
+                                            <th mat-header-cell *matHeaderCellDef>Status </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <span class="badge badge-success" *ngIf="row?.is_Paid">Paid</span>
+                                                <span class="badge badge-danger" *ngIf="!row?.is_Paid">Due</span>
+                                            </td>
+                                            <td mat-footer-cell *matFooterCellDef></td>
+                                        </ng-container>
+
+                                        <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+                                        <ng-container matColumnDef="expandedDetail">
+                                            <td mat-cell *matCellDef="let p; let rowIndex = dataIndex"
+                                                style="padding: 0px;" [attr.colspan]="displayedColumns1.length">
+                                                <div class="example-row-detail"
+                                                    [@detailExpand]="p == expandedElement1 ? 'expanded' : 'collapsed'">
+                                                    <div class="row example-row-description">
+                                                        <div class="col-md-3">
+                                                            <div class="form-group mb-0">
+                                                                <label>Amount*</label>
+                                                            </div>
+                                                            <div
+                                                                class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none d-xl-flex">
+                                                                <input type="text" #installment_amount="ngModel"
+                                                                    [(ngModel)]="p.installment_amount"
+                                                                    name="installment_amount-{{rowIndex}}"
+                                                                    class="form-control border-0 rounded-sm"
+                                                                    autocomplete="off" placeholder="Enter Amount"
+                                                                    [disabled]="!isInsAmountEditable"
+                                                                    (change)="validateInsAmount(p)" required>
+                                                                <div class="input-group-prepend">
+                                                                    <div class="input-group-text border-0 rounded-sm">
+                                                                        <a *ngIf="!isInsAmountEditable && !p.is_Paid && !isFullDisable && !p.payment_link_id"
+                                                                            (click)="isInsAmountEditable=true"
+                                                                            placement="top" ngbTooltip="Edit">
+                                                                            <i
+                                                                                class="feather icon-edit icon-md mr-2"></i>
+                                                                        </a>
+                                                                        <a *ngIf="isInsAmountEditable && !p.is_Paid && !isFullDisable && !p.payment_link_id"
+                                                                            (click)="isInsAmountEditable=false"
+                                                                            placement="top" ngbTooltip="Save">
+                                                                            <i
+                                                                                class="feather icon-check-circle icon-md mr-2"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <p class="text-danger mt-1"
+                                                                *ngIf="installment_amount?.errors?.required && (installment_amount.dirty || installment_amount.touched || orderForm.submitted)">
+                                                                This field is required.</p>
+                                                        </div>
+                                                        <div class="col-md-3" *ngIf="p.installment_date">
+                                                            <div class="form-group mb-0">
+                                                                <label>Date*</label>
+                                                            </div>
+                                                            <div
+                                                                class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none d-xl-flex">
+                                                                <input type="date" #installment_date="ngModel"
+                                                                    [ngModel]="p.installment_date | date:'yyyy-MM-dd'"
+                                                                    (ngModelChange)="p.installment_date = $event"
+                                                                    name="installment_date-{{rowIndex}}"
+                                                                    class="form-control border-0 rounded-sm"
+                                                                    autocomplete="off" [disabled]="!isInsAmountEditable"
+                                                                    (change)="validateInsDate(p)" required>
+                                                                <div class="input-group-prepend">
+                                                                    <div class="input-group-text border-0 rounded-sm">
+                                                                        <a *ngIf="!isInsAmountEditable && !p.is_Paid && !isFullDisable && !p.payment_link_id"
+                                                                            (click)="isInsAmountEditable=true"
+                                                                            placement="top" ngbTooltip="Edit">
+                                                                            <i
+                                                                                class="feather icon-edit icon-md mr-2"></i>
+                                                                        </a>
+                                                                        <a *ngIf="isInsAmountEditable && !p.is_Paid && !isFullDisable && !p.payment_link_id"
+                                                                            (click)="isInsAmountEditable=false"
+                                                                            placement="top" ngbTooltip="Save">
+                                                                            <i
+                                                                                class="feather icon-check-circle icon-md mr-2"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <p class="text-danger mt-1"
+                                                                *ngIf="installment_date?.errors?.required && (installment_date.dirty || installment_date.touched || orderForm.submitted)">
+                                                                This field is required.</p>
+                                                        </div>
+                                                        <div class="col-md-12 mt-3" *ngIf="p.payment_link_id">
+                                                            <div class="alert alert-info">
+                                                                To modify the installment amount and date, Please Cancel
+                                                                the Active Payment Link.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumns1; sticky: true"></tr>
+                                        <tr mat-row *matRowDef="let element; columns: displayedColumns1;"
+                                            class="cursor-pointer example-element-row"
+                                            [class.example-expanded-row]="expandedElement1 === element"
+                                            (click)="expandedElement1 = expandedElement1 === element ? null : element; isInsAmountEditable = false">
+                                        </tr>
+                                        <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
+                                            class="example-detail-row">
+                                        </tr>
+                                        <tr mat-footer-row *matFooterRowDef="displayedColumns1; sticky: true"></tr>
+
+                                    </table>
+                                </div>
+                                <div class="d-inline-block mt-3 mr-2" ngbDropdown
+                                    *ngIf="!isFullDisable && isPayDue && !isButtonDisable">
+                                    <button class="btn btn-light btn-icon no-dropdown-toggle-icon"
+                                        id="dropdownButtonPrimary1" ngbDropdownToggle>
+                                        Add Payment
+                                    </button>
+                                    <div ngbDropdownMenu aria-labelledby="dropdownButtonPrimary1">
+                                        <button ngbDropdownItem (click)="openPaymentLink(paymentLinkModal)">Send Payment
+                                            Link</button>
+                                        <!-- <button ngbDropdownItem disabled>Send Coupon Link</button>
+                                        <button ngbDropdownItem disabled>Send Payment Request (App Only)</button> -->
+                                        <button ngbDropdownItem (click)="openPaymentComponent(paymentModal)">Add
+                                            Invoice</button>
+                                    </div>
+                                </div>
+                                <!-- <button *ngIf="!isFullDisable && isPayDue" (click)="addInstallment()"
+                                    class="btn btn-primary mr-2">Add Installment</button> -->
+                            </ng-template>
+                        </li>
+                        <li [ngbNavItem]="3">
+                            <a ngbNavLink>Payments</a>
+                            <ng-template ngbNavContent>
+                                <div class="table-responsive no-fix-height">
+                                    <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                        [dataSource]="dataSource3">
+
+                                        <ng-container matColumnDef="installment_number">
+                                            <th mat-header-cell *matHeaderCellDef> INS No. </th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.installment_number}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="payment_date">
+                                            <th mat-header-cell *matHeaderCellDef> Payment Date</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.payment_date |
+                                                date:'mediumDate'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="txnid">
+                                            <th mat-header-cell *matHeaderCellDef> TXN ID</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.txnid}}<br>
+                                                (utr:{{row?.utr_no}})<br>
+                                                <span class="badge badge-success">{{row?.payment_method}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="invoice_number">
+                                            <th mat-header-cell *matHeaderCellDef> Invoice</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.invoice_number}}<br>
+                                                {{row?.invoice_date | date:'mediumDate'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="installment_amount">
+                                            <th mat-header-cell *matHeaderCellDef> Amount</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.installment_amount |
+                                                currency:'INR'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="gst">
+                                            <th mat-header-cell *matHeaderCellDef> GST</th>
+                                            <td mat-cell *matCellDef="let row"> {{(row?.sgst + row?.cgst + row?.igst) |
+                                                currency:'INR'}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="charges">
+                                            <th mat-header-cell *matHeaderCellDef> Additional <br> Charges</th>
+                                            <td mat-cell *matCellDef="let row"> {{(row?.additional_charges) |
+                                                currency:'INR'}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="net_amount">
+                                            <th mat-header-cell *matHeaderCellDef> Net Amount</th>
+                                            <td mat-cell *matCellDef="let row"> {{getNetAmount(row) | currency:'INR'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="status">
+                                            <th mat-header-cell *matHeaderCellDef>Verification <br> Status </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <span class="badge badge-success"
+                                                    *ngIf="row?.is_verified">Verified</span>
+                                                <span class="badge badge-danger" *ngIf="!row?.is_verified">Verification
+                                                    Pending</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="options">
+                                            <th mat-header-cell *matHeaderCellDef></th>
+                                            <td mat-cell *matCellDef="let row;let rowIndex = dataIndex">
+                                                <div ngbDropdown class="dropdown" container="body"
+                                                    *ngIf="!isFullDisable">
+                                                    <button type="button" id="insdropdown2" ngbDropdownToggle
+                                                        class="btn p-0 no-dropdown-toggle-icon">
+                                                        <i ngbTooltip="More Options"
+                                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                                    </button>
+                                                    <div ngbDropdownMenu aria-labelledby="insdropdown2">
+                                                        <button *ngIf="!row?.is_verified" (click)="verifyPayment(row)"
+                                                            ngbDropdownItem><i
+                                                                class="feather icon-check-circle icon-xs mr-2"></i>
+                                                            Verify Payment</button>
+                                                        <button *ngIf="!row?.is_verified"
+                                                            (click)="editPayment(row,paymentEditModal)"
+                                                            ngbDropdownItem><i
+                                                                class="feather icon-edit icon-xs mr-2"></i>
+                                                            Modify Payment</button>
+                                                        <button *ngIf="row?.is_verified" (click)="downloadInvoice(row)"
+                                                            ngbDropdownItem><i
+                                                                class="feather icon-download icon-xs mr-2"></i>
+                                                            Download Invoice</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumns2; sticky: true"></tr>
+                                        <tr mat-row *matRowDef="let element; columns: displayedColumns2;">
+                                        </tr>
+                                    </table>
+                                </div>
+                            </ng-template>
+                        </li>
+                        <li [ngbNavItem]="4">
+                            <a ngbNavLink>Payment Links</a>
+                            <ng-template ngbNavContent>
+                                <div class="table-responsive no-fix-height">
+                                    <table class="table table-hover table-bordered" cellspacing="0" mat-table
+                                        [dataSource]="dataSource4">
+
+                                        <ng-container matColumnDef="installment_number">
+                                            <th mat-header-cell *matHeaderCellDef>Installment Number </th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.installment_number}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="id">
+                                            <th mat-header-cell *matHeaderCellDef>Payment Link Id </th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.id}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="created_at">
+                                            <th mat-header-cell *matHeaderCellDef> Created At</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.created_at |
+                                                date:'mediumDate'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="amount">
+                                            <th mat-header-cell *matHeaderCellDef>Amount</th>
+                                            <td mat-cell *matCellDef="let row"> {{row?.amount | currency:'INR'}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="short_url">
+                                            <th mat-header-cell *matHeaderCellDef> Payment Link</th>
+                                            <td mat-cell *matCellDef="let row"> <a placement="top" ngbTooltip="Copy"
+                                                    ngxClipboard [cbContent]="row.short_url" class="mr-2"
+                                                    (click)="copied()">
+                                                    {{row.short_url}}
+                                                </a>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="status">
+                                            <th mat-header-cell *matHeaderCellDef> Status </th>
+                                            <td mat-cell *matCellDef="let row">
+                                                <span class="badge badge-info text-white"
+                                                    *ngIf="row?.status === 'created'">Created</span>
+                                                <span class="badge badge-success"
+                                                    *ngIf="row?.status === 'paid'">Paid</span>
+                                                <span class="badge badge-danger"
+                                                    *ngIf="row?.status !== 'paid' && row?.status !== 'created'">{{row?.status
+                                                    | titlecase}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="options">
+                                            <th mat-header-cell *matHeaderCellDef></th>
+                                            <td mat-cell *matCellDef="let row;let rowIndex = dataIndex">
+                                                <div ngbDropdown class="dropdown" container="body"
+                                                    *ngIf="!isFullDisable">
+                                                    <button type="button" id="insdropdown2" ngbDropdownToggle
+                                                        class="btn p-0 no-dropdown-toggle-icon">
+                                                        <i ngbTooltip="More Options"
+                                                            class="feather icon-more-vertical icon-md text-muted pb-3px"></i>
+                                                    </button>
+                                                    <div ngbDropdownMenu aria-labelledby="insdropdown2">
+                                                        <button
+                                                            *ngIf="row?.status === 'created' && !isFullDisable && !isButtonDisable"
+                                                            (click)="cancelPaymentLink(row)" ngbDropdownItem><i
+                                                                class="feather icon-check-circle icon-xs mr-2"></i>
+                                                            Cancel Payment Link</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumns3; sticky: true"></tr>
+                                        <tr mat-row *matRowDef="let element; columns: displayedColumns3;"></tr>
+                                    </table>
+                                </div>
+                            </ng-template>
+                        </li>
+                    </ul>
+
+                    <div [ngbNavOutlet]="defaultNav" class="border border-top-0 p-3"></div>
+                    <div *ngIf="errMsg" class="alert alert-danger">{{errMsg}}</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<ng-template #paymentModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Payments</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="alert alert-info">
+            <b>Please verify below payment details before submit.</b> <br>
+            <b>Installment Number:</b> {{paymentInstallment.installment_number}} <br>
+            <b>Amount:</b> {{paymentInstallment.installment_amount | currency:'INR'}} <br>
+            <b>Installment Due Date:</b> {{paymentInstallment.installment_date | date:'mediumDate'}} <br>
+        </div>
+
+        <form #paymentForm="ngForm">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Payment Txn ID*</label>
+                        <input type="text" #txnid="ngModel" [(ngModel)]="paymentInstallment.txnid" name="txnid"
+                            class="form-control" placeholder="Transaction ID" autocomplete="off" required>
+                        <p class="text-danger mt-1"
+                            *ngIf="txnid?.errors?.required && (txnid.dirty || txnid.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Payment UTR No.</label>
+                        <input type="text" #utr_no="ngModel" [(ngModel)]="paymentInstallment.utr_no" name="utr_no"
+                            class="form-control" placeholder="Utr No." autocomplete="off">
+                        <p class="text-danger mt-1"
+                            *ngIf="utr_no?.errors?.required && (utr_no.dirty || utr_no.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Payment Method*<a placement="top" ngbTooltip="Razorpay, Gpay,Paytm etc."><i
+                                    class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                        <select #paymentmethod="ngModel" [(ngModel)]="paymentInstallment.payment_method"
+                            name="paymentmethod" class="form-control" placeholder="Payment Method" required>
+                            <option value="Bank Transfer"> Bank Transfer</option>
+                            <option value="Google Pay"> Google Pay</option>
+                            <option value="Phone Pe"> Phone Pe</option>
+                            <option value="UPI"> UPI</option>
+                            <option value="Paytm"> Paytm</option>
+                            <option value="Educational Loan"> Educational Loan</option>
+                            <option value="Razor Pay Link"> Razor Pay Link</option>
+                            <option value="Cash Payment"> Cash Payment</option>
+                            <option disabled value="Android Razorpay"> Android Razorpay</option>
+                            <option disabled value="Website Razorpay"> Website Razorpay</option>
+                            <option value="Others"> Others</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="paymentmethod?.errors?.required && (paymentmethod.dirty || paymentmethod.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Date of Payment*</label>
+                        <input type="date" #date="ngModel" [max]="maxdate"
+                            [ngModel]="paymentInstallment.payment_date | date:'yyyy-MM-dd'"
+                            (ngModelChange)="paymentInstallment.payment_date = $event" name="date" class="form-control"
+                            required>
+                        <p class="text-danger mt-1"
+                            *ngIf="date?.errors?.required && (date.dirty || date.touched || paymentForm.submitted)">This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Additional Charges(if any)<a placement="top"
+                                ngbTooltip="Processing Fees, Extra gst etc."><i class="small-icon"
+                                    data-feather="help-circle" appFeatherIcon></i></a></label>
+                        <input type="number" #additional_charges="ngModel"
+                            [(ngModel)]="paymentInstallment.additional_charges" name="additional_charges"
+                            class="form-control" placeholder="Additional Charges(if any)" autocomplete="off">
+                        <p class="text-danger mt-1"
+                            *ngIf="additional_charges?.errors?.required && (additional_charges.dirty || additional_charges.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="paymentForm.invalid" class="btn btn-primary"
+            (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>
+
+<ng-template #paymentEditModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modify Payments</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #paymentForm="ngForm">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Amount*</label>
+                        <input type="text" #amount="ngModel" [(ngModel)]="paymentInstallment.installment_amount"
+                            name="amount" class="form-control" readonly placeholder="Amount" autocomplete="off"
+                            required>
+                        <p class="text-danger mt-1"
+                            *ngIf="amount?.errors?.required && (amount.dirty || amount.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Payment Txn ID*</label>
+                        <input type="text" #txnid="ngModel" [(ngModel)]="paymentInstallment.txnid" name="txnid"
+                            class="form-control" placeholder="Transaction ID" autocomplete="off" required>
+                        <p class="text-danger mt-1"
+                            *ngIf="txnid?.errors?.required && (txnid.dirty || txnid.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Payment UTR No.</label>
+                        <input type="text" #utr_no="ngModel" [(ngModel)]="paymentInstallment.utr_no" name="utr_no"
+                            class="form-control" placeholder="Utr No." autocomplete="off">
+                        <p class="text-danger mt-1"
+                            *ngIf="utr_no?.errors?.required && (utr_no.dirty || utr_no.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Payment Method*<a placement="top" ngbTooltip="Razorpay, Gpay,Paytm etc."><i
+                                    class="small-icon" data-feather="help-circle" appFeatherIcon></i></a></label>
+                        <select #paymentmethod="ngModel" [(ngModel)]="paymentInstallment.payment_method"
+                            name="paymentmethod" class="form-control" placeholder="Payment Method" required>
+                            <option value="Bank Transfer"> Bank Transfer</option>
+                            <option value="Google Pay"> Google Pay</option>
+                            <option value="Phone Pe"> Phone Pe</option>
+                            <option value="UPI"> UPI</option>
+                            <option value="Paytm"> Paytm</option>
+                            <option value="Educational Loan"> Educational Loan</option>
+                            <option value="Razor Pay Link"> Razor Pay Link</option>
+                            <option value="Cash Payment"> Cash Payment</option>
+                            <option disabled value="Android Razorpay"> Android Razorpay</option>
+                            <option disabled value="Website Razorpay"> Website Razorpay</option>
+                            <option value="Others"> Others</option>
+                        </select>
+                        <p class="text-danger mt-1"
+                            *ngIf="paymentmethod?.errors?.required && (paymentmethod.dirty || paymentmethod.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Date of Payment*</label>
+                        <input type="date" #date="ngModel" [max]="maxdate"
+                            [ngModel]="paymentInstallment.payment_date | date:'yyyy-MM-dd'"
+                            (ngModelChange)="paymentInstallment.payment_date = $event" name="date" class="form-control"
+                            required>
+                        <p class="text-danger mt-1"
+                            *ngIf="date?.errors?.required && (date.dirty || date.touched || paymentForm.submitted)">This
+                            field is required.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Additional Charges(if any)<a placement="top"
+                                ngbTooltip="Processing Fees, Extra gst etc."><i class="small-icon"
+                                    data-feather="help-circle" appFeatherIcon></i></a></label>
+                        <input type="number" #additional_charges="ngModel"
+                            [(ngModel)]="paymentInstallment.additional_charges" name="additional_charges"
+                            class="form-control" placeholder="Additional Charges(if any)" autocomplete="off">
+                        <p class="text-danger mt-1"
+                            *ngIf="additional_charges?.errors?.required && (additional_charges.dirty || additional_charges.touched || paymentForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="paymentForm.invalid" class="btn btn-primary"
+            (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>
+
+<ng-template #paymentLinkModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Payments</h5>
+        <button type="button" class="close" (click)="modal.close('close')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="alert alert-info">
+            <b>Please verify below payment details before submit.</b> <br>
+            <b>Installment Number:</b> {{newPaymentLink.installment_number}} <br>
+            <b>Amount:</b> {{newPaymentLink.amount | currency:'INR'}} <br>
+            <b>Student Name:</b> {{newPaymentLink.customer.name}} <br>
+            <b>Student Email:</b> {{newPaymentLink.customer.email}} <br>
+            <b>Student Phone:</b> {{newPaymentLink.customer.contact}}
+            <p>The student will receive the payment link in the above email and SMS.</p>
+        </div>
+        <div class="form-group">
+            <label>Payment Link Type</label>
+            <select class="form-control" #upi_link="ngModel" [(ngModel)]="newPaymentLink.upi_link" name="upi_link">
+                <option [ngValue]="true">UPI Payment Link</option>
+                <option [ngValue]="false">Standard Payment Link</option>
+            </select>
+        </div>
+        <div class="alert alert-info">
+            <p *ngIf="newPaymentLink.upi_link"><strong>UPI Payment Link:</strong> Collect UPI payments from your
+                customers, using UPI payment links, without knowing their UPI/VPA
+                addresses.</p>
+            <p *ngIf="!newPaymentLink.upi_link"><strong>Standard Payment Link:</strong> Create a classic payment link to
+                collect payment from your customers in all payment methods.</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close('close')">Exit</button>
+    </div>
+</ng-template>
+
+<ng-template #historyModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Logs</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-9">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-primary btn-block" (click)="exportLog()">Export</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource2"
+                matSort>
+
+                <ng-container matColumnDef="modified_by">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> User </th>
+                    <td mat-cell *matCellDef="let row"> {{row?.modified_by}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                    <td mat-cell *matCellDef="let row">
+                        <p>{{row?.date | date: 'medium'}}</p>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="activity">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Activity </th>
+                    <td mat-cell *matCellDef="let row">
+                        <p>
+                            <span *ngIf="row?.isError" class="badge badge-danger mr-4">{{row?.status}}</span>
+                            <span *ngIf="row?.isSuccess" class="badge badge-success mr-4">{{row?.status}}</span>
+                            <span *ngIf="row?.isWarning" class="badge badge-warning mr-4">{{row?.status}}</span>
+                            {{row?.activity}}
+                        </p>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['modified_by','date','activity']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['modified_by','date','activity'];"></tr>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>
+
+<ng-template #changeBatchModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change Batch</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #batchChangeForm="ngForm">
+            <div class="row">
+                <div class="col-md-12" *ngIf="isBatchChangeError">
+                    <div class="alert alert-danger">
+                        {{batchChangeErrMsg}}
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Select Batch*</label>
+                        <!--email-->
+                        <ng-select [items]="batchCourses" required placeholder="Search by Course Code"
+                            #batchchangecode="ngModel" [searchable]="true" [searchFn]="CourseSearchFn"
+                            [(ngModel)]="changedBatch" (change)="validateBatchChange()" name="batchchangecode">
+                            <ng-template ng-label-tmp let-item="item">
+                                <span class="ng-value-label">{{item.coursecode}}
+                                    - {{item.coursename}} - {{item?.coursestartdate | date:'mediumDate'}} -
+                                    {{item?.registration_count}}/{{item?.max_student}}</span>
+                            </ng-template>
+
+                            <ng-template ng-option-tmp let-item="item">
+                                {{item.coursecode}} -
+                                {{item.coursename}} - {{item?.coursestartdate | date:'mediumDate'}} -
+                                {{item?.registration_count}}/{{item?.max_student}}
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-12" *ngIf="changedBatch">
+                    <div class="alert alert-info">
+                        <b>Selected Batch Details:</b> <br>
+                        Course Name: {{changedBatch?.coursename | titlecase}} <br>
+                        Course Code: {{changedBatch?.coursecode | titlecase}} <br>
+                        Teachers: {{changedBatch?.teachername | titlecase}} <br>
+                        Batch Start Date: {{changedBatch?.coursestartdate | date:'mediumDate'}} <br>
+                        Language: {{changedBatch?.courselanguage}} <br>
+                        Maximum Student: {{changedBatch?.max_student}}<br>
+                        Registration Count: {{changedBatch?.registration_count}}
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>Batch Change Reason*</label>
+                        <textarea name="batchChangeReason" cols="30" class="form-control" #batchChangeReason="ngModel"
+                            required [(ngModel)]="requestBatchChange.requestReason" placeholder="Reason"
+                            rows="10"></textarea>
+                        <p class="text-danger mt-1"
+                            *ngIf="batchChangeReason?.errors?.required && (batchChangeReason.dirty || batchChangeReason.touched || batchChangeForm.submitted)">
+                            This field is required.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" [disabled]="batchChangeForm.invalid || isBatchChangeError" class="btn btn-primary"
+            (click)="modal.close('Save')">Submit</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>

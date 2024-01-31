@@ -1,0 +1,123 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Insignia</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Insignia Conv From Existing BCMB Student Report</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Insignia Conv From Existing BCMB Students Report</h6>
+                </div>
+                <form (ngSubmit)="submit()">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" #sdate="ngModel" [(ngModel)]="startDate" name="sdate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" #edate="ngModel" [(ngModel)]="endDate" name="edate"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block mb-2 mt-4">Search</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" (keyup)="applyFilter($event)"
+                                    placeholder="Search">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-block" (click)="export()">Export</button>
+                    </div>
+                </div>
+                <div *ngIf="isLoading" class="spinner-wrapper">
+                    <div class="spinner">Loading...</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered" cellspacing="0" mat-table [dataSource]="dataSource"
+                        matSort>
+
+                        <ng-container matColumnDef="employee_code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Employee </th>
+                            <td mat-cell *matCellDef="let row"> {{row.employee_code}} - {{row.employee_name}} </td>
+                            <td mat-footer-cell *matFooterCellDef></td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="insignia_count">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Insignia Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.insignia_count}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_insignia_count}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_student">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Existing BCMB <br> Student Converted
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_student}}</td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_student}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bcmb_student_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Existing BCMB <br> Student
+                                Converted</th>
+                            <td mat-cell *matCellDef="let row"> {{row.bcmb_student_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bcmb_student_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="other_source">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Source <br> Student Converted
+                            </th>
+                            <td mat-cell *matCellDef="let row"> {{row.other_source}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_other_source}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="other_source_conv">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> % of Other Source <br> Student
+                                Converted </th>
+                            <td mat-cell *matCellDef="let row"> {{row.other_source_conv | percent}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_other_source_conv | percent}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bookedamount">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Booked Amount </th>
+                            <td mat-cell *matCellDef="let row"> {{row.bookedamount | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_bookedamount | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="paymentreceived">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Received </th>
+                            <td mat-cell *matCellDef="let row"> {{row.paymentreceived | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_paymentreceived | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="due">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Due </th>
+                            <td mat-cell *matCellDef="let row"> {{row.due | currency:'INR'}} </td>
+                            <td mat-footer-cell *matFooterCellDef>{{total_due | currency:'INR'}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[25, 50, 100, 150, 200, 250, 500]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

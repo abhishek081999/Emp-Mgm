@@ -1,0 +1,99 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Jobs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Job Lists</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                    <h6 class="card-title">Job List</h6>
+                    <form class="search-form">
+                        <div class="input-group border rounded-sm">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text border-0 rounded-sm">
+                                    <i class="feather icon-search icon-sm cursor-pointer"></i>
+                                </div>
+                            </div>
+                            <input 
+                                type="text" 
+                                class="form-control border-0 rounded-sm" 
+                                id="searchForm" 
+                                name="search"  
+                                #search="ngModel" 
+                                [(ngModel)]="searchq" 
+                                placeholder="Search here..."
+                                (keyup)="filter()">
+                        </div>
+                    </form>
+                </div>
+                <ul class="list-unstyled">
+                    <li *ngFor="let j of alljobsFilter | slice: (currentPage-1) * pageSize : currentPage * pageSize">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between align-items-start pb-2 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img [src]="j.image" width="100%" [alt]="j.title">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h5 class="mt-0 mb-1">{{j.title}}
+                                                    <span *ngIf="j.active" class="badge badge-pill badge-success mr-1">Activated</span>
+                                                    <span *ngIf="!j.active" class="badge badge-pill badge-warning mr-1">Deactivated</span>
+                                                    <span *ngIf="j.active && !j.sheild" class="badge badge-pill badge-success mr-1">Open for Application</span>
+                                                    <span *ngIf="j.active && j.sheild" class="badge badge-pill badge-warning">Close for Application</span>
+                                                </h5>
+                                                <ul class="list-unstyled">
+                                                    <li><strong>Job ID :</strong> {{j.jobid}}</li>
+                                                    <li><strong>Company :</strong> {{j.company}}</li>
+                                                    <li><strong>Salary :</strong> {{j.salary}}</li>
+                                                    <li><strong>Location :</strong> {{j.location}}</li>
+                                                    <li><strong>Experience :</strong> {{j.experience}}</li>
+                                                    <li><strong>Publish Date :</strong> {{j.publishdate | date: 'mediumDate'}}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div ngbDropdown class="dropdown">
+                                        <button type="button" id="jobdropdown" ngbDropdownToggle class="btn p-0 no-dropdown-toggle-icon">
+                                            <i ngbTooltip="Settings" class="feather icon-settings icon-md text-muted pb-3px"></i>
+                                        </button>
+                                        <div ngbDropdownMenu aria-labelledby="jobdropdown">
+                                            <button (click)="editJob(j)" ngbDropdownItem><i class="feather icon-edit-2 icon-xs mr-2"></i> Edit Job</button>
+                                            <button *ngIf="!j.active" (click)="onActivate(j)" ngbDropdownItem><i class="feather icon-check-circle icon-xs mr-2"></i> Activate Job</button>
+                                            <button *ngIf="j.active" (click)="onDeactivate(j)" ngbDropdownItem><i class="feather icon-x-circle icon-xs mr-2"></i> Deactivate Job</button>
+                                            <button *ngIf="j.active && !j.sheild" (click)="onSheild(j)" ngbDropdownItem><i class="feather icon-shield icon-xs mr-2"></i> Close Application</button>
+                                            <button *ngIf="j.active && j.sheild" (click)="onSheild(j)" ngbDropdownItem><i class="feather icon-shield-off icon-xs mr-2"></i> Open Application</button>
+                                            <button *ngIf="(j.active || j.jobid)" (click)="application(j)" ngbDropdownItem><i class="feather icon-eye icon-xs mr-2"></i> View Applications</button>
+                                            <button (click)="onDelete(j)" ngbDropdownItem><i class="feather icon-trash-2 icon-xs mr-2"></i> Delete Job</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <h6>Job Details</h6> 
+                                <quill-view-html [content]="j.details" theme="snow"></quill-view-html>
+                            </div>
+                        </div>
+                        <hr>
+                    </li>
+                </ul>
+                <ngb-pagination 
+                    class="d-flex justify-content-end pagination-rounded" 
+                    [collectionSize]="totalSize" 
+                    [(page)]="currentPage"
+                    [pageSize]="pageSize"
+                    [maxSize]="5"
+                    [rotate]="true" 
+                    [boundaryLinks]="true"
+                    (pageChange)="pagechange()"
+                    >
+                </ngb-pagination>
+            </div>
+		</div>
+	</div>
+</div>

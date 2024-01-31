@@ -1,0 +1,29 @@
+.tree_title{
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.tree_nested{
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+
+.arrow{
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    &::before{
+        content: "";
+        font: normal normal normal 18px/1 feather;
+        color: black;
+        display: inline-block;
+        margin-right: 6px;
+    }
+}
+
+.arrow_down::before{
+    content: "";
+}

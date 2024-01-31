@@ -1,0 +1,124 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Jobs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Create Job</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+		<div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Add Job Details</h6>
+                <form #jobForm="ngForm" (ngSubmit)="jobForm.valid && submitForm(jobForm)"  class="forms-sample">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Title*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #title="ngModel" 
+                                    [(ngModel)]="job.title" 
+                                    name="title"
+                                    autocomplete="off" 
+                                    required
+                                    placeholder="Title">
+                                <p class="text-danger mt-1" *ngIf="title?.errors?.required && (jobForm.submitted || title.dirty || title.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Company*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #company="ngModel" 
+                                    [(ngModel)]="job.company" 
+                                    name="company"
+                                    autocomplete="off" 
+                                    required
+                                    placeholder="Company">
+                                <p class="text-danger mt-1" *ngIf="company?.errors?.required && (jobForm.submitted || company.dirty || company.touched)">This field is required.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Experience*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #experience="ngModel" 
+                                    [(ngModel)]="job.experience" 
+                                    name="experience"
+                                    autocomplete="off"
+                                    required
+                                    placeholder="Experience">
+                                <p class="text-danger mt-1" *ngIf="experience?.errors?.required && (jobForm.submitted || experience.dirty || experience.touched)">This field is required.</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Salary*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #salary="ngModel" 
+                                    [(ngModel)]="job.salary" 
+                                    name="salary"
+                                    autocomplete="off"
+                                    required
+                                    placeholder="Salary">
+                                <p class="text-danger mt-1" *ngIf="salary?.errors?.required && (jobForm.submitted || salary.dirty || salary.touched)">This field is required.</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Location*</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    #location="ngModel" 
+                                    [(ngModel)]="job.location" 
+                                    name="location"
+                                    autocomplete="off"
+                                    required
+                                    placeholder="Location">
+                                <p class="text-danger mt-1" *ngIf="location?.errors?.required && (jobForm.submitted || location.dirty || location.touched)">This field is required.</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Upload Image*</label>
+                                <input 
+                                    id="img"
+                                    type="file" 
+                                    accept="image/*"
+                                    name="img"
+                                    (change)="handelFileInput($event)"
+                                    class="file-upload-default" 
+                                    required
+                                >
+                                <div class="input-group col-xs-12" (click)="openFileBrowser($event)">
+                                    <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button">Browse</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Details*</label>
+                            <quill-editor  
+                                [(ngModel)]="job.details" 
+                                #details1="ngModel" 
+                                name="details"
+                                placeholder="Details"
+                                [styles]="{height:'213px'}" 
+                                [modules]="quillConfig"
+                                [required]="true"
+                                >
+                            </quill-editor>
+                            <p class="text-danger mt-1" *ngIf="details1?.errors?.required && (jobForm.submitted || details1.dirty || details1.touched)">This field is required.</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                </form>
+            </div>
+		</div>
+	</div>
+</div>

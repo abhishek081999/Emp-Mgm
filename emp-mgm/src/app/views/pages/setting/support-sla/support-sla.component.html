@@ -1,0 +1,292 @@
+<nav class="page-breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink=".">Setting</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Support Sla</li>
+  </ol>
+</nav>
+<div class="row">
+  <div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <form #myForm="ngForm" (ngSubmit)="myForm.valid && onSubmit()">
+          <h1 class="bold-text">New SLA policy</h1>
+
+          <div class="form-group medium-size">
+            <label for="name">Name <span class="required">*</span></label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="sla.name" required #nameInput="ngModel">
+            <div *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)" class="text-danger">
+              Name is required.
+            </div>
+          </div>
+
+          <div class="form-group small-size">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" [(ngModel)]="sla.description"
+              #descriptionInput="ngModel" required></textarea>
+            <div *ngIf="descriptionInput.invalid && (descriptionInput.dirty || descriptionInput.touched)"
+              class="text-danger">
+              Description is required.
+            </div>
+          </div>
+
+          <br><br><br>
+
+          <h3><b>When a ticket satisfies these conditions:</b></h3>
+          <div class="card">
+            <div class="card-body">
+              <p (click)="addNewCondition()" style="cursor: pointer;">
+                <span class="circle-icon" style="background-color: #69549b;">
+                  <i class="fas fa-plus" style="color: white;"></i>
+                </span>
+                Add new condition
+              </p>
+            </div>
+            <div *ngFor="let condition of sla.slacondition; let i = index" class="escalation-box">
+              <div class="condition-dropdown" style="width: 700px; height: 40px;">
+                <ng-select id="condition-select" name="condition-{{i}}" [(ngModel)]="condition.condition" required>
+                  <ng-option [value]="'group'">Group</ng-option>
+                  <ng-option [value]="'product'">Product</ng-option>
+                  <ng-option [value]="'type'">Type</ng-option>
+                  <ng-option [value]="'source'">Source</ng-option>
+                </ng-select>
+                <small *ngIf="!condition.condition" class="text-danger">Please select a condition.</small>
+                <br> <br><br><br><br>
+              </div>
+              <!-- Group dropdown -->
+              <div *ngIf="condition.condition === 'group'" class="input-field-container" style="margin-top: 10px;">
+                <ng-select name="items-{{i}}" [items]="submittedData" [(ngModel)]="condition.items" [multiple]="true">
+                  <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{ item.name }}</span>
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item.name }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <!-- Product dropdown -->
+              <div *ngIf="condition.condition === 'product'" class="input-field-container" style="margin-top: 10px;">
+                <ng-select name="items-{{i}}" [items]="productOptions" [(ngModel)]="condition.items" [multiple]="true">
+                  <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{ item }}</span>
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <!-- Type dropdown -->
+              <div *ngIf="condition.condition === 'type'" class="input-field-container" style="margin-top: 10px;">
+                <ng-select name="items-{{i}}" [items]="typeOptions" [(ngModel)]="condition.items" [multiple]="true">
+                  <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{ item }}</span>
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <!-- Source dropdown -->
+              <div *ngIf="condition.condition === 'source'" class="input-field-container" style="margin-top: 10px;">
+                <ng-select name="items-{{i}}" [items]="sourceOptions" [(ngModel)]="condition.items" [multiple]="true">
+                  <ng-template ng-label-tmp let-item="item">
+                    <span class="ng-value-label">{{ item }}</span>
+                  </ng-template>
+                  <ng-template ng-option-tmp let-item="item">
+                    {{ item }}
+                  </ng-template>
+                </ng-select>
+              </div>
+              <br>
+              <span class="delete-icon" (click)="deleteCondition(i)">
+                <i class="fas fa-trash"></i>
+              </span>
+            </div>
+          </div>
+
+          <br><br><br>
+          <h3><b>Set SLA target as:</b></h3>
+          <div class="card">
+            <table class="table">
+              <thead class="custom-thead">
+                <tr>
+                  <th>Priority</th>
+                  <th>First Response Time <span class="required">*</span></th>
+                  <th>Every Response Time <span class="required">*</span></th>
+                  <th>Resolution Time <span class="required">*</span></th>
+                  <th>Operational Hours <span class="required">*</span></th>
+                  <th>Escalation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let priority of sla.priorityModel; let i = index" class="priority-row">
+                  <td class="priority-cell">
+                    <span [style.color]="getPriorityColor(priority.name)" class="bullet">&#9679;</span> {{ priority.name
+                    }}
+                  </td>
+                  <td class="time-cell">
+                    <input type="number" [(ngModel)]="priority.firstResponseTime" [name]="'firstResponseTime' + i"
+                      #firstResponseTime="ngModel" placeholder="mins" class="time-input">
+                  </td>
+
+                  <td class="time-cell">
+                    <input type="number" [(ngModel)]="priority.everyResponseTime" [name]="'everyResponseTime' + i"
+                      #everyResponseTime="ngModel" placeholder="mins" class="time-input" required>
+                  </td>
+
+                  <td class="time-cell">
+                    <input type="number" [(ngModel)]="priority.resolutionTime" [name]="'resolutionTime' + i"
+                      #resolutionTime="ngModel" placeholder="mins" class="time-input">
+                  </td>
+
+                  <td class="operational-hours-cell">
+                    <select [(ngModel)]="priority.operationalHours" [name]="'operationalHours' + i"
+                      #operationalHours="ngModel" class="dropdown">
+                      <option>Calendar hours</option>
+                      <option>Business hours</option>
+                    </select>
+                  </td>
+
+                  <td class="escalation-cell">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="priority.escalation" [name]="'escalation' + i"
+                        #escalation="ngModel" class="form-control">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <br><br>
+
+          <h3><b>Remind agents when the SLA due time approaches</b></h3>
+          <div class="card">
+            <div class="card-header" style="text-align: center; color: black;">
+              <i class="fas fa-clock"></i>&nbsp; Set reminder to agents when the SLA due time approaches.
+            </div>
+            <div class="card-body">
+              <p (click)="addReminder()" style="cursor: pointer;">
+                <span class="circle-icon" style="background-color: rgb(96, 72, 150);">
+                  <i class="fas fa-plus" style="color: white;"></i>
+                </span>
+                Add new reminders
+              </p>
+              <div *ngFor="let instance of sla.reminderModel; let i = index" class="escalation-box">
+                <div class="form-group" style="display: inline-block; margin-right: 10px;">
+                  <label for="when" class="medium-label">When <span class="required">*</span></label> &nbsp;
+                  <ng-select [items]="responseTargets" [(ngModel)]="instance.when" #when="ngModel" name="when-{{i}}"
+                    required></ng-select>
+                  <div *ngIf="when.invalid && (when.dirty || when.touched)">
+                    <small class="text-danger">This field is required.</small>
+                  </div>
+                </div>
+
+                <div class="form-group" style="display: inline-block; margin-right: 10px;">
+                  <label for="approaches" class="medium-label">approaches <span class="required">*</span></label> &nbsp;
+                  <ng-select [items]="remainderTime" [(ngModel)]="instance.approaches" #approaches="ngModel"  bindValue="value" bindLabel="name"
+                    name="approaches-{{i}}" required></ng-select>
+                  <div *ngIf="approaches.invalid && (approaches.dirty || approaches.touched)">
+                    <small class="text-danger">This field is required.</small>                   
+                  </div>
+                </div>
+
+                <div class="form-group" style="display: inline-block; margin-right: 10px;">
+                  <label for="sendReminderTo" class="medium-label">send reminder to <span
+                      class="required">*</span></label> &nbsp;
+                  <ng-select [items]="employees" [multiple]="true" [(ngModel)]="instance.sendReminderTo"
+                    #sendReminderTo="ngModel" name="sendReminderTo-{{i}}" [searchFn]="StaffSearchFn" [searchable]="true"
+                    bindValue="invid" required>
+
+                    <ng-template ng-label-tmp let-item="item">
+                      <span class="ng-value-label">
+                        {{item.fullName}} - {{item.invid}}</span>
+                    </ng-template>
+
+                    <ng-template ng-option-tmp let-item="item">
+                      {{item.fullName}} - {{item.invid}}
+                    </ng-template>
+
+                  </ng-select>
+                  <div *ngIf="sendReminderTo.invalid && (sendReminderTo.dirty || sendReminderTo.touched)">
+                    <small class="text-danger">This field is required.</small>
+                  </div>
+                </div>
+
+                <span class="delete-icon" (click)="deleteReminders(i)">
+                  <i class="fas fa-trash"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <br><br>
+
+          <h3><b>Send escalation when the SLA is violated</b></h3>
+          <div class="card">
+            <div class="card-header" style="text-align: center; color: black;">
+              <i class="fas fa-envelope"></i>&nbsp; Set escalation whenever the SLA is been breached.
+            </div>
+            <div class="card-body">
+              <p (click)="addEscalation()" style="cursor: pointer;">
+                <span class="circle-icon" style="background-color: rgb(96, 72, 150);">
+                  <i class="fas fa-plus" style="color: white;"></i>
+                </span>
+                Add new escalation
+              </p>
+              <div *ngFor="let instance of sla.escalationModel; let i = index" class="escalation-box">
+
+                <div class="form-group" style="display: inline-block; margin-right: 10px;">
+                  <label for="when" class="medium-label">When <span class="required">*</span></label> &nbsp;
+                  <ng-select [items]="responseTargets" [(ngModel)]="instance.when" #when="ngModel" name="when-{{i}}"
+                    required></ng-select>
+                  <div *ngIf="instance.when === undefined || instance.when === null">
+                    <small class="text-danger">Please select a value for When.</small>
+                  </div>
+                </div>
+
+                <div class="form-group" style="display: inline-block; margin-right: 10px;">
+                  <label for="escalate" class="medium-label">is not met, escalate <span
+                      class="required">*</span></label> &nbsp;
+                  <ng-select [items]="escalationTime" [(ngModel)]="instance.isNotMet"  bindValue="value" bindLabel="name"
+                    name="isNotMet-{{i}}"></ng-select>
+                  <small *ngIf="!instance.isNotMet" class="text-danger">Please select an escalation time.</small>
+                </div>
+                
+                <div class="form-group" style="display: inline-block; margin-right: 10px;">
+                  <label for="to" class="medium-label">to <span class="required">*</span></label> &nbsp;
+                  <ng-select [items]="employees" [(ngModel)]="instance.escalateTo" name="escalateTo-{{i}}"
+                    #escalateTo="ngModel" [multiple]="true" [searchFn]="StaffSearchFn" [searchable]="true"
+                    bindValue="invid" required>
+                    <ng-template ng-label-tmp let-item="item">
+                      <span class="ng-value-label">
+                        {{item.fullName}} - {{item.invid}}</span>
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item">
+                      {{item.fullName}} - {{item.invid}}
+                    </ng-template>
+                  </ng-select>
+                  <div *ngIf="escalateTo.errors?.required && (escalateTo.dirty || escalateTo.touched)"
+                    class="text-danger">
+                    This field is required.
+                  </div>
+                </div>
+
+                <span class="delete-icon" style="display: inline-block; margin-right: 10px;"
+                  (click)="deleteEscalation(i)">
+                  <i class="fas fa-trash" style="background-color: white; padding: 5px;"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <br><br><br>
+          <div class="button-container text-right">
+            <button type="submit" class="btn btn-secondary" (click)="redirectToSupportSlaPage()">Cancel</button>
+            &nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

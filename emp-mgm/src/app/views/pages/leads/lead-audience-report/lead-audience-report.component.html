@@ -1,0 +1,146 @@
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink=".">Leads</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Leads Audience Report</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <h4 class="mb-3 mb-md-0">Leads Audience Report</h4>
+    <div class="d-flex align-items-center flex-wrap text-nowrap">
+        <div class="input-group border rounded-sm mr-2 mb-2 mb-md-0 d-md-none wd-md-250 d-xl-flex">
+            <div class="input-group border rounded-sm">
+                <div class="input-group-prepend">
+                    <div class="input-group-text border-0 rounded-sm">
+                        <i class="feather icon-search icon-sm cursor-pointer"></i>
+                    </div>
+                </div>
+                <ng-select 
+                    [items]="monthslabels"
+                    #months="ngModel"
+                    [(ngModel)]="month" 
+                    class="wd-md-200 border-0 rounded-sm" 
+                    name="months"
+                    placeholder="Search By Month" 
+                    (change)="onchange1()">
+                </ng-select>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-icon-text mb-2 mb-md-0" (click)="print()">Export</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        
+    </div>
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Experience In stock Market vs Gender                    
+                    <a placement="top" ngbTooltip="Based on Lead Genarate Date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a>
+                </h6>
+                <apx-chart
+                [series]="barChartOptions1.series"
+                [colors]="barChartOptions1.colors"
+                [grid]="barChartOptions1.grid"
+                [chart]="barChartOptions1.chart"
+                [xaxis]="barChartOptions1.xaxis"
+                ></apx-chart>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Occupation vs Gender                    
+                    <a placement="top" ngbTooltip="Based on Lead Genarate Date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a>
+                </h6>
+                <apx-chart
+                    [series]="barChartOptions2.series"
+                    [colors]="barChartOptions2.colors"
+                    [grid]="barChartOptions2.grid"
+                    [chart]="barChartOptions2.chart"
+                    [xaxis]="barChartOptions2.xaxis"
+                    ></apx-chart>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Age vs Gender                    
+                    <a placement="top" ngbTooltip="Based on Lead Genarate Date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a>
+                </h6>
+                <apx-chart
+                [series]="barChartOptions3.series"
+                [colors]="barChartOptions3.colors"
+                [grid]="barChartOptions3.grid"
+                [chart]="barChartOptions3.chart"
+                [xaxis]="barChartOptions3.xaxis"
+                ></apx-chart>
+            </div>
+        </div>
+    </div>
+ 
+</div>
+
+<div class="row">
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Experience In stock Market vs Gender (Convertion Rate) 
+                    <a placement="top" ngbTooltip="Based on Lead Assign Date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a>
+                </h6>
+                <apx-chart
+                [series]="barChartOptions1_conv.series"
+                [colors]="barChartOptions1_conv.colors"
+                [grid]="barChartOptions1_conv.grid"
+                [chart]="barChartOptions1_conv.chart"
+                [xaxis]="barChartOptions1_conv.xaxis"
+                [yaxis]="barChartOptions1_conv.yaxis"
+                [tooltip]="barChartOptions1_conv.tooltip"
+                [dataLabels]="barChartOptions1_conv.dataLabels"
+                ></apx-chart>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Occupation vs Gender (Convertion Rate)
+                    <a placement="top" ngbTooltip="Based on Lead Assign Date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a>
+                </h6>
+                <apx-chart
+                    [series]="barChartOptions2_conv.series"
+                    [colors]="barChartOptions2_conv.colors"
+                    [grid]="barChartOptions2_conv.grid"
+                    [chart]="barChartOptions2_conv.chart"
+                    [xaxis]="barChartOptions2_conv.xaxis"
+                    [yaxis]="barChartOptions2_conv.yaxis"
+                    [tooltip]="barChartOptions2_conv.tooltip"
+                    [dataLabels]="barChartOptions2_conv.dataLabels"
+                    ></apx-chart>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Age vs Gender (Convertion Rate)                    
+                    <a placement="top" ngbTooltip="Based on Lead Assign Date"><i class="small-icon" data-feather="help-circle" appFeatherIcon></i></a>
+                </h6>
+                <apx-chart
+                [series]="barChartOptions3_conv.series"
+                [colors]="barChartOptions3_conv.colors"
+                [grid]="barChartOptions3_conv.grid"
+                [chart]="barChartOptions3_conv.chart"
+                [xaxis]="barChartOptions3_conv.xaxis"
+                [yaxis]="barChartOptions3_conv.yaxis"
+                [tooltip]="barChartOptions3_conv.tooltip"
+                [dataLabels]="barChartOptions3_conv.dataLabels"
+                ></apx-chart>
+            </div>
+        </div>
+    </div>
+</div>
